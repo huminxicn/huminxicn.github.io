@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/img/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,基础," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java 基础笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 基础">
+<meta property="og:url" content="https://huminxi.netlify.com/2021/11/03/Java%20%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="Java 基础笔记。">
+<meta property="og:locale">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/08/jdk-jre-jvm.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/08/java-compile.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/09/parent-delegate.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/09/exception-structures.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/09/threadLocal.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/09/thread-pool-process.png">
+<meta property="article:published_time" content="2021-11-03T12:10:56.000Z">
+<meta property="article:modified_time" content="2022-02-24T02:44:18.931Z">
+<meta property="article:author" content="胡匪">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2021/08/jdk-jre-jvm.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huminxi.netlify.com/2021/11/03/Java 基础/"/>
+
+
+
+
+
+  <title>Java 基础 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">黄枫谷</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">勿在浮沙筑高台。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2021/11/03/Java%20%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/huangfenggu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java 基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-03T20:10:56+08:00">
+                2021-11-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java 基础笔记。</p>
+<span id="more"></span>
+
+<h2 id="1-面向对象"><a href="#1-面向对象" class="headerlink" title="1 面向对象"></a>1 面向对象</h2><h3 id="什么是面向对象"><a href="#什么是面向对象" class="headerlink" title="什么是面向对象"></a>什么是面向对象</h3><ul>
+<li><p>面向对象和面向过程是两种不同的处理问题的角度。面向过程更注重事情的每一个步骤及顺序，面向对象更注重事情有哪些参与者（对象）及各自需要做什么。</p>
+</li>
+<li><p>示例：洗衣机洗衣服</p>
+<ul>
+<li>面向过程会将任务拆解成一系列的步骤（函数）：1.打开洗衣机 &#x3D;&gt; 2.放衣服 &#x3D;&gt; 3.放洗衣液 &#x3D;&gt; 4.清洗 &#x3D;&gt; 5.烘干 </li>
+<li>面向对象会拆出人和洗衣机两个对象：<ul>
+<li>人：打开洗衣机、放衣服、放洗衣液</li>
+<li>洗衣机：清洗、烘干</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>总结</p>
+<ul>
+<li>面向过程比较直接高效，面向对象更易于复用、扩展和维护。</li>
+</ul>
+</li>
+</ul>
+<h3 id="面向对象的三大特征"><a href="#面向对象的三大特征" class="headerlink" title="面向对象的三大特征"></a>面向对象的三大特征</h3><ul>
+<li>封装<ul>
+<li>明确标识出允许外部使用的成员函数和数据项。内部细节对外部调用透明。</li>
+</ul>
+</li>
+<li>继承<ul>
+<li>继承父类的方法和属性，并作出自己的扩展。</li>
+</ul>
+</li>
+<li>多态<ul>
+<li>允许将子类类型的引用赋值给父类类型的引用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-JDK、JRE、JVM-三者区别和联系"><a href="#2-JDK、JRE、JVM-三者区别和联系" class="headerlink" title="2 JDK、JRE、JVM 三者区别和联系"></a>2 JDK、JRE、JVM 三者区别和联系</h2><ul>
+<li>JDK<ul>
+<li>Java Develpment Kit </li>
+<li>java 开发工具</li>
+</ul>
+</li>
+<li>JRE<ul>
+<li>Java Runtime Environment </li>
+<li>java 运行时环境</li>
+</ul>
+</li>
+<li>JVM<ul>
+<li>Java Virtual Machine </li>
+<li>java 虚拟机</li>
+</ul>
+</li>
+</ul>
+<img jdk-jre-jvm src="/img/hufei/2021/08/jdk-jre-jvm.png" width="100%" height="100%">
+
+<h2 id="3-x3D-x3D-和-equals-比较"><a href="#3-x3D-x3D-和-equals-比较" class="headerlink" title="3 &#x3D;&#x3D; 和 equals 比较"></a>3 &#x3D;&#x3D; 和 equals 比较</h2><ul>
+<li>&#x3D;&#x3D; 对比的是栈中的值，基本数据类型是变量值，引用类型是队中内存对象的地址。</li>
+<li>equals：Object 中默认是采用 &#x3D;&#x3D; 比较，通常会重写。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object obj)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">this</span> == obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="4-final"><a href="#4-final" class="headerlink" title="4 final"></a>4 final</h2><h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li>修饰类：表示类不可被继承。</li>
+<li>修饰方法：表示方法不可被子类覆盖，但是可以重载。</li>
+<li>修饰变量：如果是基本数据类型的变量，则其数值在初始化之后不能修改；如果是引用类型的变量，则初始化之后不能指向另一个对象，但引用的值可以改。<ul>
+<li>类变量：在静态初始化块中指定初始值、或声明该变量的时候指定初始值。</li>
+<li>成员变量：在非静态初始化块、声明该变量时或构造器中指定初始值。</li>
+<li>局部变量：系统不会为局部变量初始化，局部变量必须由程序员显示初始化。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FinalVar</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">0</span>;<span class="comment">//在静态初始化块中指定初始值、或声明该变量的时候指定初始值。</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    static &#123;</span></span><br><span class="line"><span class="comment">        a =1;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">final</span> <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">1</span>; <span class="comment">//在非静态初始化块、声明该变量时或构造器中指定初始值。</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    &#123;</span></span><br><span class="line"><span class="comment">        b=1;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="type">int</span> localA;<span class="comment">//局部变量只声明没有初始化，不会报错，与 final 无关。</span></span><br><span class="line">        localA = <span class="number">0</span>;<span class="comment">//在使用之前一定要赋值。</span></span><br><span class="line">        <span class="comment">//localA = 1;//不允许第二次赋值。</span></span><br><span class="line">        System.out.println(localA);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FinalReference</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="type">int</span>[] arr = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line">        arr[<span class="number">2</span>] = <span class="number">3</span>;<span class="comment">//合法</span></span><br><span class="line">        <span class="comment">//arr = null;//非法，不能二次赋值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="为什么局部内部类和匿名内部类只能访问局部-final-变量"><a href="#为什么局部内部类和匿名内部类只能访问局部-final-变量" class="headerlink" title="为什么局部内部类和匿名内部类只能访问局部 final 变量"></a>为什么局部内部类和匿名内部类只能访问局部 final 变量</h3><ul>
+<li>内部类和外部类是处于同一个级别的，内部类不会因为定义在方法中就随着方法的执行完毕就被销毁。</li>
+<li>这里就会产生一个问题，当外部类的方法结束时，局部变量会被销毁，但是内部类对象可能还存在。这样内部类对象就会访问一个不存在的变量。</li>
+<li>为了解决这个问题，就将局部变量复制一份作为内部类的成员变量，这样当局部变量死亡后，内部类仍然可以访问它，实际访问的是局部变量的 copy。</li>
+<li>将局部变量复制为内部类的成员变量时，必须保证这两个变量是一样的。所以需要用 final 来修饰局部变量。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FinalOutClass</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">age</span> <span class="operator">=</span> <span class="number">12</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">outPrint</span><span class="params">(<span class="keyword">final</span> <span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">class</span> <span class="title class_">InnerClass</span> &#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">InPrint</span><span class="params">()</span> &#123;</span><br><span class="line">                System.out.println(age);</span><br><span class="line">                System.out.println(x);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InnerClass</span>().InPrint();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="5-String、StringBuffer、StringBuilder-区别及使用场景"><a href="#5-String、StringBuffer、StringBuilder-区别及使用场景" class="headerlink" title="5 String、StringBuffer、StringBuilder 区别及使用场景"></a>5 String、StringBuffer、StringBuilder 区别及使用场景</h2><ul>
+<li>String 是 final 修饰的，不可变，每次操作都会产生新的 String 对象。</li>
+<li>StringBuffer 和 StringBuilder 都是在原对象上操作。</li>
+<li>StringBuffer 是线程安全的（方法都是由 synchronize 修饰的），StringBuilder 线程不安全。</li>
+<li>性能：StringBuilder &gt; StringBuffer &gt; String</li>
+<li>场景：经常需要改变字符串内容时使用后面两个。优先使用 StringBuilder，多线程使用共享变量时使用 StringBuffer。</li>
+</ul>
+<h2 id="6-重载和重写的区别"><a href="#6-重载和重写的区别" class="headerlink" title="6 重载和重写的区别"></a>6 重载和重写的区别</h2><ul>
+<li>重载<ul>
+<li>发生在同一个类中，方法名相同，参数类型不同、个数不同、顺序不同。</li>
+<li>方法返回值和修饰符可以不同。</li>
+<li>发生在编译时期。</li>
+</ul>
+</li>
+<li>重写<ul>
+<li>发生在父子类中，方法名、参数列表必须相同。</li>
+<li>返回值范围小于等于父类，抛出异常范围小于等于父类，访问修饰符范围大于等于父类。</li>
+<li>如果父类方法访问修饰符为 private，则子类就不能重写该方法。</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-接口和抽象类的区别"><a href="#7-接口和抽象类的区别" class="headerlink" title="7 接口和抽象类的区别"></a>7 接口和抽象类的区别</h2><h3 id="语法区别"><a href="#语法区别" class="headerlink" title="语法区别"></a>语法区别</h3><ul>
+<li>抽象类可以存在普通成员函数，而接口中只能存在 public abstract 方法（JDK 1.8 之后接口中允许有 default 方法）。</li>
+<li>抽象类中的成员变量可以是各种类型的，而接口中的成员变量只能是 public static final 类型的。</li>
+<li>抽象类只能继承一个，接口可以实现多个。</li>
+</ul>
+<h3 id="设计区别"><a href="#设计区别" class="headerlink" title="设计区别"></a>设计区别</h3><ul>
+<li>抽象类主要是为了代码复用。而接口更像是一种规约，实现这个接口的类都需要遵守这个规约。</li>
+<li>抽象类是对类本质的抽象，表示的是 is a 的关系。而接口是对行为的抽象，表达的是 like a 的关系。</li>
+</ul>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><p>当你关注一个事务的本质的时候，用抽象类；当你关注一个动作的时候，用接口。</p>
+<h2 id="8-List-和-Set-的区别"><a href="#8-List-和-Set-的区别" class="headerlink" title="8 List 和 Set 的区别"></a>8 List 和 Set 的区别</h2><ul>
+<li>List<ul>
+<li>有序，按元素进入的顺序保存。</li>
+<li>可重复，允许多个 null 元素。</li>
+<li>可以使用 Iterator 遍历，也可以使用 get() 获取指定下标的元素。</li>
+</ul>
+</li>
+<li>Set<ul>
+<li>无序</li>
+<li>不可重复</li>
+<li>最多允许一个 null 元素。</li>
+<li>只能使用 Iterator 遍历。</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-hashCode-和-equals"><a href="#9-hashCode-和-equals" class="headerlink" title="9 hashCode 和 equals"></a>9 hashCode 和 equals</h2><ul>
+<li>hashCode() 的作用是获取 hash 值，也称散列码。hashCode() 默认是将对象的地址转换成一个  int 型整数。</li>
+<li>这个 hash 值可以用来确定对象在哈希表中的位置。<ul>
+<li>例如，对象加入 HashSet 时，HashSet 会先计算对象的 hashCode() 值来判断对象加入的位置，如果该位置没有对象，HashSet 会假设对象没有重复出现；如果有对象，这时会调用 equals 方法来检查两个对象是否真的相同，如果对象相同，就会重新散列到其它位置。</li>
+</ul>
+</li>
+<li>两个对象相等，则 hashCode 一定是相同的。</li>
+<li>两个对象相等，两个对象分别调用 equals 方法时返回 true。</li>
+<li>两个对象的 hashCode 相同，它们不一定相等（存在哈希碰撞的情况）。</li>
+<li>因此，equals 方法被覆写时，hashCode() 方法也要覆写。</li>
+</ul>
+<h2 id="10-ArrayList-和-LinkedList-区别"><a href="#10-ArrayList-和-LinkedList-区别" class="headerlink" title="10 ArrayList 和 LinkedList 区别"></a>10 ArrayList 和 LinkedList 区别</h2><ul>
+<li><p>ArrayList</p>
+<ul>
+<li>基于动态数组，连续内存存储，适合下标访问（随机访问）。</li>
+<li>扩容机制<ul>
+<li>因为数组长度固定，超出长度存数据时需要新建数组，然后将老数组的数据拷贝到新数组。</li>
+<li>使用尾插法并制定初始容量可以极大提升性能，甚至超过 LinkedList（需要创建大量 node 对象）。 如果不使用尾插法，会涉及到元素的移动。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>LinkedList</p>
+<ul>
+<li>基于链表，可以存储在分散的内存中，适合做数据的插入及删除操作，不适合做查询。</li>
+<li>遍历 LinkedList 必须要使用 Iterator，不能使用 for 循环。因为 for 循环内通过 get(i) 取得某一元素时都要对 list 重新遍历，效率低下。</li>
+</ul>
+</li>
+</ul>
+<h2 id="11-HashMap-和-HashTable-的区别"><a href="#11-HashMap-和-HashTable-的区别" class="headerlink" title="11 HashMap 和 HashTable 的区别"></a>11 HashMap 和 HashTable 的区别</h2><h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
+<li>HashMap 方法没有 synchronized 修饰，线程不安全，HashTable 线程安全。</li>
+<li>HashMap 允许 key 和 value 为 null，而 HashTable 不允许。</li>
+</ul>
+<h3 id="底层实现"><a href="#底层实现" class="headerlink" title="底层实现"></a>底层实现</h3><ul>
+<li>JDK 8 开始，链表高度达到 8，数组长度超过 64，链表转变为红黑树。</li>
+<li>元素以内部类 Node 节点存在。</li>
+<li>计算 key 的 hash 值，二次 hash 然后对数组长度取模，对应到数组下班。</li>
+<li>如果没有产生 hash 冲突，则直接创建 Node 存入数组。</li>
+<li>如果产生 hash 冲突，先进行 equals 比较，相同则取代该元素，不同，则判断链表高度插入链表。<ul>
+<li>链表高度达到 8，并且数组长度到 64 则转变为红黑树。</li>
+<li>长度低于 6 则将红黑树转回链表。</li>
+</ul>
+</li>
+<li>key 为 null，存在下标 0 的位置。</li>
+<li>采用数组来保存 Node 节点。</li>
+</ul>
+<h2 id="12-ConcurrentHashMap-原理"><a href="#12-ConcurrentHashMap-原理" class="headerlink" title="12 ConcurrentHashMap 原理"></a>12 ConcurrentHashMap 原理</h2><h3 id="JDK-7"><a href="#JDK-7" class="headerlink" title="JDK 7"></a>JDK 7</h3><ul>
+<li>数据结构<ul>
+<li>ReentrantLock + Segment + HashEntry</li>
+<li>一个 Segment 中包含一个 HashEntry 数组，每个 HashEntry 又是一个链表结构。</li>
+</ul>
+</li>
+<li>元素查询<ul>
+<li>二次 hash，第一次 hash 定位到 Segment，第二次 hash 定位到元素所在的链表的头部。</li>
+</ul>
+</li>
+<li>锁<ul>
+<li>Segment 分段锁。Segment 继承了 ReentrantLock，锁定操作的 Segment，其它的 Segment 不受影响，并发度为 Segment 个数。</li>
+<li>可以通过构造函数指定，数组扩容不会影响其它的 Segment。</li>
+</ul>
+</li>
+<li>get 方法无需加锁，volatile 保证</li>
+</ul>
+<h3 id="JDK-8"><a href="#JDK-8" class="headerlink" title="JDK 8"></a>JDK 8</h3><ul>
+<li>数据结构<ul>
+<li>synchronized+ CAS + Node + 红黑树， Node 的 val 和 next 都用 volatile 修饰，保证可见性。</li>
+</ul>
+</li>
+<li>查找，替换，赋值操作都使用 CAS</li>
+<li>锁<ul>
+<li>锁链表的 head 节点，不影响其他元素的读写，锁粒度更细，效率更高。扩容时，阻塞所有的读写操作、并发扩容。</li>
+</ul>
+</li>
+<li>读操作无锁<ul>
+<li>Node 的 val 和 next 使用 volatile 修饰，读写线程对该变量互相可见。</li>
+<li>数组用 volatile 修饰，保证扩容时被读线程感知。</li>
+</ul>
+</li>
+</ul>
+<h2 id="13-如何实现一个-IOC-容器"><a href="#13-如何实现一个-IOC-容器" class="headerlink" title="13 如何实现一个 IOC 容器"></a>13 如何实现一个 IOC 容器</h2><ul>
+<li>配置文件中指定需要扫描的包路径</li>
+<li>定义一些注解。分别表示访问控制层、业务服务层、数据持久层、依赖注入、获取配置文件的注解。</li>
+<li>从配置文件中获取需要扫描的包路径，获取到当前路径下的文件信息及文件夹信息，我们将当前路径下所有以 .class 结尾的文件添加到一个 Set 集合中进行存储。</li>
+<li>遍历这个 Set 集合，获取有指定注解的类，并将其交给 IOC 容器，定义一个安全的 Map 用来存储这些对象。</li>
+<li>遍历这个 IOC 容器，获取到每一个类的实例，判断里面是否有依赖其他类的实例，然后进行递归注入。</li>
+</ul>
+<h2 id="14-什么是字节码，作用是什么"><a href="#14-什么是字节码，作用是什么" class="headerlink" title="14 什么是字节码，作用是什么"></a>14 什么是字节码，作用是什么</h2><h3 id="什么是字节码"><a href="#什么是字节码" class="headerlink" title="什么是字节码"></a>什么是字节码</h3><ul>
+<li>Java 中引入了虚拟机的概念，即在机器和编译程序之间加入了一层抽象的虚拟机器，这层虚拟机器在任何平台都提供了统一的接口给编译程序。</li>
+<li>编译程序只需要面向虚拟机，生产虚拟机能够理解的代码，然后由解释器来讲虚拟机代码转换为特定系统的机器码执行。</li>
+<li>在 Java 中，这种供虚拟机理解的代码叫做<strong>字节码</strong>(即 .class 文件)，它不面向任何特定的机器，只面向虚拟机。</li>
+<li>每一种平台的解释器是不同的。Java 源程序经过编译器之后变成字节码，字节码由虚拟机解释执行，虚拟机将每一条要执行的字节码送给解释器，解释器将其翻译成特定机器上的机器码，然后再运行。<strong>这也就解释了 Java 是编译和解释并存的特点。</strong></li>
+</ul>
+<img  java-compile src="/img/hufei/2021/08/java-compile.png" width="100%" height="100%">
+
+<h3 id="字节码的作用"><a href="#字节码的作用" class="headerlink" title="字节码的作用"></a>字节码的作用</h3><p>Java 语言通过字节码的方式，在一定程度上解决了传统解释型语言执行效率低的问题，同时又保留了解释型语言可移植的特点。Java 程序经过一次编译，就能在不同的机器上执行。</p>
+<h2 id="15-Java-类加载器有哪些"><a href="#15-Java-类加载器有哪些" class="headerlink" title="15 Java 类加载器有哪些"></a>15 Java 类加载器有哪些</h2><h3 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3><ul>
+<li>BootStrapClassLoader <ul>
+<li>启动类加载器</li>
+<li>是 extClassLoader 的父加载器，负责加载 %JAVA_HOME%&#x2F;lib 下的 jar 包和 class 文件。</li>
+</ul>
+</li>
+<li>ExtClassLoader <ul>
+<li>扩展类加载器</li>
+<li>是 AppClassLoader 的父加载器，负责加载 %JAVA_HOME&#x2F;lib&#x2F;ext 文件夹下的 jar 包和 class 文件。</li>
+</ul>
+</li>
+<li>AppClassLoader <ul>
+<li>是自定义类加载器的父加载器，负责加载 classpath 下的类文件。</li>
+<li>系统类加载器，线程上下文加载器。</li>
+</ul>
+</li>
+<li>可以通过继承 ClassLoader 类，实现自定义的类加载器。</li>
+</ul>
+<h3 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h3><ul>
+<li>安全<ul>
+<li>避免用户自己编写的类动态替换 Java 的一些核心类，比如 String。</li>
+</ul>
+</li>
+<li>避免类的重复加载<ul>
+<li>因为 JVM 中区分不同类，不仅仅是根据类的全限定名，相同的 class 文件被不同的 ClassLoader 加载就是不同的两个类。</li>
+</ul>
+</li>
+</ul>
+<img parent-delegate src="/img/hufei/2021/09/parent-delegate.png" width="100%" height="100%">
+
+
+<h2 id="16-Java-中的异常体系"><a href="#16-Java-中的异常体系" class="headerlink" title="16 Java 中的异常体系"></a>16 Java 中的异常体系</h2><ul>
+<li>Java 中所有异常都来自顶级父类 Throwable。</li>
+<li>Throwable 下有两个子类 Exception 和 Error。</li>
+<li>Error 是程序无法处理的错误，一旦出现这个错误，则程序将被迫停止运行。</li>
+<li>Exception 不会导致程序停止，又分为两个部分：<ul>
+<li>RuntimeException 常常发生在程序运行过程中，会导致当前线程执行失败。</li>
+<li>Checked Exception 常常发生在程序编译过程中个，会导致编译不通过。</li>
+</ul>
+</li>
+</ul>
+<img exception-structures src="/img/hufei/2021/09/exception-structures.png" width="100%" height="100%">
+
+
+<h2 id="17-GC-如何判断对象可以被回收"><a href="#17-GC-如何判断对象可以被回收" class="headerlink" title="17 GC 如何判断对象可以被回收"></a>17 GC 如何判断对象可以被回收</h2><ul>
+<li>引用记数法。<ul>
+<li>每个对象有一个引用计数属性，新增一个引用时计数加 1，计数为 0 时可以回收。</li>
+<li>可能会出现 A 引用了 B，B 又引用了 A。这样计数器就一直 &#x3D;1，无法回收。</li>
+</ul>
+</li>
+<li>可达性分析法。<ul>
+<li>从 GC Roots 开始向下搜索，搜索走过的路径被称为引用链。当一个对象到 GC Roots 没有任何引用链相连时，则证明此对象是不可用的，虚拟机可回收。</li>
+<li>GC Roots 对象<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象</li>
+<li>方法去中类静态属性引用的对象</li>
+<li>方法去中常量引用的对象</li>
+<li>本地方法栈中 JNI（即 Native 方法）引用的对象</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Java GC 使用的是可达性分析算法。<ul>
+<li>不可达对象并不是立即死亡的，对象拥有一次自我拯救的机会。对象被系统宣告死亡至少要经过两次标记过程<ul>
+<li>第一次是经过可达性分析发现没有与 GC Roots 相连的引用链</li>
+<li>第二次是在 GC（Garbage Collection） 建立的 Finalizer 队列中判断是否需要执行 finalize() 方法。</li>
+</ul>
+</li>
+<li>GC 会判断该对象是否重写了 finalize 方法。<ul>
+<li>未重写，直接回收。</li>
+<li>已重写，若对象未执行过 finalize 方法，将其放入 F-Queue 队列，由一低优先级线程执行该队列中对象的 finalize 方法。执行完 finalize 方法之后，GC 会再次判断该对象是否可达。     <ul>
+<li>还是不可达，则进行回收。</li>
+<li>否则，对象复活。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>每个对象只能触发一次 finalize() 方法。<ul>
+<li>由于 finalize() 方法运行代价高昂，不确定性大，无法保证各个对象的调用顺序，不推荐大家使用，建议忽略这个方法。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="18-线程的生命周期，线程有几种状态"><a href="#18-线程的生命周期，线程有几种状态" class="headerlink" title="18 线程的生命周期，线程有几种状态"></a>18 线程的生命周期，线程有几种状态</h2><ul>
+<li>线程通常有五种状态<ul>
+<li>新建状态（New）：新创建了一个线程对象。</li>
+<li>就绪状态（Runnable）：线程对象创建后，其它线程调用了该对象的 start 方法。该状态的线程位于可运行线程池中，等待获取 CPU 的使用权。</li>
+<li>运行状态（Running）：就绪状态的线程获取了 CPU，执行程序代码。</li>
+<li>阻塞状态（Blocked）：阻塞状态是线程因为某种原因放弃 CPU 使用权，暂时停止运行。直到线程进入就绪状态，才有机会转到运行状态。<ul>
+<li>等待阻塞：运行的线程执行 wait 方法，该现场会释放占用的所有资源，JVM 会把该线程放入等待池中。进入这个状态后，是不能自动唤醒的，必须依靠其它线程调用 notify 或 notifyAll 方法才能被唤醒。</li>
+<li>同步阻塞：运行的线程在获取对象的同步锁时，若该同步锁被别的线程占用，则 JVM 会把该线程放入锁池中。</li>
+<li>其它阻塞：运行的线程执行 sleep 或 join 方法，或者发出了 I&#x2F;O 请求，JVM 会把该线程设置为阻塞状态、当 sleep 状态超时、join 等待线程终止或超时、I&#x2F;O 处理完毕时，线程重新转入就绪状态。</li>
+</ul>
+</li>
+<li>死亡状态（Dead）：线程执行完了或者因异常退出了 run 方法，该线程结束生命周期。</li>
+</ul>
+</li>
+</ul>
+<h2 id="19-sleep、wait、join、yield-的区别"><a href="#19-sleep、wait、join、yield-的区别" class="headerlink" title="19 sleep、wait、join、yield 的区别"></a>19 sleep、wait、join、yield 的区别</h2><ul>
+<li><p>锁池</p>
+<ul>
+<li>所有需要竞争同步锁的线程都会放在锁池中。</li>
+<li>比如当前对象的锁已经被其中一个线程得到，则其它线程需要在这个锁池进行等待。当前面的线程释放同步锁后，锁池中的线程去竞争同步锁，竞争到的线程会进入就绪队列，等待 CPU 资源分配。</li>
+</ul>
+</li>
+<li><p>等待池</p>
+<ul>
+<li>当我们调用 wait 方法后，线程会放到等待池中，等待池中的线程不会竞争同步锁。</li>
+<li>只有调用了 notify 或 notifyAll 方法后，等待池的线程才会开始去竞争所。</li>
+<li>notify 是随机从等待池选出一个线程放到锁池，notifyAll 是将等待池的所有线程放到锁池中。</li>
+</ul>
+</li>
+<li><p>sleep 是 Thread 类的静态本地方法， wait 是 Object 类的本地方法。</p>
+</li>
+<li><p>sleep 不会释放锁，wait 会释放锁，而且会加入到等待队列中。</p>
+</li>
+<li><p>sleep 不依赖与同步器 synchronized，wait 需要依赖 synchronized 关键字。</p>
+</li>
+<li><p>sleep 不需要被唤醒（休眠之后退出阻塞），wait 需要（不指定时间需要被别人中断）。</p>
+</li>
+<li><p>sleep 一般用于当前线程休眠，或者轮训暂停操作，wait 多用于多线程之间的通信。</p>
+</li>
+<li><p>sleep 会让出 CPU 执行时间且强制上下文切换，wait 则不一定，wait 后可能还是有机会重新竞争到锁继续执行的。</p>
+</li>
+<li><p>yield 执行之后线程直接进入就绪状态，马上释放了 cpu 的执行权，但依然保留了 cpu 的执行资格。所以有可能下次线程调度还会让这个线程获取到执行权，继续执行。</p>
+</li>
+<li><p>join 执行后线程进入阻塞状态。例如在线程 B 中调用线程 A 的 join，那线程 B 会进入阻塞队列，知道线程 A 执行结束或中断。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadJoin</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">t1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    System.out.println(<span class="string">&quot;t1 执行中...&quot;</span>);</span><br><span class="line">                    Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">                    System.out.println(<span class="string">&quot;t1 执行结束。&quot;</span>);</span><br><span class="line">                &#125;<span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        t1.join();</span><br><span class="line">        <span class="comment">//这行代码必须要等待 t1 全部执行完毕，才会执行。</span></span><br><span class="line">        System.out.println(<span class="string">&quot;hello world&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="20-说说你对线程安全的理解"><a href="#20-说说你对线程安全的理解" class="headerlink" title="20 说说你对线程安全的理解"></a>20 说说你对线程安全的理解</h2><ul>
+<li>当多个线程访问同一个对象时，如果不用进行额外的同步控制或其他的协调操作，调用这个对象的行为都可以获得正确的结果，我们就说这个对象是线程安全的。</li>
+<li>堆是进程和线程共享的空间，分全局堆和局部堆。<ul>
+<li>全局堆就是所有没有分配的空间，局部堆就是用户分配的空间。</li>
+<li>堆在操作系统对进程初始化的时候分配，运行过程中也可以向系统要额外的堆，但是用完了要还给操作系统，要不然就是内存泄露。</li>
+</ul>
+</li>
+<li>栈是每个线程独有的，保存其运行状态和局部变量的。<ul>
+<li>栈在线程开始的时候初始化，每个线程的栈互相独立，因此，栈是线程安全的。</li>
+<li>操作系统在切换线程的时候回自动切换栈。</li>
+<li>栈空间不需要显示的分配和释放。</li>
+</ul>
+</li>
+<li>目前主流操作系统都是多任务的，即多个进程同时运行。为了保证安全，每个进程只能访问分配给自己的内存空间，而不能访问其它的进程内存空间，这是由操作系统保障的（通过虚拟内存技术，让每个进程以为自己在独占内存空间）。</li>
+<li>在每个进程的内存空间中都会有一块特殊的公共区域，通常称为堆，进程内的的所有线程都可以访问到该区域，这就是线程不安全的根本原因。</li>
+</ul>
+<h2 id="21-Thread、Runnable-的区别"><a href="#21-Thread、Runnable-的区别" class="headerlink" title="21 Thread、Runnable 的区别"></a>21 Thread、Runnable 的区别</h2><ul>
+<li>Thread 和 Runnable 的实质上是继承关系，没有可比性。无论使用 Runnable 还是 Thread，都会 new Thread，然后执行 run 方法。</li>
+<li>用法上，如果有复杂的线程操作需求，那就选择继承 Thread，如果只是简单的执行一个任务，那就实现 runnable。</li>
+</ul>
+<h2 id="22-对守护线程的理解"><a href="#22-对守护线程的理解" class="headerlink" title="22 对守护线程的理解"></a>22 对守护线程的理解</h2><ul>
+<li>守护线程为所有非守护线程提供服务，任何一个守护线程都是整个 JVM 中所有非守护线程的保姆。</li>
+<li>守护线程类似于整个进程的一个默默无闻的小喽啰，它的生死无关重要，它却依赖整个进程而运行。哪天其它线程结束了，没有必要执行了，程序就结束了，理都没理守护线程，就把它中断了。</li>
+<li>由于守护线程的终止是自身无法控制的，因此千万不要把 IO、File 等重要逻辑分配给它，因为它不靠谱。</li>
+<li>GC 垃圾回收线程就是一个经典的守护线程，当我们的程序中不再有任何运行的 Thread，程序就不会再产生垃圾，垃圾收集器也就无事可做，所以当垃圾回收线程是 JVM 上仅剩的线程时，垃圾回收线程会自动离开。它始终在低优先级的状态中运行，用于实时监控和管理系统中的可回收资源。</li>
+<li>thread.setDaemon(true) 必须在 thread.start() 之前设置，否则会抛出 IllegalThreadStateException，你不能把正在运行的线程设置为守护线程。</li>
+<li>在 Daemon 线程中产生的新线程也是 Daemon 的。</li>
+</ul>
+<h2 id="23-强引用和弱引用"><a href="#23-强引用和弱引用" class="headerlink" title="23 强引用和弱引用"></a>23 强引用和弱引用</h2><ul>
+<li>强引用<ul>
+<li>使用最普遍的引用（new），一个对象具有强引用，不会被垃圾回收器回收。当内存空间不足，JVM 宁愿抛出 OutOfMemoryError 错误，使程序异常终止，也不回收这种对象。</li>
+<li>如果想取消强引用和某个对象之间的关联，可以显示的将引用赋值为 null，这样 JVM 就会在合适的时间回收该对象。</li>
+</ul>
+</li>
+<li>弱引用<ul>
+<li>JVM 进行垃圾回收时，无论内存是否充足，都会回收被弱引用关联的对象。在 Java 中，用 java.lang.ref.WeakReference 类来表示。可以在缓存中使用弱引用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="24-ThreadLocal-的原理和使用场景"><a href="#24-ThreadLocal-的原理和使用场景" class="headerlink" title="24 ThreadLocal 的原理和使用场景"></a>24 ThreadLocal 的原理和使用场景</h2><ul>
+<li><p>ThreadLocal 的实现原理，每一个 Thread 维护一个 ThreadLocalMap，key 为使用弱引用的 ThreadLocal 实例，value 为线程变量的副本。</p>
+</li>
+<li><p>ThreadLocalMap 由一个 Entry 对象构成。</p>
+<ul>
+<li>Entry 继承自 <code>WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</code>，一个 Entry 由 ThreadLocal 对象和 Object 构成。由此可见，Entry 的 key 是 ThreadLocal 对象，并且是一个弱引用。当没指向 Key 的强引用后，该 key 就会被垃圾收集器会后。</li>
+<li>当指向 set 方法时，ThreadLocal 首先会获取当前线程对象，然后获取当前线程的 ThreadLocalMap 对象。再以当前 ThreadLocal 对象为 key，将值存储进 ThreadLocalMap 对象中。</li>
+<li>get 方法执行过程类似。ThreadLocal 首先会获取当前线程对象，然后获取当前线程的 ThreadLocalMap 对象，再以当前 ThreadLocal 对象为 key，获取对应的 value。</li>
+</ul>
+</li>
+<li><p>ThreadLocalMap 是线程私有的，因此不会出现线程安全性问题。</p>
+</li>
+<li><p>使用场景</p>
+</li>
+</ul>
+<ul>
+<li>在进行对象跨层传递的时候，使用 ThreadLocal 可以避免多次传递，打破层次间的约束。</li>
+<li>线程间数据隔离。</li>
+<li>进行实物操作，用于存储线程事务信息。</li>
+<li>数据库连接，Session 会话管理。<ul>
+<li>Spring 框架在事务开始时会给当前线程绑定一个 jdbc connection，在整个事务过程都是使用该线程绑定的 connection 来执行数据库操作，实现了事务的隔离性。Spring 框架里面就是用的 ThreadLocal 来实现这种隔离。</li>
+</ul>
+</li>
+<li>每个 ThreadLocal 只能保存一个变量副本，如果想要一个线程保存多个副本，需要创建多个 ThreadLocal。</li>
+</ul>
+<img threadLocal src="/img/hufei/2021/09/threadLocal.png" width="100%" height="100%">
+
+<h2 id="25-ThreadLocal-内存泄露原因，如何避免"><a href="#25-ThreadLocal-内存泄露原因，如何避免" class="headerlink" title="25 ThreadLocal 内存泄露原因，如何避免"></a>25 ThreadLocal 内存泄露原因，如何避免</h2><ul>
+<li>内存泄露是程序在申请内存后，无法释放已申请的内存空间。<ul>
+<li>不会再被使用的对象。</li>
+<li>变量占用的内存不能被回收。</li>
+</ul>
+</li>
+<li>内存泄露后果很严重，无论多少内存，迟早都会被占光。</li>
+<li>每次使用完 ThreadLocal，都调用它的 remove 方法，清除数据。</li>
+</ul>
+<h2 id="26-串行、并行、并发的区别"><a href="#26-串行、并行、并发的区别" class="headerlink" title="26 串行、并行、并发的区别"></a>26 串行、并行、并发的区别</h2><ul>
+<li>串行在时间上不可能发生重叠。前一个任务没搞定，下一个任务就只能等着。</li>
+<li>并行在时间上是重叠的。两个任务在同一时刻互不干扰的同时执行。</li>
+<li>并发允许两个任务彼此干扰。同一时间点，只有一个任务运行，交替执行。</li>
+</ul>
+<h2 id="27-并发的三大特性"><a href="#27-并发的三大特性" class="headerlink" title="27 并发的三大特性"></a>27 并发的三大特性</h2><h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><ul>
+<li>原子性是指在一个操作中， CPU 不可以在中途暂停然后再调度。要么全部执行完成，要么都不执行。<ul>
+<li>就好比转账，从账户 A 向账户 B 转 1000 元，那么必然包括 2 个操作：从账户 A 减去 1000 元，往账户 B 加上 1000 元。两个操作必须全部完成。</li>
+</ul>
+</li>
+<li>程序中原子性指的是最小的操作单元。比如自增操作，分了 3 步，包括读取变量的原始值、进行加 1 操作、写入工作内存。所以在多线程中，有可能一个线程还没自增完，另一个线程就读取了值，导致程序结果错误。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Atomicity</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">increase</span><span class="params">()</span> &#123;</span><br><span class="line">        count++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>自增操作<ul>
+<li>将 count 从主存读到工作内存中。</li>
+<li>+1 的运算。</li>
+<li>将结果写入工作内存。</li>
+<li>将工作内存的值刷回主存（什么时候刷入由操作系统决定）。</li>
+</ul>
+</li>
+<li>**关键字 synchronized **</li>
+</ul>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><ul>
+<li>当多个线程访问同一个变量时，一个线程修改了这个变量的值，其它线程能够立即看到修改之后的值。<ul>
+<li>若两个线程在不用的 CPU，当线程 1 改变了 i 的值还没刷新到主存，线程 2 又使用的 i，那么这个 i 值肯定还是之前的。线程 1 对变量的修改线程 2 没看到，这就是可见性问题。</li>
+</ul>
+</li>
+<li><strong>关键字：volatile、synchronized、final</strong></li>
+</ul>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><ul>
+<li>虚拟机在进行代码编译时，对于改变顺序之后不会对最终结果造成影响的代码，虚拟机不一定会按照代码写的顺序来执行，有可能会将它们重排序。</li>
+<li>实际上，代码重新排序之后，虽然在单线程环境下没有影响，但是在多线程环境中可能会出现线程安全问题。</li>
+<li><strong>关键字 volatile、synchronized</strong><ul>
+<li>volatile 本身就包含了禁止指令重排序的语义。</li>
+<li>synchronized 关键字保证了在同一时间只有一个线程对变量进行修改。</li>
+</ul>
+</li>
+</ul>
+<h2 id="28-为什么使用线程池，参数解释"><a href="#28-为什么使用线程池，参数解释" class="headerlink" title="28 为什么使用线程池，参数解释"></a>28 为什么使用线程池，参数解释</h2><h3 id="为什么使用线程池"><a href="#为什么使用线程池" class="headerlink" title="为什么使用线程池"></a>为什么使用线程池</h3><ul>
+<li>降低资源消耗<ul>
+<li>提高线程利用率，降低创建和销毁线程的消耗。</li>
+</ul>
+</li>
+<li>提高响应速度<ul>
+<li>任务来了，直接有线程可以执行，而不是先创建线程，再执行。</li>
+</ul>
+</li>
+<li>提高线程的可管理性<ul>
+<li>线程是稀缺资源，使用线程池可以统一分配，调优监控。</li>
+</ul>
+</li>
+</ul>
+<h3 id="参数解释"><a href="#参数解释" class="headerlink" title="参数解释"></a>参数解释</h3><ul>
+<li>corePoolSize <ul>
+<li>常驻在线程池中的线程数，即使它们处于空闲状态。除非设置了 allowCoreThreadTimeOut 参数。</li>
+</ul>
+</li>
+<li>maximumPoolSize<ul>
+<li>线程池中允许的最大线程数。</li>
+</ul>
+</li>
+<li>keepAliveTime、uint<ul>
+<li>表示超出核心线程数之外的线程的空闲存活时间。</li>
+</ul>
+</li>
+<li>workQueue<ul>
+<li>用来存放待执行任务的队列。假设现在核心线程都已被占用，还有任务进来时，将被放入队列。如果队列也被放满，则创建新线程来处理任务，但是线程总数不会超过 maximumPoolSize。</li>
+</ul>
+</li>
+<li>ThreadFactory<ul>
+<li>这是一个线程工厂，用来创建线程执行任务。默认的线程工厂创建的线程都在同一个组内，拥有相同的优先级，且都不是守护线程。也可以支持自定义线程工厂。</li>
+</ul>
+</li>
+<li>RejectedExecutionHandler<ul>
+<li>任务拒绝策略，存在两种情况。<ul>
+<li>第一种情况是当我们调用 shutdown 等方法关闭线程池后，我们再继续往线程池提交任务就会遭到拒绝。</li>
+<li>第二种情况是当线程池达到最大线程数，说明已经没有能力再处理新提交的任务时，也会触发拒绝。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="29-简述线程池处理流程"><a href="#29-简述线程池处理流程" class="headerlink" title="29 简述线程池处理流程"></a>29 简述线程池处理流程</h2><img thread-pool-process src="/img/hufei/2021/09/thread-pool-process.png" width="100%" height="100%">
+
+
+<h2 id="30-线程池中阻塞队列的作用？为什么是先添加队列而不是先创建最大线程？"><a href="#30-线程池中阻塞队列的作用？为什么是先添加队列而不是先创建最大线程？" class="headerlink" title="30 线程池中阻塞队列的作用？为什么是先添加队列而不是先创建最大线程？"></a>30 线程池中阻塞队列的作用？为什么是先添加队列而不是先创建最大线程？</h2><h3 id="阻塞队列的作用"><a href="#阻塞队列的作用" class="headerlink" title="阻塞队列的作用"></a>阻塞队列的作用</h3><ul>
+<li>一般的队列只能作为一个有限长度的缓冲区，如果超出了缓冲长度，就无法保留当前的任务了。阻塞队列通过阻塞，可以保留住当前入队的任务。</li>
+<li>阻塞队列可以保证任务队列中没有任务时，阻塞获取任务的线程，使线程进入 wait 状态，释放 CPU 资源。</li>
+<li>阻塞队列自带阻塞和唤醒功能，不需要额外处理，无任务执行时，线程池利用阻塞队列的 take 方法挂起，从而维持核心线程的存活，不至于一直占用 CPU 资源。</li>
+</ul>
+<h3 id="为什么是先添加队列而不是先创建最大线程"><a href="#为什么是先添加队列而不是先创建最大线程" class="headerlink" title="为什么是先添加队列而不是先创建最大线程"></a>为什么是先添加队列而不是先创建最大线程</h3><ul>
+<li>创建新线程的时候，是要获取全局锁的。这个时候其它线程就得阻塞，影响了整体效率。<ul>
+<li>就好比一个企业里面有 10 个（corePoolSize）正式工的名额，最多招 10 个正式工。要是任务超过正式工人数（task &gt; corePoolSize）的情况下，工厂管理者（threadPoolExecutor）不是先扩招工人，而是稍微积压一下任务，即放到阻塞队列中（blockQueue），只要 10 个正式工加班干活，迟早会完成的。这样做的代价较低。</li>
+<li>如果任务持续积压，正式工一天工作 24h 都来不及，此时就需要扩招临时工（maxPoolSize）。任务一旦处理完，这些临时工就会被被工厂辞退。</li>
+<li>如果扩招了临时工，依然来不及，那么新来的任务就会被拒绝了（rejectedExecutionHandler）。</li>
+</ul>
+</li>
+</ul>
+<h2 id="31-线程池中线程复用原理"><a href="#31-线程池中线程复用原理" class="headerlink" title="31 线程池中线程复用原理"></a>31 线程池中线程复用原理</h2><ul>
+<li>线程池将线程和任务进行解耦，线程是线程，任务是任务。</li>
+<li>摆脱了之前通过 Thread 创建线程时，一个线程必须对应一个任务的限制。</li>
+<li>在线程池中，同一个线程可以从阻塞队列中不断获取新任务来执行。<ul>
+<li>其核心原理在于线程池对 Thread 进行了封装，并不是每次执行任务都会调用 Thread.start() 来创建新线程，而是让每个线程去执行一个循环任务。</li>
+<li>在这个循环任务中，不停地检查是否有任务需要被执行，如果有则直接执行，也就是调用任务中的 run  方法，将 run 方法当成一个普通的方法执行。</li>
+<li>这种方式只使用固定的几个线程，就将所有任务的 run 方法串联起来。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/%E5%9F%BA%E7%A1%80/" rel="tag"># 基础</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/06/30/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="next" title="代理模式">
+                <i class="fa fa-chevron-left"></i> 代理模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/11/03/Spring/" rel="prev" title="Spring">
+                Spring <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/huangfenggu.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">64</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">104</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huminxicn" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huminxi0214@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.ruanyifeng.com/home.html" title="阮一峰" target="_blank">阮一峰</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">1 面向对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.1.</span> <span class="nav-text">什么是面向对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%9A%84%E4%B8%89%E5%A4%A7%E7%89%B9%E5%BE%81"><span class="nav-number">1.2.</span> <span class="nav-text">面向对象的三大特征</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-JDK%E3%80%81JRE%E3%80%81JVM-%E4%B8%89%E8%80%85%E5%8C%BA%E5%88%AB%E5%92%8C%E8%81%94%E7%B3%BB"><span class="nav-number">2.</span> <span class="nav-text">2 JDK、JRE、JVM 三者区别和联系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-x3D-x3D-%E5%92%8C-equals-%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">3 &#x3D;&#x3D; 和 equals 比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-final"><span class="nav-number">4.</span> <span class="nav-text">4 final</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">4.1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B1%80%E9%83%A8%E5%86%85%E9%83%A8%E7%B1%BB%E5%92%8C%E5%8C%BF%E5%90%8D%E5%86%85%E9%83%A8%E7%B1%BB%E5%8F%AA%E8%83%BD%E8%AE%BF%E9%97%AE%E5%B1%80%E9%83%A8-final-%E5%8F%98%E9%87%8F"><span class="nav-number">4.2.</span> <span class="nav-text">为什么局部内部类和匿名内部类只能访问局部 final 变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-String%E3%80%81StringBuffer%E3%80%81StringBuilder-%E5%8C%BA%E5%88%AB%E5%8F%8A%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">5.</span> <span class="nav-text">5 String、StringBuffer、StringBuilder 区别及使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%87%8D%E8%BD%BD%E5%92%8C%E9%87%8D%E5%86%99%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.</span> <span class="nav-text">6 重载和重写的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%8E%A5%E5%8F%A3%E5%92%8C%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">7.</span> <span class="nav-text">7 接口和抽象类的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E5%8C%BA%E5%88%AB"><span class="nav-number">7.1.</span> <span class="nav-text">语法区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%8C%BA%E5%88%AB"><span class="nav-number">7.2.</span> <span class="nav-text">设计区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">7.3.</span> <span class="nav-text">使用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-List-%E5%92%8C-Set-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">8.</span> <span class="nav-text">8 List 和 Set 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-hashCode-%E5%92%8C-equals"><span class="nav-number">9.</span> <span class="nav-text">9 hashCode 和 equals</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-ArrayList-%E5%92%8C-LinkedList-%E5%8C%BA%E5%88%AB"><span class="nav-number">10.</span> <span class="nav-text">10 ArrayList 和 LinkedList 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-HashMap-%E5%92%8C-HashTable-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">11.</span> <span class="nav-text">11 HashMap 和 HashTable 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BA%E5%88%AB"><span class="nav-number">11.1.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">11.2.</span> <span class="nav-text">底层实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-ConcurrentHashMap-%E5%8E%9F%E7%90%86"><span class="nav-number">12.</span> <span class="nav-text">12 ConcurrentHashMap 原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK-7"><span class="nav-number">12.1.</span> <span class="nav-text">JDK 7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK-8"><span class="nav-number">12.2.</span> <span class="nav-text">JDK 8</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA-IOC-%E5%AE%B9%E5%99%A8"><span class="nav-number">13.</span> <span class="nav-text">13 如何实现一个 IOC 容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E4%BB%80%E4%B9%88%E6%98%AF%E5%AD%97%E8%8A%82%E7%A0%81%EF%BC%8C%E4%BD%9C%E7%94%A8%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">14.</span> <span class="nav-text">14 什么是字节码，作用是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AD%97%E8%8A%82%E7%A0%81"><span class="nav-number">14.1.</span> <span class="nav-text">什么是字节码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">14.2.</span> <span class="nav-text">字节码的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-Java-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%9C%89%E5%93%AA%E4%BA%9B"><span class="nav-number">15.</span> <span class="nav-text">15 Java 类加载器有哪些</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="nav-number">15.1.</span> <span class="nav-text">类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%A8%A1%E5%9E%8B"><span class="nav-number">15.2.</span> <span class="nav-text">双亲委派模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-Java-%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E4%BD%93%E7%B3%BB"><span class="nav-number">16.</span> <span class="nav-text">16 Java 中的异常体系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-GC-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E5%8F%AF%E4%BB%A5%E8%A2%AB%E5%9B%9E%E6%94%B6"><span class="nav-number">17.</span> <span class="nav-text">17 GC 如何判断对象可以被回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#18-%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%EF%BC%8C%E7%BA%BF%E7%A8%8B%E6%9C%89%E5%87%A0%E7%A7%8D%E7%8A%B6%E6%80%81"><span class="nav-number">18.</span> <span class="nav-text">18 线程的生命周期，线程有几种状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#19-sleep%E3%80%81wait%E3%80%81join%E3%80%81yield-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">19.</span> <span class="nav-text">19 sleep、wait、join、yield 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#20-%E8%AF%B4%E8%AF%B4%E4%BD%A0%E5%AF%B9%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">20.</span> <span class="nav-text">20 说说你对线程安全的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#21-Thread%E3%80%81Runnable-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">21.</span> <span class="nav-text">21 Thread、Runnable 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#22-%E5%AF%B9%E5%AE%88%E6%8A%A4%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">22.</span> <span class="nav-text">22 对守护线程的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#23-%E5%BC%BA%E5%BC%95%E7%94%A8%E5%92%8C%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="nav-number">23.</span> <span class="nav-text">23 强引用和弱引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#24-ThreadLocal-%E7%9A%84%E5%8E%9F%E7%90%86%E5%92%8C%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">24.</span> <span class="nav-text">24 ThreadLocal 的原理和使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#25-ThreadLocal-%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E5%8E%9F%E5%9B%A0%EF%BC%8C%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D"><span class="nav-number">25.</span> <span class="nav-text">25 ThreadLocal 内存泄露原因，如何避免</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#26-%E4%B8%B2%E8%A1%8C%E3%80%81%E5%B9%B6%E8%A1%8C%E3%80%81%E5%B9%B6%E5%8F%91%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">26.</span> <span class="nav-text">26 串行、并行、并发的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#27-%E5%B9%B6%E5%8F%91%E7%9A%84%E4%B8%89%E5%A4%A7%E7%89%B9%E6%80%A7"><span class="nav-number">27.</span> <span class="nav-text">27 并发的三大特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="nav-number">27.1.</span> <span class="nav-text">原子性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="nav-number">27.2.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="nav-number">27.3.</span> <span class="nav-text">有序性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#28-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%8C%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A"><span class="nav-number">28.</span> <span class="nav-text">28 为什么使用线程池，参数解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">28.1.</span> <span class="nav-text">为什么使用线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A"><span class="nav-number">28.2.</span> <span class="nav-text">参数解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#29-%E7%AE%80%E8%BF%B0%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">29.</span> <span class="nav-text">29 简述线程池处理流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#30-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%B8%AD%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E7%9A%84%E4%BD%9C%E7%94%A8%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%85%88%E6%B7%BB%E5%8A%A0%E9%98%9F%E5%88%97%E8%80%8C%E4%B8%8D%E6%98%AF%E5%85%88%E5%88%9B%E5%BB%BA%E6%9C%80%E5%A4%A7%E7%BA%BF%E7%A8%8B%EF%BC%9F"><span class="nav-number">30.</span> <span class="nav-text">30 线程池中阻塞队列的作用？为什么是先添加队列而不是先创建最大线程？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">30.1.</span> <span class="nav-text">阻塞队列的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%85%88%E6%B7%BB%E5%8A%A0%E9%98%9F%E5%88%97%E8%80%8C%E4%B8%8D%E6%98%AF%E5%85%88%E5%88%9B%E5%BB%BA%E6%9C%80%E5%A4%A7%E7%BA%BF%E7%A8%8B"><span class="nav-number">30.2.</span> <span class="nav-text">为什么是先添加队列而不是先创建最大线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#31-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%B8%AD%E7%BA%BF%E7%A8%8B%E5%A4%8D%E7%94%A8%E5%8E%9F%E7%90%86"><span class="nav-number">31.</span> <span class="nav-text">31 线程池中线程复用原理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">胡匪</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

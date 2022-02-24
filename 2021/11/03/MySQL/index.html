@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/img/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MySQL 笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL">
+<meta property="og:url" content="https://huminxi.netlify.com/2021/11/03/MySQL/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="MySQL 笔记。">
+<meta property="og:locale">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/10/sql-explain.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/10/mysql-default-isolate.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/10/mvcc-trace.png">
+<meta property="article:published_time" content="2021-11-03T14:26:27.000Z">
+<meta property="article:modified_time" content="2022-02-24T02:44:18.933Z">
+<meta property="article:author" content="胡匪">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2021/10/sql-explain.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://huminxi.netlify.com/2021/11/03/MySQL/"/>
+
+
+
+
+
+  <title>MySQL | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">黄枫谷</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">勿在浮沙筑高台。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2021/11/03/MySQL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/huangfenggu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-03T22:26:27+08:00">
+                2021-11-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MySQL 笔记。</p>
+<span id="more"></span>
+
+
+<h2 id="1-索引的基本原理"><a href="#1-索引的基本原理" class="headerlink" title="1 索引的基本原理"></a>1 索引的基本原理</h2><ul>
+<li>索引用来快速的寻找哪些具有特定值的记录。如果没有索引，一般来说执行查询时遍历整张表。</li>
+<li>索引的本质：就是把无序的数据变成有序的数据。<ul>
+<li>把创建了索引的列内容进行排序。</li>
+<li>对排序结果生成倒排表。</li>
+<li>在倒排表内容上拼上数据地址链。</li>
+<li>在查询的时候，先拿到倒排内容，再取出数据地址链，从而拿到具体数据。</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-聚簇索引和非聚簇索引的区别"><a href="#2-聚簇索引和非聚簇索引的区别" class="headerlink" title="2 聚簇索引和非聚簇索引的区别"></a>2 聚簇索引和非聚簇索引的区别</h2><ul>
+<li>都是 B+ 树的数据结构</li>
+<li>聚簇索引<ul>
+<li>将数据存储于索引放到了一块，并且是按照一定的顺序组织的，找到索引也就找到了数据。</li>
+<li>数据的物理存放顺序与索引顺序是一致的。只要索引是相邻的，那么对应的数据一定也是相邻的存放在磁盘的。</li>
+</ul>
+</li>
+<li>非聚簇索引<ul>
+<li>叶子节点不存储数据，存储的是数据行地址。也就是说，根据索引查找到数据行的位置，再去磁盘查找数据。</li>
+<li>这有点类似一本书的目录，比如我们要找第三章第一节，那我们先在这个目录里面找，找到对应的页面后再去找对应的页码查看文章。</li>
+</ul>
+</li>
+<li>优势<ul>
+<li>查询通过聚簇索引可以直接获取数据，相比非聚簇索引需要第二次查询（非覆盖索引的情况下），效率更高。</li>
+<li>聚簇索引对于范围查询的效率很高，因为其数据是按照大小排列的。</li>
+<li>聚簇索引适合用在排序的场合，非聚簇索引不合适。</li>
+</ul>
+</li>
+<li>劣势<ul>
+<li>维护索引很昂贵，特别爽插入新行或者主键被更新至要分页（page split）的时候。建议在大量插入新行后，选在负载较低的时间段，通过 OPTIMIZE TABLE 优化表。<ul>
+<li>当你删除数据时，MySQL 并不会回收，被已删除数据的占据的存储空间以及索引位。而是空在那里，而是等待新的数据来弥补这个空缺。</li>
+<li>如果一时半会没有数据来填补这个空缺，那这样就太浪费资源了。所以对于写比较频烦的表，要定期进行 optimize，具体频率根据实际情况而定。</li>
+<li>使用独享表空间可以减小碎片。</li>
+</ul>
+</li>
+<li>表因为使用 UUID（随机 ID）作为主键，使数据存储稀疏，这就会出现聚簇索引可能比全表扫描更慢，所以建议使用 auto_increment 的 bigint 作为主键。</li>
+<li>如果主键比较大的话，那辅助索引将会变得更大，因为辅助索引的叶子存储的是主键值。过长的主键值，会导致非叶子节点占用更多的物理空间。</li>
+</ul>
+</li>
+<li>InnoDB 中一定有主键，主键一定是聚餐索引。不动手设置，则会使用 unique 索引，没有 unique 索引，则会使用数据库内部的一个行的隐藏 id 来当做主键索引。<ul>
+<li>在聚簇索引之上创建的索引称之为辅助索引，辅助索引访问数据总是需要二次查找，非聚簇索引都是辅助索引，辅助索引叶子节点存储的不是行的物理位置，而是主键 id。</li>
+</ul>
+</li>
+<li>MyISM 使用的非聚簇索引，没有聚簇索引。非聚簇索引的两个 B+ 树看上去没什么不同，节点的结构完全一致，只是存储的内容不同。<ul>
+<li>主键索引 B+ 树的节点存储了主键，辅助索引 B+ 树存储了辅助键。 </li>
+<li>表数据存储在独立的地方，这两颗 B+ 树的叶子节点都使用一个地址只想真正的表数据，对于表数据来说，这两个键没有任何差别。由于索引树是独立的，通过辅助键检索无需访问主键的索引树。</li>
+<li>如果涉及到大数据量的排序、全表扫描、count 之类的操作的话，还是 MyISAM 占优势些，因为索引所占空间小，这些操作是需要在内存中完成的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-MySQL-索引的数据结构，各自的优劣"><a href="#3-MySQL-索引的数据结构，各自的优劣" class="headerlink" title="3 MySQL 索引的数据结构，各自的优劣"></a>3 MySQL 索引的数据结构，各自的优劣</h2><ul>
+<li>索引的数据结构和具体存储引擎的实现有关。在 MySQL 中使用较多的索引有 Hash 索引，B+ 树索引等。InnoDB 存储引擎的默认索引实现为：B+ 树索引。</li>
+<li>对于 Hash 索引来说，底层的数据结构就是哈希表，因此在绝大所述需求未单条记录查询的时候，可以选择 Hash 索引，查询性能最快；其余大部分场景，建议选择 B+ 树索引。</li>
+<li>B+ 树<ul>
+<li>B+ 树是一个平衡的多叉树。从根节点到每个叶子节点的高度差值不超过 1，而且同层级的节点间有双向指针相互链接。</li>
+<li>在 B+ 树上的常规检索，从根节点到叶子节点的搜索效率基本相当，不会出现大幅波动。</li>
+<li>而且基于索引的顺序扫描时，也可以利用双向指针快速左右移动，效率非常高。</li>
+<li>因此，B+ 树索引被广泛应用于数据库、文件系统等场景。</li>
+</ul>
+</li>
+<li>Hash 索引<ul>
+<li>Hash 索引就是采用一定的哈希算法，把键值换算成 Hash 值。检索时不需要类似 B+ 树那样从根节点到叶子节点逐级查找，只需一次哈希算法即可定位为相应的位置，速度非常快。</li>
+</ul>
+</li>
+<li>等值查询<ul>
+<li>那么哈希索引明显有绝对优势，因为只需要经过一次哈希计算即可找到对应的键值。如果发生哈希冲突，那就需要先找到该键所在位置，然后再根据链表往后扫描，知道找到相应的数据。</li>
+</ul>
+</li>
+<li>范围查询<ul>
+<li>这时候哈希索引就不合适了。因为原先是有序的键值，经过哈希算法后，有可能变成不连续的，就没办法利用索引完成范围检索。</li>
+<li>哈希索引也没有办法利用索引完成排序，以及 like ‘xxx%’ 这样的部分模糊查询（这种部分模糊查询，本质上也是范围查询）。</li>
+<li>哈希索引也不支持多列联合索引的最左匹配规则</li>
+<li>B + 树索引的关键字检索比较平均，不想 B 树那样波动幅度大，在有大量重复键值情况下，，哈希索引的效率也是极低的，因为存在哈希碰撞问题（会形成一个长链表）。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-索引设计的原则"><a href="#4-索引设计的原则" class="headerlink" title="4 索引设计的原则"></a>4 索引设计的原则</h2><ul>
+<li>查询更快，占用空间更小。</li>
+<li>适合索引的列是出现在 where 子句中的列，或者连接字句中指定的列。</li>
+<li>小表索引效果较差，没有必要建立索引。</li>
+<li>尽量使用短索引。<ul>
+<li>如果对长字符串进行索引，应该指定一个前缀长度，这样能节省大量索引空间。如果搜索词超过索引前缀长度，则使用索引排除不匹配的行，然后检查其余行是否可能匹配。</li>
+</ul>
+</li>
+<li>不要过度索引。<ul>
+<li>索引需要额外的磁盘空间，并降低写操作的性能。</li>
+<li>在修改表内容的时候，索引会进行更新，甚至重构，索引列越多，这个时间就会越长。</li>
+<li>所以只需要保持需要的索引，覆盖查询需求即可。</li>
+</ul>
+</li>
+<li>定义有外键的数据列一定要建立索引。<ul>
+<li>一般会使用外键来关联其它表，所以外键上需要建索引。</li>
+</ul>
+</li>
+<li>更新频繁字段不合适创建索引。</li>
+<li>区分度不高的数据列不适合做索引。例如，性别。</li>
+<li>尽量的扩展索引，不要新建索引。<ul>
+<li>比如表中已经有 a 的索引，现在要加（a,b）的索引，那么只需要修改原来的索引即可。</li>
+</ul>
+</li>
+<li>对于那些查询中很少涉及的列，重复值比较多的列不要建立索引。</li>
+<li>对于定义为 text、image、bit 数据类型的列不要建立索引。</li>
+</ul>
+<h2 id="5-MySQL-锁的类型有哪些"><a href="#5-MySQL-锁的类型有哪些" class="headerlink" title="5 MySQL 锁的类型有哪些"></a>5 MySQL 锁的类型有哪些</h2><ul>
+<li>基于锁的属性分类：共享锁（Share Lock）、排它锁（Exclusive Lock）。</li>
+<li>基于锁的粒度分类：行级锁（Innodb）、表级锁（Innodb、MyISAM）、页级锁（BDB）、记录所、间隙锁、临键锁。</li>
+<li>基于锁的状态分类：意向共享锁、意向排它锁。</li>
+<li>共享锁<ul>
+<li>共享锁又称读锁，简称 S 锁。</li>
+<li>当一个事务为数据加上读锁之后，其它事务只能对该数据加读锁，不能对数据加写锁。直到所有的读锁释放之后，其它事务才能对其加写锁。</li>
+<li>共享锁的特性主要是为了支持并发的读数据，读数据的时候不支持修改，避免出现重复读的问题。</li>
+</ul>
+</li>
+<li>排它锁<ul>
+<li>排它锁又称写锁，简称 X 锁。</li>
+<li>当一个事务为数据加上写锁时，其它请求将不能加任何锁。直到写锁释放之后，其它事务才能对数据加锁。</li>
+<li>排它锁的目的是在数据修改的时候，不允许人和人同时修改和读取，避免出现脏数据和脏读的问题。</li>
+</ul>
+</li>
+<li>表锁<ul>
+<li>表锁是指上锁的时候锁住的是整张表。当下一个事务访问该表的时候，必须等前一个事务释放了锁才能对表进行访问。</li>
+<li>粒度大，加锁简单，容易冲突。</li>
+</ul>
+</li>
+<li>行锁<ul>
+<li>行锁是指上锁的时候锁住的是表的某一行或多行记录。其它事务访问同一张表时，只有被锁住的记录不能访问，其它的记录可以正常访问。</li>
+<li>粒度小，加锁比表锁麻烦，不容易冲突。比表锁的并发高。</li>
+</ul>
+</li>
+<li>记录锁（Record Lock）<ul>
+<li>记录锁也属于行锁中的一种，只不过记录锁的是表中的某一条记录。</li>
+<li>精确条件命中，并且命中的条件字段是唯一索引。普通索引哪怕只命中一条记录，也不是记录锁。</li>
+</ul>
+</li>
+<li>页锁<ul>
+<li>页级锁是 MySQL 中粒度介于行级锁和表级锁中间的一种锁。表级锁速度快，但冲突多，行级锁冲突小，但速度慢。所以去了折中的页级，一次锁定相邻的一组记录。</li>
+<li>开销和加锁时间介于表锁和行锁之间，会出现死锁；锁粒度介于表锁和行锁之间，并发度一般。</li>
+</ul>
+</li>
+<li>间隙锁（Gap Lock）<ul>
+<li>属于行锁的一种，间隙锁锁住的是标记了的某一个区间。当表的相邻 id 之间出现空隙，则会形成一个区间。</li>
+<li>遵循左开右闭原则。</li>
+<li>触发条件：范围查询并且查询未命中记录，查询条件必须命中索引。间隙锁只会出现在 REPEATABLE_READ 的事务级别中。</li>
+<li>防止幻读问题，事务并发的时候，如果没有间隙锁，就会发生下图的问题，在同一个事务里，A 事务的两次查询结果会不一样。<ul>
+<li>比如表里面的数据 id 为 1,4,5,7,10。那么会形成以下几个间隙区间，(-n,1],（1,4] ,(7,10],(10,+n)，-n 表示负无穷，+n 表示正无穷。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>临键锁（Next-Key Lock）<ul>
+<li>也属于行锁的一种，并且是 Innodb 的行锁默认算法。总结来说，它就是记录锁和间隙锁的组合，临键锁会把查询出来的记录锁住，同时把该查询范围内的所有间隙空间锁住，还会把相邻的下一个区间锁住。</li>
+<li>遵循左闭右闭原则。</li>
+<li>触发条件：范围查询并命中，查询命中索引。</li>
+<li>结合记录锁和间隙锁的特性，临键锁避免了在范围查询时出现脏读、重复读、幻读问题。加了临键锁之后，在范围区间内数据不允许被修改和插入。</li>
+</ul>
+</li>
+<li>意向锁<ul>
+<li>当事务 A 加锁成功后，就设置一个状态告诉后面的人，已经有人对表里的行加了一个排它锁，不能再对整个表加共享锁或排它锁了。那么后面需要对整个表加锁的事务只需要获取这个状态就可以知道可不可以对表加锁。避免了对整个索引树的每个节点进行扫描，这个状态就是意向锁。</li>
+<li>意向共享锁<ul>
+<li>当一个事务试图对整个表加共享锁之前，需要先获取这个标的意向共享锁。</li>
+</ul>
+</li>
+<li>意向排它锁<ul>
+<li>当一个事务试图对整个表加排它锁之前，需要先获取这个表的意向排它锁。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-MySQL-的执行计划怎么看"><a href="#6-MySQL-的执行计划怎么看" class="headerlink" title="6 MySQL 的执行计划怎么看"></a>6 MySQL 的执行计划怎么看</h2><ul>
+<li><p>执行计划九十 SQL 执行查询的顺序，以及如何使用索引查询，返回的结果集的行数。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> poc_refund_sub_order <span class="keyword">where</span> sub_refund_no<span class="operator">=</span><span class="string">&#x27;B1903112709788835834&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<img sql-explain src="/img/hufei/2021/10/sql-explain.png" width="100%" height="100%">
+</li>
+<li><p>id：是一个查询的序号，有几个 select 就显示几行。</p>
+<ul>
+<li>id 的顺序是按 select 出现的顺序增长的。</li>
+<li>id 列的值越大执行优先级越高，越先执行。id 列的值相同则从上往下执行，id 列的值为 null 则最后执行。</li>
+</ul>
+</li>
+<li><p>select_type：表示查询中每个 select 子句的类型。</p>
+<ul>
+<li>SIMPLE：表示此查询不包含 UNION 查询或子查询。</li>
+<li>PRIMARY：表示次查询是最外层的查询（包含子查询）。</li>
+<li>SUBQUERY：子查询中的第一个 SELECT。</li>
+<li>UNION：表示次查询是 UNION 的第二或随后的查询。</li>
+</ul>
+</li>
+<li><p>table： 表示该语句查询的表。</p>
+</li>
+<li><p>partiitions：表示分区信息。</p>
+</li>
+<li><p>type：优化 SQL 的重要字段。也是我们判断 SQL 性能和优化程度重要指标，取值范围：</p>
+<ul>
+<li>const：通过索引一次命中，匹配一行数据。</li>
+<li>system：表中只有一行记录，相当于系统表。</li>
+<li>eq_ref：唯一索引扫描，对于每个索引键，表中只有一条记录与之匹配。</li>
+<li>ref：非唯一索引扫描，返回匹配某个值的所有。</li>
+<li>range：只检索给定范围的行，使用一个索引来选择行，一般用于 between、&lt;、&gt;。</li>
+<li>index：只遍历索引树。</li>
+<li>ALL：表示全表扫描，这个类型的查询是性能最差的查询之一。</li>
+<li>执行效率： system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL。</li>
+</ul>
+</li>
+<li><p>possible_keys：表示该 SQL 执行的时候，可能用到的索引信息，仅仅是可能，实际不一定会用到。</p>
+</li>
+<li><p>key：此字段是 MySQL 在当前查询时真正用到的索引。它是 possible_keys 的子集。</p>
+</li>
+<li><p>key_len：表示查询优化器使用了索引的字节数。这个字段可以评估组合索引是否完全被使用，这也是我们优化 SQL 时，评估索引的重要指标。</p>
+</li>
+<li><p>ref：显示索引的哪一列被使用了。等值查询会打印 const。</p>
+</li>
+<li><p>rows：MySQL 查询优化器根据统计信息，估算该 SQL 返回结果集需要扫描读取的行数。</p>
+<ul>
+<li>这个值相当重要。如果索引优化之后，扫描读取的行数变多了，说明索引设置不对。或者字段传入的类型有问题，需要进一步优化。</li>
+</ul>
+</li>
+<li><p>filtered：返回结果的行占需要读到的行（rows）的百分比。百分比越高，说明查询越准确。</p>
+</li>
+<li><p>Extra：</p>
+<ul>
+<li>using filesort：表示 MySQL 对结果集进行外部排序，不能通过索引顺序得到排序效果。一般有 using filesort 都建议优化掉。因为这样的查询 cpu 资源消耗大，延时高。</li>
+<li>using index：覆盖索引扫描。表示查询在索引树中就可以查找所需数据，不用扫描表数据文件，说明性能不错。</li>
+<li>using temporary：查询有使用临时表，一般出现于排序、分组和多表 join 的情况。查询效率不高，建议优化。</li>
+<li>using where：SQL 使用了 where 过滤，效率较高。</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-事务的基本特性和隔离级别"><a href="#7-事务的基本特性和隔离级别" class="headerlink" title="7 事务的基本特性和隔离级别"></a>7 事务的基本特性和隔离级别</h2><ul>
+<li>事务的 ACID 特性<ul>
+<li><strong>原子性（Atomicity）</strong> <ul>
+<li>一个事务中的操作要么全部成功，要么全部失败。</li>
+</ul>
+</li>
+<li><strong>一致性（Consistency）</strong> <ul>
+<li>一个事务在执行前后，数据库都必须处于正确的状态。</li>
+<li>假设用户 A 和用户 B 两者的钱加起来一共是 700，那么不管 A 和 B 之间如何转账，转几次账，这一约束都得成立，即事务结束后两个用户的钱相加起来还得是 700，这就是事务的一致性。</li>
+</ul>
+</li>
+<li><strong>隔离性（Isolation）</strong> <ul>
+<li>一个事务的修改在最终提交前，对其它事务是不可见的。</li>
+<li>两个并发的事务应该不能操作同一项数据。数据库管理系统通常使用锁来实现这个特征。</li>
+</ul>
+</li>
+<li><strong>持久性（Durability）</strong><ul>
+<li>一旦事务提交，所做的修改就会永久保存到数据库中。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>事务的隔离级别<ul>
+<li><strong>读未提交（read uncommit）</strong><ul>
+<li>可能会读到其它事务未提交的数据，叫做脏读。</li>
+</ul>
+</li>
+<li><strong>读已提交（read commit）</strong><ul>
+<li>MVCC 每次读都生成一个新的 Read View。</li>
+<li>两次读取结果不一致，叫不可重复读。</li>
+</ul>
+</li>
+<li><strong>可重复读（repeatable read）</strong><ul>
+<li>MVCC 只在事务启动的时候生成一个 Read View。</li>
+<li>每次读取结果都一样，但是可能产生幻读。<ul>
+<li>事务 A 按照一定条件进行数据读取， 期间事务 B 插入了相同搜索条件的新数据，事务 A 再次按照原先条件进行读取时，发现了事务 B 新插入的数据，称为幻读。</li>
+</ul>
+</li>
+<li>这是 MySQL 的默认隔离级别。</li>
+</ul>
+</li>
+<li><strong>串行化（serializable）</strong><ul>
+<li>读取每一行数据都加锁</li>
+<li>会导致大量超时和锁竞争的问题，一般不使用。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &#x27;%isolation%&#x27;;</span><br></pre></td></tr></table></figure>
+<img mysql-default-isolate src="/img/hufei/2021/10/mysql-default-isolate.png" width="100%" height="100%"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-怎么处理慢查询"><a href="#8-怎么处理慢查询" class="headerlink" title="8 怎么处理慢查询"></a>8 怎么处理慢查询</h2><ul>
+<li>在业务系统中，除了使用主键进行的查询。其它的都会在测试库上测试其耗时，慢查询的统计主要由 DBA 在做，会定期将业务中的慢查询反馈给我们。</li>
+<li>慢查询的优化首先要搞明白慢的原因是什么，是加载了不需要的数据？是查询条件没有命中索引？还是数据量太大导致？可以针对这几个方向进行优化。<ul>
+<li>首先分析语句。<ul>
+<li>看看是否加载了额外的列，是否查询了多余的行或列。</li>
+</ul>
+</li>
+<li>再分析语句的执行计划。<ul>
+<li>修改语句或者修改索引，使语句可以尽可能的命中索引。</li>
+</ul>
+</li>
+<li>如果以上都已经无法再优化，根据表中数据量的情况，进行横向或纵向的分表。<ul>
+<li>横向分表：根据记录行进行拆分。例，根据时间段进行拆分。</li>
+<li>纵向分表：根据列进行拆分。例，将一个 20 字段的表拆成一个 10 + 11 个字段的表。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-ACID-靠什么保证的"><a href="#9-ACID-靠什么保证的" class="headerlink" title="9 ACID 靠什么保证的"></a>9 ACID 靠什么保证的</h2><ul>
+<li>A 原子性由 undo log 日志保证，它记录了需要回滚的日志信息。事务回滚时撤销已经执行成功的 SQL。</li>
+<li>C 一致性由其它三大特性保证，程序代码要保证业务上的一致性。</li>
+<li>I 隔离性由 MVCC 来保证。</li>
+<li>D 持久性由内存 + redo log 来保证，MySQL 修改数据同事在内存和 redo log 记录这次操作，宕机的时候可以从 redo log 恢复。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">InnoDB redo log 写盘，InnoDB 事务进入 prepare 状态。</span><br><span class="line">如果 prepare 成功，binlog 协办，再继续将事务日志持久化到 binlog。</span><br><span class="line">如果持久化成功，那么 InnoDB 事务进入 commit 状态（在 redo log 里面写一个 commit 记录）。</span><br><span class="line"></span><br><span class="line">redo log 的刷盘会在系统空闲时进行。 </span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="10-什么是-MVCC"><a href="#10-什么是-MVCC" class="headerlink" title="10 什么是 MVCC"></a>10 什么是 MVCC</h2><ul>
+<li><p><strong>多版本并发控制（Multi-Version Concurrency Control）</strong></p>
+<ul>
+<li>读取数据时通过一种类似快照的方式将数据保存下来，这样读锁和写锁就不冲突了，不同的事务 session 会看到自己特定版本的数据。</li>
+<li>MVCC 只在 read commit 和 repeatable read 两个隔离级别下工作。 read uncommitted 总是读最新的数据行，serializable 则会对所有读取的行都加锁。</li>
+</ul>
+</li>
+<li><p>聚簇索引记录中有两个必要的隐藏列</p>
+<ul>
+<li>trx_id：用来存储每次对聚簇索引记录进行修改的事务 id。</li>
+<li>roll_pointer：每次对聚簇索引记录有修改的时候，都会把老版本写入 undo 日志中。<ul>
+<li>这个 roll_pointer 就是存了一个指针，它指向这条聚簇索引记录的上一个版本的位置。插入操作的日志中没有这个属性。<img mvcc-trace src="/img/hufei/2021/10/mvcc-trace.png" width="100%" height="100%"></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>read commit 和 repeatable read 的区别就在于他们生产 read View 的策略不同。</p>
+<ul>
+<li>开始事务时创建 read View。 read View 维护当前活动的事务 id，即未提交的事务 id，生成一个有序数组。</li>
+<li>访问数据，获取数据中的事务 id（获取的是版本链中最大的事务 id），对比 read View。 </li>
+<li>如果在 read view 的左边（比 read view 都小），可以访问（在左边意味着该事务已经提交）。</li>
+<li>如果在 read view 的右边（比 read view 都大）或者就在 read view 中，不可以访问。获取 roll_pointer，取上一版本重新对比，依次类推（在右边意味着该事务在 read view 生成之后出现，在 read view 中意味着该事务还未提交）。</li>
+</ul>
+</li>
+<li><p>read commit 隔离级别的事务在每次查询的开始都会生成一个独立的 read view，repeatable read 级别的事务在第一次读的时候生成 read view，之后的读都复用这个 read view。</p>
+<ul>
+<li>这就是 MySQL 的 MVCC，通过版本链，实现多版本。通过 read view 生成策略的不同实现不同的隔离级别。</li>
+</ul>
+</li>
+</ul>
+<h2 id="11-MySQL-主从同步原理"><a href="#11-MySQL-主从同步原理" class="headerlink" title="11 MySQL 主从同步原理"></a>11 MySQL 主从同步原理</h2><ul>
+<li>MySQL 的主从复制中主要有三个线程：master（binlog dump thread）、slave（I&#x2F;O thread、SQL thread）。Master 一条线程和 Slave 中的两条线程。<ul>
+<li>主节点 binlog，主从复制的基础是主库记录数据库的所有变更记录到 binlog。binlog 是数据库服务器启动的那一刻起，保存所有修改数据库结构或内容的一个文件。</li>
+<li>主节点 log dump 线程，当 binlog 有变动时，log dump 线程读取器内容并发送给从节点。</li>
+<li>从节点 I&#x2F;O 线程接受 binlog 内容，并将其写入到 relay log 文件中。</li>
+<li>从节点的 SQL 线程读取 relay log 文件内容对数据更新进行重放，最终保证主从数据库的一致性。</li>
+</ul>
+</li>
+<li>主从节点使用 binlog 文件 + position 偏移量来定位主从同步的位置，从节点会保存其已接收的偏移量。如果从节点发生宕机重启，则会自动从 position 的位置发起同步。</li>
+<li>由于 MySQL 默认的复制方式是异步的，主库把日志发送给从库后不关心从库是否已经处理，这样会产生一个问题就是假设主库挂了，从库处理失败了，这时候从库升为主库后，日志就丢失了。由此产生两个概念：<ul>
+<li>全同步复制<ul>
+<li>主库写入 binlog 后强制同步日志到从库，所有的从库都执行完成后才返回给客户端。</li>
+<li>这个方式性能会收到严重影响。</li>
+</ul>
+</li>
+<li>半同步复制<ul>
+<li>从库写入日志成功后返回 ACK 给主库，主库至少收到一个从库的确认就认为写操作完成。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="12-简述-MyISAM-和-Innodb-的区别"><a href="#12-简述-MyISAM-和-Innodb-的区别" class="headerlink" title="12 简述 MyISAM 和 Innodb 的区别"></a>12 简述 MyISAM 和 Innodb 的区别</h2><ul>
+<li>MyISAM <ul>
+<li>不支持事务，但每次查询都是原子的。</li>
+<li>支持表级锁，即每次操作都是对整个表加锁。</li>
+<li>存储表的总行数。</li>
+<li>一个 MyISAM 表有三个文件：索引文件、表结构文件、数据文件。<ul>
+<li>采用非聚簇索引，索引文件的数据域存储只想数据文件的指针。</li>
+<li>辅索引与主索引基本一直，但是辅索引不用保证唯一性。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Innodb<ul>
+<li>支持 ACID 事务，支持事务的四种隔离级别。</li>
+<li>支持行级锁及外键约束，可以支持并发写。</li>
+<li>不存储总行数</li>
+<li>一个 Innodb 表存储在一个文件空间<ul>
+<li>共享表空间，表大小不受操作系统控制，一个表可能分布在多个文件里。</li>
+<li>独立表空间，表大小受操作系统文件大小限制，一般为 2G。</li>
+<li>主键索引采用聚簇索引，索引的数据域存是文件本身，辅助索引的数据域是主键的值。</li>
+<li>从辅索引查找数据，需要先找到主键值，再根据主键值去主键索引查找。</li>
+<li>最好使用自增主键，避免插入数据时，频繁调整 B+ 数据结构。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="13-简述-MySQL-的索引类型"><a href="#13-简述-MySQL-的索引类型" class="headerlink" title="13 简述 MySQL 的索引类型"></a>13 简述 MySQL 的索引类型</h2><ul>
+<li>普通索引<ul>
+<li>允许被索引的数据列包含重复的值。</li>
+</ul>
+</li>
+<li>唯一索引<ul>
+<li>可以保证数据记录的唯一性。</li>
+</ul>
+</li>
+<li>主键索引<ul>
+<li>是一种特殊的唯一索引，在一张表中只能定义一个主键索引。</li>
+<li>主键索引用于唯一标识一条记录，使用关键字 PRIMARY KEY 来创建。</li>
+</ul>
+</li>
+<li>联合索引<ul>
+<li>索引可以覆盖多个数据列，例如 INDEX(columnA, columnB) 索引。</li>
+</ul>
+</li>
+<li>全文索引<ul>
+<li>通过建立倒排索引，可以极大地提升检索效率，解决是否包含某字段的问题。</li>
+<li>是目前搜索引擎使用的一种关键技术。</li>
+<li>可以通过 ALTER TABLE table_name ADD FULLTEXT(columnA) 来创建全文索引。</li>
+<li>推荐使用 ES，不推荐使用 MySQL 的全文索引。</li>
+</ul>
+</li>
+</ul>
+<h2 id="14-索引对数据库的性能影响"><a href="#14-索引对数据库的性能影响" class="headerlink" title="14 索引对数据库的性能影响"></a>14 索引对数据库的性能影响</h2><ul>
+<li>索引可以极大地提高数据的查询速度。<ul>
+<li>通过使用索引，可以在查询的过程中，使用优化隐藏器，提高系统的性能。</li>
+</ul>
+</li>
+<li>索引会降低插入、删除、更新表的速度。<ul>
+<li>因为在执行这些写操作时，还要操作索引文件。</li>
+</ul>
+</li>
+<li>索引需要占物理空间。<ul>
+<li>除了数据表占数据空间外，每一个索引还要占一定的物理空间。</li>
+<li>如果要建立聚簇索引，那么需要的空间就会更大。如果非聚簇索引很多，一旦聚簇索引改变，那么所有的非聚簇索引都会跟着改变。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/11/03/Mybatis/" rel="next" title="Mybatis">
+                <i class="fa fa-chevron-left"></i> Mybatis
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/11/03/Redis/" rel="prev" title="Redis">
+                Redis <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/huangfenggu.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">64</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">104</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huminxicn" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huminxi0214@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.ruanyifeng.com/home.html" title="阮一峰" target="_blank">阮一峰</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%B4%A2%E5%BC%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">1 索引的基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">2 聚簇索引和非聚簇索引的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-MySQL-%E7%B4%A2%E5%BC%95%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%8C%E5%90%84%E8%87%AA%E7%9A%84%E4%BC%98%E5%8A%A3"><span class="nav-number">3.</span> <span class="nav-text">3 MySQL 索引的数据结构，各自的优劣</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%B4%A2%E5%BC%95%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%8E%9F%E5%88%99"><span class="nav-number">4.</span> <span class="nav-text">4 索引设计的原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-MySQL-%E9%94%81%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%9C%89%E5%93%AA%E4%BA%9B"><span class="nav-number">5.</span> <span class="nav-text">5 MySQL 锁的类型有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-MySQL-%E7%9A%84%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E6%80%8E%E4%B9%88%E7%9C%8B"><span class="nav-number">6.</span> <span class="nav-text">6 MySQL 的执行计划怎么看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%89%B9%E6%80%A7%E5%92%8C%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-number">7.</span> <span class="nav-text">7 事务的基本特性和隔离级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E6%85%A2%E6%9F%A5%E8%AF%A2"><span class="nav-number">8.</span> <span class="nav-text">8 怎么处理慢查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-ACID-%E9%9D%A0%E4%BB%80%E4%B9%88%E4%BF%9D%E8%AF%81%E7%9A%84"><span class="nav-number">9.</span> <span class="nav-text">9 ACID 靠什么保证的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E4%BB%80%E4%B9%88%E6%98%AF-MVCC"><span class="nav-number">10.</span> <span class="nav-text">10 什么是 MVCC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-MySQL-%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E5%8E%9F%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">11 MySQL 主从同步原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-%E7%AE%80%E8%BF%B0-MyISAM-%E5%92%8C-Innodb-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">12.</span> <span class="nav-text">12 简述 MyISAM 和 Innodb 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-%E7%AE%80%E8%BF%B0-MySQL-%E7%9A%84%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B"><span class="nav-number">13.</span> <span class="nav-text">13 简述 MySQL 的索引类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E7%B4%A2%E5%BC%95%E5%AF%B9%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%80%A7%E8%83%BD%E5%BD%B1%E5%93%8D"><span class="nav-number">14.</span> <span class="nav-text">14 索引对数据库的性能影响</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">胡匪</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
