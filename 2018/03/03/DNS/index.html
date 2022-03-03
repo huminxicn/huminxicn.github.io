@@ -96,7 +96,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/dns-trace-1.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/dns-trace-2.png">
 <meta property="article:published_time" content="2018-03-03T02:19:27.000Z">
-<meta property="article:modified_time" content="2022-03-03T08:56:08.857Z">
+<meta property="article:modified_time" content="2022-03-03T08:57:16.411Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="DNS">
 <meta property="article:tag" content="协议">
@@ -380,15 +380,15 @@
 </li>
 <li>邮件服务器别名（mail server aliasing）<ul>
 <li>显而易见，人们也希望电子邮件地址好记忆。</li>
-<li>例如，如果 huminxi 在 Gmail 上有一个账户，那邮箱地址就像 <a href="mailto:&#104;&#117;&#x6d;&#105;&#110;&#120;&#x69;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;">&#104;&#117;&#x6d;&#105;&#110;&#120;&#x69;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;</a> 这样简单。然而，Gmail 邮件服务器的规范主机名可能十分复杂，不像 gmail.com 这样简单好记。</li>
+<li>例如，如果 huminxi 在 Gmail 上有一个账户，那邮箱地址就像 <a href="mailto:&#x68;&#x75;&#109;&#x69;&#x6e;&#120;&#x69;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#x68;&#x75;&#109;&#x69;&#x6e;&#120;&#x69;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a> 这样简单。然而，Gmail 邮件服务器的规范主机名可能十分复杂，不像 gmail.com 这样简单好记。</li>
 <li>电子邮件应用程序可以调用 DNS 服务，对邮件服务器别名进行解析，以获得该主机的规范主机名及其 IP 地址。</li>
 <li><strong>MX 记录允许一个公司的邮件服务器和 Web 服务器使用相同的主机别名</strong>。例如，一个公司的邮件服务器和 Web 服务器都叫做 enterprise.com。</li>
 </ul>
 </li>
 <li>负载均衡（load distribution）<ul>
 <li>DNS 可以用于冗余服务器之间的负载分配。</li>
-<li>繁忙的站点（如 cnn.com）被冗余分布在多台服务器上，每台服务器运行在不同的端系统上，每个都有着不同的 IP 地址。</li>
-<li><strong>由于这些冗余 Web 服务器的存在，一个规范主机名可能与一个 IP 地址集合相关联</strong>。DNS 数据库中存储着这些 IP 地址集合。当客户发出一个 DNS 请求时，该 DNS 服务器会用 IP 地址的整个集合进行响应，但在每个回答中循环这些地址的次序（客户通常是向排在最前面的 IP 地址服务器发送 HTTP 请求报文）。</li>
+<li>繁忙的站点（如 cnn.com）被冗余分布在多台服务器上，每台服务器运行在不同的端系统上，每个都有着不同的 IP 地址。<strong>由于这些冗余 Web 服务器的存在，一个规范主机名可能与一个 IP 地址集合相关联</strong>。DNS 数据库中存储着这些 IP 地址集合。</li>
+<li>当客户发出一个 DNS 请求时，该 DNS 服务器会用 IP 地址的整个集合进行响应，但在每个回答中循环这些地址的次序（客户通常是向排在最前面的 IP 地址服务器发送 HTTP 请求报文）。</li>
 </ul>
 </li>
 </ul>
