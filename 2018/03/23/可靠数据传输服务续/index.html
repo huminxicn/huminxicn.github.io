@@ -79,12 +79,12 @@
 
 
 
-<meta name="description" content="经过 前文 的介绍，我们现在已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输(reliable data transfer)的协议——rdt3.0。但同时我们也发现了 rdt3.0 其实并不完善，因为它是一个停等(stop-and-wait)协议，所以还存在性能方面的问题待优化。今天我们就一起来看看具体是怎么优化的吧！">
+<meta name="description" content="经过 前文 的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。但同时我们也发现 rdt3.0 其实并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="可靠数据传输服务续">
 <meta property="og:url" content="https://huminxi.netlify.com/2018/03/23/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1%E7%BB%AD/index.html">
 <meta property="og:site_name" content="黄枫谷">
-<meta property="og:description" content="经过 前文 的介绍，我们现在已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输(reliable data transfer)的协议——rdt3.0。但同时我们也发现了 rdt3.0 其实并不完善，因为它是一个停等(stop-and-wait)协议，所以还存在性能方面的问题待优化。今天我们就一起来看看具体是怎么优化的吧！">
+<meta property="og:description" content="经过 前文 的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。但同时我们也发现 rdt3.0 其实并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
 <meta property="og:locale">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/stop-and-wait-versus-pipelined-protocol.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/stop-and-wait-and-pipelined-sending.png">
@@ -96,7 +96,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/sr-operation.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/sr-receiver-dilemma.png">
 <meta property="article:published_time" content="2018-03-23T14:55:06.000Z">
-<meta property="article:modified_time" content="2022-02-24T02:44:18.937Z">
+<meta property="article:modified_time" content="2022-03-07T09:21:53.515Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="数据传输">
 <meta property="article:tag" content="网络">
@@ -335,7 +335,31 @@
           
 
           
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
 
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  12k
+                </span>
+              
+
+              
+
+              
+            </div>
           
 
           
@@ -357,11 +381,11 @@
     src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
-<p>经过 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/03/18/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1/#more">前文</a> 的介绍，我们现在已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输(reliable data transfer)的协议——rdt3.0。但同时我们也发现了 rdt3.0 其实并不完善，因为它是一个停等(stop-and-wait)协议，所以还存在性能方面的问题待优化。今天我们就一起来看看具体是怎么优化的吧！</p>
+<p>经过 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/03/18/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1/#more">前文</a> 的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。但同时我们也发现 rdt3.0 其实并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。</p>
 <span id="more"></span>
 
 <h2 id="由停等到流水线"><a href="#由停等到流水线" class="headerlink" title="由停等到流水线"></a>由停等到流水线</h2><blockquote>
-<p>为了评价该停等行为对性能的影响，可考虑一种具有两台主机的理想化场合，一台主机位于美国西海岸，另一台位于美国东海岸，如图 3-17 所示。在这两个端系统之间的光速往返传播时延 RTT 大约为 30 毫秒。假定彼此通过一条发送速率 R 为 1Gbps (每秒 10⁹ 比特）的信道相连。包括首部字段和数据的分组长 L 为 1000 字节(8000 比特），发送一个分组进入 1Gbps 链路实际所需时间是:</p>
+<p>为了评价停等行为对性能的影响，可考虑一种具有两台主机的理想化场合，一台主机位于美国西海岸，另一台位于美国东海岸，如图 3-17 所示。在这两个端系统之间的光速往返传播时延 RTT（Round-Trip Time） 大约为 30 毫秒。假定彼此通过一条发送速率 R 为 1Gbps (每秒 10⁹ 比特）的信道相连。包括首部字段和数据的分组 L 为 1000 字节（8000 比特），发送一个分组进入 1Gbps 链路实际所需时间是:</p>
 </blockquote>
 <p>$$T𝗍𝗋𝖺𝗇𝗌&#x3D;\frac{L}{R}&#x3D;\frac{8000 bit}{10⁹ bit&#x2F;s}&#x3D;8µs$$</p>
 <p><code>图 3-17 停等协议与流水线协议</code><br><img stop-and-wait-versus-pipelined-protocol src="/img/hufei/2018/03/stop-and-wait-versus-pipelined-protocol.png" width="100%" height="100%"></p>
@@ -759,14 +783,8 @@
 
         
 <div class="busuanzi-count">
-  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
-  
-    <span class="site-uv">
-      <i class="fa fa-user"></i>
-      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
-      
-    </span>
   
 
   
