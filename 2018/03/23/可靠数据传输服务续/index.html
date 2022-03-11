@@ -79,12 +79,12 @@
 
 
 
-<meta name="description" content="经过 前文的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
+<meta name="description" content="经过 前文的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0 并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="可靠数据传输服务续">
 <meta property="og:url" content="https://huminxi.netlify.com/2018/03/23/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1%E7%BB%AD/index.html">
 <meta property="og:site_name" content="黄枫谷">
-<meta property="og:description" content="经过 前文的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
+<meta property="og:description" content="经过 前文的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0 并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。">
 <meta property="og:locale">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/stop-and-wait-versus-pipelined-protocol.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/stop-and-wait-and-pipelined-sending.png">
@@ -97,7 +97,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/sr-receiver-dilemma.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/03/tcp-msl.png">
 <meta property="article:published_time" content="2018-03-23T14:55:06.000Z">
-<meta property="article:modified_time" content="2022-03-08T12:15:09.233Z">
+<meta property="article:modified_time" content="2022-03-09T02:08:20.073Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="数据传输">
 <meta property="article:tag" content="网络">
@@ -377,7 +377,7 @@
     src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
-<p>经过 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/03/18/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1/#more">前文</a><br>的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0<br>并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。</p>
+<p>经过 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/03/18/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1/#more">前文</a>的介绍，我们已经有了一个可以在『存在比特差错的丢包信道』上进行可靠数据传输（reliable data transfer）的协议——rdt3.0。同时我们也发现 rdt3.0 并不完善，它是一个停等（stop-and-wait）协议，还存在性能方面的问题待优化。</p>
 <span id="more"></span>
 
 <h2 id="由停等到流水线"><a href="#由停等到流水线" class="headerlink" title="由停等到流水线"></a>由停等到流水线</h2><p>为了评价停等行为对性能的影响，可以考虑一种只有两台主机的理想化场合，一台主机位于美国西海岸，另一台位于美国东海岸，如图 3-17 所示。<strong>这两个端系统之间的光速往返传播时延 RTT（Round-Trip Time） 大约为 30 毫秒</strong><br>。假定彼此通过一条发送速率 R 为 1Gbps (每秒 10⁹ 比特）的信道相连。包括首部字段和数据的分组 L 长 1000 字节（8000 比特），发送一个分组进入 1Gbps 链路实际所需时间是：</p>
