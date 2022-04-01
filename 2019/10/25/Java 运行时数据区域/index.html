@@ -79,16 +79,16 @@
 
 
 
-<meta name="description" content="Java 虚拟机在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而一直存在，有些区域则是依赖用户线程的启动和结束而建立和销毁。">
+<meta name="description" content="Java 虚拟机在执行程序的过程中，会把它管理的内存划分为若干个数据区域，这些区域的用途不一，有着各自的创建和销毁时间。有些区域与虚拟机进程共存，有些区域则依赖用户线程。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 运行时数据区域">
 <meta property="og:url" content="https://huminxi.netlify.com/2019/10/25/Java%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/index.html">
 <meta property="og:site_name" content="黄枫谷">
-<meta property="og:description" content="Java 虚拟机在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而一直存在，有些区域则是依赖用户线程的启动和结束而建立和销毁。">
+<meta property="og:description" content="Java 虚拟机在执行程序的过程中，会把它管理的内存划分为若干个数据区域，这些区域的用途不一，有着各自的创建和销毁时间。有些区域与虚拟机进程共存，有些区域则依赖用户线程。">
 <meta property="og:locale">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/jvm-runtime-data-areas.png">
 <meta property="article:published_time" content="2019-10-25T07:25:07.000Z">
-<meta property="article:modified_time" content="2022-02-24T02:44:18.932Z">
+<meta property="article:modified_time" content="2022-04-01T09:06:48.191Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="Java 虚拟机">
@@ -339,7 +339,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  6.6k
+                  6.7k
                 </span>
               
 
@@ -364,17 +364,21 @@
       
 
       
-        <p>Java 虚拟机在执行 Java 程序的过程中会把它所管理的内存划分为若干个不同的数据区域。这些区域有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而一直存在，有些区域则是依赖用户线程的启动和结束而建立和销毁。</p>
+        <p>Java 虚拟机在执行程序的过程中，会把它管理的内存划分为若干个数据区域，这些区域的用途不一，有着各自的创建和销毁时间。有些区域与虚拟机进程共存，有些区域则依赖用户线程。</p>
 <span id="more"></span>
 
 
 <h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><img jvm-runtime-data-areas src="/img/hufei/2019/10/jvm-runtime-data-areas.png" width="100%" height="100%">
 
 <h2 id="线程私有区域"><a href="#线程私有区域" class="headerlink" title="线程私有区域"></a>线程私有区域</h2><h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>程序计数器（Program Counter Register）是一块较小的内存空间，<strong>它可以看做是当前线程所指向的字节码的行号指示器。</strong></p>
-<p>由于 Java 虚拟机的多线程是通过线程轮流切换、分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器（对于多核处理器来说是一个内核）都只会执行一条线程中的指令。因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各条线程之间计数器互不影响，独立存储。我们称这类内存区域为线程私有的内存。</p>
-<p><strong>如果线程正在执行的是一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；如果正在执行的时候本地（Native）方法，这个计数器值为空（Undefined）。</strong></p>
+<blockquote>
+<p>由于 Java 虚拟机的多线程是通过线程轮流切换、分配处理器执行时间的方式来实现的。在任何一个确定的时刻，一个处理器（对于多核处理器来说是一个内核）都只会执行某个线程中的指令。因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各条线程之间计数器互不影响，独立存储。我们称这类内存区域为线程私有的区域。</p>
+</blockquote>
+<p>如果线程正在执行的是一个 Java 方法，<strong>这个计数器记录的是正在执行的虚拟机字节码指令的地址</strong>；如果正在执行的时候本地（Native）方法，<strong>这个计数器值为空（Undefined）</strong>。</p>
 <h3 id="Java-虚拟机栈"><a href="#Java-虚拟机栈" class="headerlink" title="Java 虚拟机栈"></a>Java 虚拟机栈</h3><p>与程序计数器一样，<strong>Java 虚拟机栈（Java Virtual Machine Stack）也是线程私有的，它的生命周期与线程相同。</strong></p>
-<p>Java 虚拟机栈描述的是 Java 方法执行的线程内存模型：每个方法被执行的时候，Java 虚拟机都会同步创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态连接、方法出口等信息。<strong>每一个方法被调用直至执行完毕的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。</strong></p>
+<blockquote>
+<p>Java 虚拟机栈描述的是 Java 方法执行的线程内存模型：每个方法被执行的时候，Java 虚拟机都会同步创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态连接、方法出口等信息。每一个方法被调用直至执行完毕的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。</p>
+</blockquote>
 <p>在 《Java 虚拟机规范》中，对这个内存区域规定了两类异常状况：</p>
 <ul>
 <li>如果线程请求的栈深度大于虚拟机所允许的深度，将抛出 StackOverflowError 异常。</li>
@@ -383,14 +387,18 @@
 <p>HotSpot VM 没有实现动态扩展，但可以用下面的参数来指定线程栈大小：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:ThreadStackSize=512 //虚拟机栈大小。以 KB 为单位，0 表示使用默认的堆栈大小。</span><br></pre></td></tr></table></figure>
 
-<h3 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h3><p>本地方法栈（Native Method Stack）与虚拟机栈所发挥的作用是非常相似的，其区别只是 <strong>虚拟机栈为虚拟机执行 Java 方法（也就是字节码）服务，而本地方法栈则是为虚拟机使用到的本地（Native）方法服务。</strong></p>
+<h3 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h3><p>本地方法栈（Native Method Stack）与虚拟机栈是非常相似的，区别是虚拟机栈 <strong>为虚拟机执行 Java 方法服务</strong>，而本地方法栈则是 <strong>为虚拟机使用到的本地（Native）方法服务</strong>。</p>
+<blockquote>
 <p>《Java 虚拟机规范》对本地方法栈中使用的语言、使用方式与数据结构并没有任何强制规定。因此具体的虚拟机可以根据需要自由实现它，HotSpot 虚拟机直接就把本地方法栈和虚拟机栈合二为一。与虚拟机栈一样，本地方法栈也会在栈深度溢出或者栈扩展失败时分别抛出 StackOverflowError 和 OutOfMemoryError 异常。</p>
-<h2 id="线程共享区域"><a href="#线程共享区域" class="headerlink" title="线程共享区域"></a>线程共享区域</h2><h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p>对 Java 应用程序来说，Java 堆（Java Heap）是虚拟机所管理的内存中最大的一块。<strong>Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此内存的唯一目的就是存放对象实例，Java 世界里几乎所有的对象实例都在这里分配内存。</strong></p>
-<p>Java 堆是垃圾收集器管理的内存区域，因此一些资料中它也被称作 GC 堆（Garbage Collected Heap）。从回收内存的角度看，由于现代垃圾收集器大部分都是基于分带收集理论设计的，所以 Java 堆中经常会出现新生代、老年代、永久代、Eden 空间、From Survivor 空间、To Survivor 空间等名称。从分配内存的角度看，所有线程共享的 Java 堆中可以划分出多个线程私有的分配缓存区（Thread Local Allocation Buffer，TLAB），以提升对象分配时的效率。不过无论从什么角度，将 Java 堆细分的目的只是为了更好地回收内存，或者更快地分配内存。</p>
-<p>Java 堆既可以被实现成固定大小的，也可以是可扩展的。不过当前主流的 Java 虚拟机都是按照可扩展来实现的。<strong>如果在 Java 堆中没有内存完成实例分配，并且堆也无法再扩展时，Java 虚拟机将会抛出 OutOfMemoryError 异常。</strong></p>
+</blockquote>
+<h2 id="线程共享区域"><a href="#线程共享区域" class="headerlink" title="线程共享区域"></a>线程共享区域</h2><h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p>对 Java 应用程序来说，Java 堆（Java Heap）是虚拟机所管理的内存中最大的一块。<strong>Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建</strong>。此内存的唯一目的就是存放对象实例，<strong>Java 世界里几乎所有的对象实例都在这里分配内存</strong>。</p>
+<blockquote>
+<p>Java 堆是垃圾收集器管理的内存区域，因此一些资料中它也被称作 GC 堆（Garbage Collected Heap）。从回收内存的角度看，<strong>由于现代垃圾收集器大部分都是基于分带收集理论设计的</strong>，所以 Java 堆中经常会出现新生代、老年代、永久代、Eden 空间、From Survivor 空间、To Survivor 空间等名称。从分配内存的角度看，所有线程共享的 Java 堆可以划分出多个线程私有的分配缓存区（Thread Local Allocation Buffer，TLAB），以提升对象分配时的效率。不过无论从什么角度，将 Java 堆细分的目的只是为了更好地回收内存，或者更快地分配内存。</p>
+</blockquote>
+<p>Java 堆既可以被实现成固定大小的，也可以是可扩展的。不过当前主流的 Java 虚拟机都是按照可扩展来实现的。<strong>如果 Java 堆中没有足够的内存完成实例分配，并且也无法再扩展时，Java 虚拟机将会抛出 OutOfMemoryError 异常。</strong></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms20M //Java 堆初始为 20MB。</span><br><span class="line">-Xmx40M //Java 堆最大为 40MB。</span><br></pre></td></tr></table></figure>
 
-<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区(Method Area)与 Java 堆一样，是各个线程共享的内存区域，<strong>它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。</strong> 虽然《Java 虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫做非堆（Non-Heap），目的是与 Java 堆区分开来。</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区（Method Area）与 Java 堆一样，是各个线程共享的内存区域，<strong>它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码等数据。</strong> 虽然《Java 虚拟机规范》中把方法区描述为堆的一个部分，但是它却有一个别名叫做非堆（Non-Heap），目的是与 Java 堆区分开来。</p>
 <blockquote>
 <p>说到方法区，不得不提一下『永久代』这个概念，尤其是在 JDK 8 以前，许多 Java 程序员都习惯在 HotSpot 虚拟机上开发、部署程序，很多人更愿意把方法区称呼为『永久代』（Permanent Generation），或将两者混为一谈。本质上这两者并不是等价的，仅仅是因为当时的 HotSpot 虚拟机设计团队选择把收集器的分代设计扩展至方法区，或者说使用永久代来实现方法区而已，这样使得 HotSpot 的垃圾收集器能够像管理 Java 堆一样管理这部分内存，省去了专门为方法区编写内存管理代码的工作。但是对于其它虚拟机实现，譬如 BEA JRockit、IBM J9 等来说，是不存在永久代的概念的。<br>原则上如何实现方法区属于虚拟机实现细节，不受《Java 虚拟机规范》管束，并不要求统一。但现在回过头来看，当年使用永久代来实现方法区的决定并不是一个好主意，这种设计导致了 Java 应用更容易遇到内存溢出的问题（永久代有 -XX:MaxPermSize 的上限，即使不设置也有默认大小。而 JRockit 和 J9 只要没有触碰到进程可用内存的上限，例如 32 位系统中的 4GB 限制，就不会出问题），而且有极少数方法（例如 String::intern()）会因为永久代的原因而导致不同虚拟机下有不同的表现。<br>考虑到 HotSpot 未来的发展，在 JDK 6 的时候 HotSpot 开发团队就有放弃永久代，逐步把原本放在永久代的字符串常量池、静态变量等移出。而到了 JDK 8，终于完全废弃了永久代的概念，改用与 JRockit、J9 一样在本地内存中实现的元空间（Meta-space）来代替，把 JDK 7 中永久代还剩余的内容（主要是类型信息）全部移到元空间中。</p>
 </blockquote>
@@ -540,7 +548,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">54</span>
+                  <span class="site-state-item-count">55</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -562,7 +570,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-count">97</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
