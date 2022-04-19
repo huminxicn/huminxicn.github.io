@@ -79,12 +79,12 @@
 
 
 
-<meta name="description" content="最近在阅读 《深入理解 Java 虚拟机》 一书，于是就想跟书中一样编译一个自己的 JDK 出来。">
+<meta name="description" content="最近在阅读 《深入理解 Java 虚拟机》 一书，想跟着书编译一个自己的 JDK 出来。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="macOS 编译 OpenJDK 10">
 <meta property="og:url" content="https://huminxi.netlify.com/2019/01/03/macOS%20%E7%BC%96%E8%AF%91%20OpenJDK%2010/index.html">
 <meta property="og:site_name" content="黄枫谷">
-<meta property="og:description" content="最近在阅读 《深入理解 Java 虚拟机》 一书，于是就想跟书中一样编译一个自己的 JDK 出来。">
+<meta property="og:description" content="最近在阅读 《深入理解 Java 虚拟机》 一书，想跟着书编译一个自己的 JDK 出来。">
 <meta property="og:locale">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/jdk10-before.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/jdk10-complete.png">
@@ -97,7 +97,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/hufei-jdk.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/jdk-n.png">
 <meta property="article:published_time" content="2019-01-03T01:27:14.000Z">
-<meta property="article:modified_time" content="2022-02-24T02:44:18.935Z">
+<meta property="article:modified_time" content="2022-04-01T09:11:10.435Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="macOS">
 <meta property="article:tag" content="openJDK">
@@ -348,7 +348,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  6.8k
+                  6.6k
                 </span>
               
 
@@ -373,7 +373,7 @@
       
 
       
-        <p>最近在阅读 <a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a> 一书，于是就想跟书中一样编译一个自己的 JDK 出来。</p>
+        <p>最近在阅读 <a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a> 一书，想跟着书编译一个自己的 JDK 出来。</p>
 <span id="more"></span>
 
 <h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><p>开始前建议阅读一下 OpenJDK 的官方构建文档 <a target="_blank" rel="noopener" href="http://cr.openjdk.java.net/~ihse/demo-new-build-readme/common/doc/building.html#boot-jdk-requirements">Building OpenJDK</a>。</p>
@@ -382,20 +382,16 @@
 <p>安装完成后按顺序执行下面的命令。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hg clone http://hg.openjdk.java.net/jdk10/jdk10</span><br><span class="line">cd jdk10</span><br><span class="line">bash ./get_source.sh (或 chmod +x get_source.sh &amp;&amp; ./get_source.sh)</span><br></pre></td></tr></table></figure>
 <p>注意 get_source.sh 脚本下载时间较长，而且容易中断。需要多次执行 <code>bash ./get_source.sh</code> 命令。</p>
-<p><code>execute ./get_source.sh before</code><br><img jdk10-before src="/img/hufei/2019/01/jdk10-before.png" width="100%" height="50%"></p>
-<p><code>execute ./get_source.sh complete</code><br><img jdk10-complete src="/img/hufei/2019/01/jdk10-complete.png" width="100%" height="50%"></p>
+<p><code>执行 ./get_source.sh 脚本之前的目录</code><br><img jdk10-before src="/img/hufei/2019/01/jdk10-before.png" width="100%" height="50%"></p>
+<p><code>执行 ./get_source.sh 脚本之后的目录</code><br><img jdk10-complete src="/img/hufei/2019/01/jdk10-complete.png" width="100%" height="50%"></p>
 <h3 id="boot-JDK"><a href="#boot-JDK" class="headerlink" title="boot JDK"></a>boot JDK</h3><blockquote>
-<blockquote>
 <p>Paradoxically, building OpenJDK requires a pre-existing JDK. This is called the “boot JDK”. The boot JDK does not have to be OpenJDK, though.</p>
 </blockquote>
-</blockquote>
-<p>所以这里准备的 boot JDK 是 <a target="_blank" rel="noopener" href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle JDK 8u191</a>。</p>
+<p>这里准备的 boot JDK 是 <a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/downloads/#java8-mac">Oracle JDK 8u191</a>。</p>
 <p><code>boot JDK</code><br><img boot-jdk src="/img/hufei/2019/01/boot-jdk.png" width="100%" height="50%"></p>
-<h3 id="Xcode"><a href="#Xcode" class="headerlink" title="Xcode"></a>Xcode</h3><p>因为之前没用过 Xcode，于是就去 AppStore 中下载了一个最新版的 Xcode(10.1)，结果就被坑了。原来是 c++ 相关的 <code>stdlibc++</code> <a target="_blank" rel="noopener" href="https://forums.developer.apple.com/message/322208#322208">库被替换</a> 成了 <code>libc++</code>，只能去 <a target="_blank" rel="noopener" href="https://developer.apple.com/">官网</a> 重新下载了 Xcode(9.4.1)。</p>
+<h3 id="Xcode"><a href="#Xcode" class="headerlink" title="Xcode"></a>Xcode</h3><p>因为之前没用过 Xcode，于是就去 AppStore 中下载了一个最新版的 Xcode（10.1），结果就被坑了。原来 c++ 相关的 <code>stdlibc++</code> 库被替换成了 <code>libc++</code>，只能再去 <a target="_blank" rel="noopener" href="https://developer.apple.com/">官网</a> 重新下载了 Xcode（9.4.1）。</p>
 <h3 id="freetype"><a href="#freetype" class="headerlink" title="freetype"></a>freetype</h3><blockquote>
-<blockquote>
 <p>FreeType2 from The FreeType Project is required on all platforms. At least version 2.3 is required.</p>
-</blockquote>
 </blockquote>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install freetype</span><br></pre></td></tr></table></figure>
 <img brew-install-freetype src="/img/hufei/2019/01/brew-install-freetype.png" width="100%" height="50%">
@@ -429,7 +425,7 @@
 <img hufei-jdk src="/img/hufei/2019/01/hufei-jdk.png" width="100%" height="50%">
 
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>不要放弃<ul>
+<li>不要放弃。<ul>
 <li>如果今天编译不出来，那就明天再来。</li>
 <li>如果 OpenJDK 10 编译不出来，那就换 OpenJDK 9。还不行，那就用 9u。我自己就是从 7 一直试到了 10。</li>
 </ul>
@@ -438,12 +434,12 @@
 <img jdk-n src="/img/hufei/2019/01/jdk-n.png" width="50%" height="50%">
   
 <ul>
-<li>不要用 Xcode 10，建议用 Xcode 9<ul>
+<li>不要用 Xcode 10，建议用 Xcode 9。<ul>
 <li>因为 10 中将 c++ 相关的依赖库由 stdlibc++ 替换成了 libc++。我自己还没有解决这个依赖问题，干脆就重新下载了 Xcode 9.4.1。</li>
 </ul>
 </li>
-<li>善用 Google<ul>
-<li>这只是在我的环境中编译成功了，在你们的环境中也许还会遇到其它的问题，这时候就要自己去问 Google。</li>
+<li>善用搜索引擎。<ul>
+<li>这只是在我的环境中编译成功了，在你们的环境中也许还会遇到其它的问题，这时候就要用到 Google。</li>
 </ul>
 </li>
 </ul>
@@ -600,7 +596,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">97</span>
+                  <span class="site-state-item-count">98</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
