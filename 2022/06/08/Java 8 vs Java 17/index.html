@@ -93,7 +93,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/java-naming-module.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/npe-detail.png">
 <meta property="article:published_time" content="2022-06-08T11:22:21.000Z">
-<meta property="article:modified_time" content="2022-06-28T10:38:33.563Z">
+<meta property="article:modified_time" content="2022-06-28T10:47:59.198Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JDK8">
 <meta property="article:tag" content="JDK17">
@@ -430,7 +430,7 @@
 <h3 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h3><p>JDK 9 引入了一个新的特性叫做 JPMS（Java Platform Module System），项目代号为 <a target="_blank" rel="noopener" href="https://openjdk.org/projects/jigsaw/">Jigsaw</a>。</p>
 <h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>我们知道在 Java 9 之前代码都是按包进行组织的，<strong>而模块则是在包的概念上又增加了一个更高层的抽象</strong>，它将多个逻辑、功能上相关的包及资源文件（如 xml 文件）组织成一个可重用的逻辑单元，这个逻辑单元就称为模块。<strong>听起来是不是和 gradle 或者 maven 中的模块很像</strong>？</p>
 <blockquote>
-<p>通常情况下模块中包含着一个模块描述符文件（module-info.class），用来指定模块的名字、依赖（每个模块必须显式声明依赖的模块）、对外暴露的包（其余的包则对外不可见）、模块提供的服务、模块使用的服务以及允许哪些模块可以对其进行反射等配置信息。模块最终都会打包成 jar 包来分发和使用的，那么模块打包的 jar 包和普通的 jar 包有什么区别呢？模块和普通的 jar 包几乎是一样的，只不过比普通的 jar 包在根目录下多了一个模块描述符文件（module-info.class）而已。</p>
+<p>通常情况下模块中包含着一个模块描述符文件（module-info.class），用来指定模块的名字、依赖（每个模块必须显式声明依赖的模块）、对外暴露的包（其余的包则对外不可见）、模块提供的服务、模块使用的服务以及允许哪些模块可以对其进行反射等配置信息。模块最终都会打包成 jar 包来分发和使用，那么模块打包的 jar 包和普通的 jar 包有什么区别呢？模块和普通的 jar 包几乎是一样的，只不过比普通的 jar 包在根目录下多了一个模块描述符文件（module-info.class）而已。</p>
 </blockquote>
 <h4 id="模块化的目标"><a href="#模块化的目标" class="headerlink" title="模块化的目标"></a>模块化的目标</h4><p>根据 <a target="_blank" rel="noopener" href="https://openjdk.org/projects/jigsaw/spec/">JSR 376</a> 规范的描述，模块化要实现以下几个目标：</p>
 <ul>
@@ -439,7 +439,7 @@
 </ul>
 </li>
 <li>强封装<ul>
-<li>模块化机制要求模块中的包（package）只有在 <strong>显式的导出</strong> 后才可以被其他模块所使用，并且其他模块必须 <strong>显式的声明</strong> 它需要这个模块的包之后才能使用这些包。这种机制可以提高安全性，攻击者能够访问的类越少越安全。</li>
+<li>模块化机制要求模块中的包（package）只有在 <strong>显式的导出</strong> 后才可以被其他模块使用，并且其他模块必须 <strong>显式的声明</strong> 它需要这个模块的包之后才能使用这些包。这种机制可以提高安全性，攻击者能够访问的类越少越安全。</li>
 <li>此外，模块的强封装也有助于我们思考如何组织代码，获得更合理的设计。</li>
 </ul>
 </li>
