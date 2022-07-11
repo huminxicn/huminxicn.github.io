@@ -90,7 +90,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/java-version.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/g1.png">
 <meta property="article:published_time" content="2022-07-06T03:30:47.000Z">
-<meta property="article:modified_time" content="2022-07-08T10:24:40.313Z">
+<meta property="article:modified_time" content="2022-07-11T03:33:50.557Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="Java 17">
@@ -374,27 +374,13 @@
 
 <p>伴随 Java 版本的更新，垃圾收集器（GC，Garbage Collection）也在不断迭代优化。从经典的 Serial，到划时代的并发收集器 CMS、再到全新思路设计的 G1、以及最新的低延迟收集器 Shenandoah、ZGC。虽然垃圾收集器的技术在不断进步，但没有最好的收集器，只有更合适的收集器。</p>
 <span id="more"></span>
-
-<h2 id="并行和并发"><a href="#并行和并发" class="headerlink" title="并行和并发"></a>并行和并发</h2><p>并行和并发都是并发编程中的专业名词，在谈论垃圾收集器的语境中，它们可以理解为：</p>
-<ul>
-<li>并行（Parallel）<ul>
-<li>并行描述的是 <strong>多条垃圾收集器线程</strong> 之间的关系。</li>
-<li>说明同一时间有多条垃圾收集器线程在工作，此时用户线程默认是处于等待状态。</li>
-</ul>
-</li>
-<li>并发（Concurrent）<ul>
-<li>并发描述的是 <strong>垃圾收集器线程与用户线程</strong> 之间的关系。</li>
-<li>说明同一时间垃圾收集器线程与用户线程都在运行。</li>
-</ul>
-</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43012792/article/details/107450886">Stop The World</a> 这个词听起来很酷，它是由虚拟机在后台自动发起和自动完成的。<strong>是在用户不可知、不可控的情况下把用户正常工作的线程全部停掉</strong>，这对很多应用来说都是不能接受的。</p>
 <h2 id="垃圾收集器图谱"><a href="#垃圾收集器图谱" class="headerlink" title="垃圾收集器图谱"></a>垃圾收集器图谱</h2><p><code>HotSpot 虚拟机的垃圾收集器图谱</code><br><img gc-preview src="/img/hufei/2022/07/gc-preview.png" width="100%" height="50%"></p>
 <h3 id="分代收集"><a href="#分代收集" class="headerlink" title="分代收集"></a>分代收集</h3><h4 id="Serial"><a href="#Serial" class="headerlink" title="Serial"></a>Serial</h4><p>Serial 收集器是最基础、历史最悠久的收集器，曾经是 HotSpot 虚拟机新生代收集器的唯一选择（在 JDK 1.3.1 之前）。<strong>当它进行垃圾收集时，必须暂停其他所有工作线程，直到它收集结束</strong>。</p>
 <blockquote>
 <p>它是 HotSpot 虚拟机运行在 <a target="_blank" rel="noopener" href="https://blog.csdn.net/timchen525/article/details/76039746">客户端模式</a> 下的默认新生代收集器。优点就是简单而高效（与其他收集器的单线程相比），适用于内存资源受限的环境。</p>
 </blockquote>
 <p><code>64 位操作系统默认是 Server 模式。</code><br><img java-version src="/img/hufei/2022/07/java-version.png" width="100%" height="50%"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43012792/article/details/107450886">Stop The World</a> 这个词听起来很酷，它是由虚拟机在后台自动发起的，<strong>是在用户不可知、不可控的情况下把用户正常工作的线程全部停掉</strong>，这对很多应用来说都是不能接受的。</p>
 <h4 id="Serial-Old"><a href="#Serial-Old" class="headerlink" title="Serial Old"></a>Serial Old</h4><p>Serial Old 是 Serial 收集器的老年代版本，同样是一个单线程收集器。</p>
 <blockquote>
 <p>它是客户端模式下的老年代收集器。在服务端模式下，它可能有两种用途：一种是在 JDK 5 及之前的版本中与 Parallel Scavenge 收集器配合使用；另一种就是在 CMS 收集器发生 <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/50398881">Concurrent Mode Failure</a> 时使用。</p>
@@ -403,6 +389,17 @@
 <blockquote>
 <p>ParNew 与 Serial 相比并没有太多创新之处，但它却是许多运行在服务端模式下的 HotSpot 虚拟机（尤其是 JDK 7 之前）首选的新生代收集器。其中一个很重要的原因是：除了 Serial 收集器之外，只有它能与 CMS 收集器配合工作。</p>
 </blockquote>
+<h4 id="并行和并发"><a href="#并行和并发" class="headerlink" title="并行和并发"></a>并行和并发</h4><p>并行和并发都是并发编程中的专业名词，在谈论垃圾收集器的语境中，它们可以理解为：</p>
+<ul>
+<li>并行（Parallel）<ul>
+<li>并行描述的是 <strong>多条垃圾收集器线程</strong> 之间的关系。说明同一时间有多条垃圾收集器线程在工作，此时用户线程默认是处于等待状态。</li>
+</ul>
+</li>
+<li>并发（Concurrent）<ul>
+<li>并发描述的是 <strong>垃圾收集器线程与用户线程</strong> 之间的关系。说明同一时间垃圾收集器线程与用户线程都在运行。</li>
+</ul>
+</li>
+</ul>
 <h4 id="CMS"><a href="#CMS" class="headerlink" title="CMS"></a>CMS</h4><p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2020/11/12/java-9-cms-gc.html">CMS</a>（Concurrent Mark Sweep）收集器是一种 <strong>以获取最短回收停顿时间为目标</strong> 的收集器。 </p>
 <blockquote>
 <p>在 JDK 5 发布时，HotSpot 推出了一款在强交互应用中具有划时代意义的垃圾收集器——CMS 收集器。这款收集器是 HotSpot 虚拟机中第一款真正意义上支持并发的垃圾收集器，它首次实现了让垃圾收集线程与用户线程（基本上）同时工作。</p>
@@ -652,7 +649,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.</span> <span class="nav-text">并行和并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E5%9B%BE%E8%B0%B1"><span class="nav-number">2.</span> <span class="nav-text">垃圾收集器图谱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86"><span class="nav-number">2.1.</span> <span class="nav-text">分代收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial"><span class="nav-number">2.1.1.</span> <span class="nav-text">Serial</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial-Old"><span class="nav-number">2.1.2.</span> <span class="nav-text">Serial Old</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ParNew"><span class="nav-number">2.1.3.</span> <span class="nav-text">ParNew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMS"><span class="nav-number">2.1.4.</span> <span class="nav-text">CMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Scavenge"><span class="nav-number">2.1.5.</span> <span class="nav-text">Parallel Scavenge</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Old"><span class="nav-number">2.1.6.</span> <span class="nav-text">Parallel Old</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86"><span class="nav-number">2.2.</span> <span class="nav-text">分区收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Garbage-First"><span class="nav-number">2.2.1.</span> <span class="nav-text">Garbage First</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shenandoah"><span class="nav-number">2.2.2.</span> <span class="nav-text">Shenandoah</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZGC"><span class="nav-number">2.2.3.</span> <span class="nav-text">ZGC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">默认垃圾收集器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-17-%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">4.</span> <span class="nav-text">Java 17 的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E5%9B%BE%E8%B0%B1"><span class="nav-number">1.</span> <span class="nav-text">垃圾收集器图谱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">分代收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial"><span class="nav-number">1.1.1.</span> <span class="nav-text">Serial</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial-Old"><span class="nav-number">1.1.2.</span> <span class="nav-text">Serial Old</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ParNew"><span class="nav-number">1.1.3.</span> <span class="nav-text">ParNew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.1.4.</span> <span class="nav-text">并行和并发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMS"><span class="nav-number">1.1.5.</span> <span class="nav-text">CMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Scavenge"><span class="nav-number">1.1.6.</span> <span class="nav-text">Parallel Scavenge</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Old"><span class="nav-number">1.1.7.</span> <span class="nav-text">Parallel Old</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86"><span class="nav-number">1.2.</span> <span class="nav-text">分区收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Garbage-First"><span class="nav-number">1.2.1.</span> <span class="nav-text">Garbage First</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shenandoah"><span class="nav-number">1.2.2.</span> <span class="nav-text">Shenandoah</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZGC"><span class="nav-number">1.2.3.</span> <span class="nav-text">ZGC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">默认垃圾收集器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-17-%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">Java 17 的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
             
 
           </div>
