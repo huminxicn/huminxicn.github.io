@@ -94,8 +94,12 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/jdk8.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/jdk9.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/jdk17.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-throughput.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-latency.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-p99-pause.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-footprint.png">
 <meta property="article:published_time" content="2022-07-06T03:30:47.000Z">
-<meta property="article:modified_time" content="2022-07-11T12:31:59.526Z">
+<meta property="article:modified_time" content="2022-07-12T03:04:28.470Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="Java 17">
@@ -347,7 +351,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  8.2k
+                  9.4k
                 </span>
               
 
@@ -460,7 +464,32 @@
 <p>CMS 比 G1 早不了多少。CMS 从 jdk 5 开始加入，6 成熟；而 G1 是 7 加入，8 成熟，9 正式成为默认 gc 策略。此时 CMS 就被标记为 Deprecated，随后在 jdk 14 中被移除。</p>
 </blockquote>
 <p>CMS 的杯具之处在于，<strong>它相比前辈们，没有带来革命性的改变；而它的后辈们比它强太多</strong>。它自身的实现又很复杂，兼容性又差，调参也很麻烦，所以无法成为默认 GC 方案了。</p>
-<h2 id="Java-17-的改进"><a href="#Java-17-的改进" class="headerlink" title="Java 17 的改进"></a>Java 17 的改进</h2><h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<h2 id="Java-17-的-GC-改进"><a href="#Java-17-的-GC-改进" class="headerlink" title="Java 17 的 GC 改进"></a>Java 17 的 GC 改进</h2><p>自 Java 8 以来，所有收集器在各个方面都或多或少地有所改进。为了更好地显示进度，下面的比较使用了归一化分数，而不是查看原始分数（基于 16GB 内存测试）。</p>
+<h3 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h3><img gc-throughput src="/img/hufei/2022/07/gc-throughput.png" width="100%" height="50%">
+
+<p>所有收集器的吞吐量与旧版本相比都有显著改善，其中 ZGC 进步最大。</p>
+<h3 id="延迟"><a href="#延迟" class="headerlink" title="延迟"></a>延迟</h3><img gc-latency src="/img/hufei/2022/07/gc-latency.png" width="100%" height="50%">
+
+<p>所有收集器的延迟指标改善的更多，其中 G1 进步最大。</p>
+<p><code>p99 暂停时间</code><br><img gc-p99-pause src="/img/hufei/2022/07/gc-p99-pause.png" width="100%" height="50%"></p>
+<ul>
+<li>可以看到 JDK 17 中的 ZGC 远低于其亚毫秒暂停时间的目标。<ul>
+<li>ZGC 被设计为具有不随堆大小缩放的暂停时间，我们清楚地看到当堆扩大到 128 GB 时就是这种情况。</li>
+</ul>
+</li>
+<li>G1 的目标是在延迟和吞吐量之间保持平衡，保持远低于 200 毫秒的默认暂停时间目标。<ul>
+<li>从暂停时间的角度来看，G1 比 Parallel 更好地处理更大的堆，因为它具有保持暂停时间目标的逻辑。</li>
+</ul>
+</li>
+</ul>
+<h3 id="峰值内存开销"><a href="#峰值内存开销" class="headerlink" title="峰值内存开销"></a>峰值内存开销</h3><img gc-footprint src="/img/hufei/2022/07/gc-footprint.png" width="100%" height="50%">
+这里比较了三个不同收集器的峰值内存开销：
+
+<ul>
+<li>从这个角度来看 Parallel 和 ZGC 都非常稳定。</li>
+<li>G1 在这方面改进很大，主要原因是减少了 <a target="_blank" rel="noopener" href="https://tschatzl.github.io/2021/02/26/early-prune.html">记忆集的内存消耗</a>。</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://gitlab.com/ronglexie/java-books-collections/-/blob/master/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%EF%BC%9AJVM%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%EF%BC%88%E7%AC%AC3%E7%89%88%EF%BC%89%E5%91%A8%E5%BF%97%E6%98%8E.pdf">《深入理解 Java 虚拟机第三版》</a></li>
 <li><a target="_blank" rel="noopener" href="https://kstefanj.github.io/2021/11/24/gc-progress-8-17.html">GC progress from JDK 8 to JDK 17</a></li>
 <li><a target="_blank" rel="noopener" href="https://ost.51cto.com/posts/3824">盘点Java中的那些常用的Garbage Collector</a></li>
@@ -673,7 +702,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E5%9B%BE%E8%B0%B1"><span class="nav-number">1.</span> <span class="nav-text">垃圾收集器图谱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.1.</span> <span class="nav-text">并行和并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86"><span class="nav-number">1.2.</span> <span class="nav-text">分代收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial"><span class="nav-number">1.2.1.</span> <span class="nav-text">Serial</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial-Old"><span class="nav-number">1.2.2.</span> <span class="nav-text">Serial Old</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ParNew"><span class="nav-number">1.2.3.</span> <span class="nav-text">ParNew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMS"><span class="nav-number">1.2.4.</span> <span class="nav-text">CMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Scavenge"><span class="nav-number">1.2.5.</span> <span class="nav-text">Parallel Scavenge</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Old"><span class="nav-number">1.2.6.</span> <span class="nav-text">Parallel Old</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86"><span class="nav-number">1.3.</span> <span class="nav-text">分区收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Garbage-First"><span class="nav-number">1.3.1.</span> <span class="nav-text">Garbage First</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shenandoah"><span class="nav-number">1.3.2.</span> <span class="nav-text">Shenandoah</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZGC"><span class="nav-number">1.3.3.</span> <span class="nav-text">ZGC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">默认垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84-JDK-%E7%89%88%E6%9C%AC%E9%BB%98%E8%AE%A4-GC"><span class="nav-number">2.1.</span> <span class="nav-text">各 JDK 版本默认 GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-CMS-%E4%BB%8E%E6%9D%A5%E6%B2%A1%E6%9C%89%E6%88%90%E4%B8%BA%E9%BB%98%E8%AE%A4%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">为什么 CMS 从来没有成为默认收集器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-17-%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">Java 17 的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E5%9B%BE%E8%B0%B1"><span class="nav-number">1.</span> <span class="nav-text">垃圾收集器图谱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.1.</span> <span class="nav-text">并行和并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86"><span class="nav-number">1.2.</span> <span class="nav-text">分代收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial"><span class="nav-number">1.2.1.</span> <span class="nav-text">Serial</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Serial-Old"><span class="nav-number">1.2.2.</span> <span class="nav-text">Serial Old</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ParNew"><span class="nav-number">1.2.3.</span> <span class="nav-text">ParNew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMS"><span class="nav-number">1.2.4.</span> <span class="nav-text">CMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Scavenge"><span class="nav-number">1.2.5.</span> <span class="nav-text">Parallel Scavenge</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parallel-Old"><span class="nav-number">1.2.6.</span> <span class="nav-text">Parallel Old</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86"><span class="nav-number">1.3.</span> <span class="nav-text">分区收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Garbage-First"><span class="nav-number">1.3.1.</span> <span class="nav-text">Garbage First</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Shenandoah"><span class="nav-number">1.3.2.</span> <span class="nav-text">Shenandoah</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZGC"><span class="nav-number">1.3.3.</span> <span class="nav-text">ZGC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">默认垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84-JDK-%E7%89%88%E6%9C%AC%E9%BB%98%E8%AE%A4-GC"><span class="nav-number">2.1.</span> <span class="nav-text">各 JDK 版本默认 GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-CMS-%E4%BB%8E%E6%9D%A5%E6%B2%A1%E6%9C%89%E6%88%90%E4%B8%BA%E9%BB%98%E8%AE%A4%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">为什么 CMS 从来没有成为默认收集器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-17-%E7%9A%84-GC-%E6%94%B9%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">Java 17 的 GC 改进</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%9E%E5%90%90%E9%87%8F"><span class="nav-number">3.1.</span> <span class="nav-text">吞吐量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F"><span class="nav-number">3.2.</span> <span class="nav-text">延迟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B3%B0%E5%80%BC%E5%86%85%E5%AD%98%E5%BC%80%E9%94%80"><span class="nav-number">3.3.</span> <span class="nav-text">峰值内存开销</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
             
 
           </div>
