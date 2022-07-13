@@ -99,7 +99,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-p99-pause.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-footprint.png">
 <meta property="article:published_time" content="2022-07-06T03:30:47.000Z">
-<meta property="article:modified_time" content="2022-07-12T07:47:29.842Z">
+<meta property="article:modified_time" content="2022-07-13T06:14:30.738Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="Java 17">
@@ -351,7 +351,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  9.7k
+                  9.8k
                 </span>
               
 
@@ -443,6 +443,10 @@
 <blockquote>
 <p>ZGC 是一款在 JDK 11 中新加入的具有实验性质的低延迟垃圾收集器。如果说 RedHat 公司开发的 Shenandoah 像是 G1 收集器的实际继承者的话，那 Oracle 公司开发的 ZGC 就更像是 Azul System 公司独步天下的 PGC（Pauseless GC）和 C4（Concurrent Continuously Compacting Collector）收集器的同胞兄弟。</p>
 </blockquote>
+<p>开启 ZGC 收集器：</p>
+<ul>
+<li><code>-XX:+UseZGC</code> JDK 17 默认收集器为 G1，需要手动开启 ZGC。</li>
+</ul>
 <h2 id="默认垃圾收集器"><a href="#默认垃圾收集器" class="headerlink" title="默认垃圾收集器"></a>默认垃圾收集器</h2><h3 id="各-JDK-版本默认-GC"><a href="#各-JDK-版本默认-GC" class="headerlink" title="各 JDK 版本默认 GC"></a>各 JDK 版本默认 GC</h3><ul>
 <li>JDK 7，默认是 Parallel Scavenge + Serial Old。</li>
 <li>JDK 8 及 JDK 7u40 之后的版本，默认是 Parallel Scavenge + Parallel Old。</li>
