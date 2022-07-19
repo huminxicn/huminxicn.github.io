@@ -99,7 +99,7 @@
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-p99-pause.png">
 <meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/07/gc-footprint.png">
 <meta property="article:published_time" content="2022-07-06T03:30:47.000Z">
-<meta property="article:modified_time" content="2022-07-19T03:24:15.443Z">
+<meta property="article:modified_time" content="2022-07-19T03:34:52.060Z">
 <meta property="article:author" content="胡匪">
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="Java 17">
@@ -436,13 +436,13 @@
 <blockquote>
 <p>在 G1 收集器出现之前的所有收集器（包括 CMS 在内），垃圾收集的目标范围要么是整个新生代（Minor GC），要么是整个老年代（Major GC），再要么就是整个 Java 堆（Full GC）。而 G1 跳出了这个樊笼，它可以面向堆内存任何部分来组成回收集（Collection Set），衡量标准不再是它属于哪个分代，而是哪块内存中存放的垃圾数量最多，回收收益最大，<strong>优先处理回收收益最大的那些 Region，这也就是 Garbage First 名字的由来</strong>。</p>
 </blockquote>
-<h4 id="Shenandoah"><a href="#Shenandoah" class="headerlink" title="Shenandoah"></a>Shenandoah</h4><p><a target="_blank" rel="noopener" href="https://wiki.openjdk.org/display/shenandoah/Main">Shenandoah</a> 是一款只有 OpenJDK 才会包含，而 OracleJDK 里反而不存在的收集器。Shenandoah 收集器的目标之一就是 <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/189">暂停时间与堆大小无关</a>，并且经过优化，中断时间不会超过几毫秒。</p>
+<h4 id="Shenandoah"><a href="#Shenandoah" class="headerlink" title="Shenandoah"></a>Shenandoah</h4><p><a target="_blank" rel="noopener" href="https://wiki.openjdk.org/display/shenandoah/Main">Shenandoah</a> 是一款只有 OpenJDK 才会包含，而 OracleJDK 里反而不存在的收集器。Shenandoah 收集器的目标之一是 <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/189">暂停时间与堆大小无关</a>，并且经过优化，中断时间不会超过几毫秒。</p>
 <blockquote>
 <p>最初 Shenandoah 是由 RedHat 公司独立发展的新型收集器项目，在 2014 年 RedHat 把 Shenandoah 贡献给了 OpenJDK。Shenandoah 作为第一款不由 Oracle（包括以前的 Sun）公司的虚拟机团队领导开发的 HotSpot 垃圾收集器，不可避免地会受到一些来自官方的排挤。</p>
 </blockquote>
-<h4 id="ZGC"><a href="#ZGC" class="headerlink" title="ZGC"></a>ZGC</h4><p><a target="_blank" rel="noopener" href="https://wiki.openjdk.org/display/zgc/Main">ZGC</a> 和 Shenandoah 的目标是高度相似的。都希望在 <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/333">对吞吐量影响不太大的前提下</a>（与使用 G1 相比，应用程序吞吐量减少不超过 15%），实现 <strong>任意堆内存大小下都可以把垃圾收集的停顿时间限制在十毫秒以内</strong> 的低延迟。</p>
+<h4 id="ZGC"><a href="#ZGC" class="headerlink" title="ZGC"></a>ZGC</h4><p><a target="_blank" rel="noopener" href="https://wiki.openjdk.org/display/zgc/Main">ZGC</a> 和 Shenandoah 的目标是高度相似的。ZGC 希望在 <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/333">对吞吐量影响不太大的前提下</a>（与使用 G1 相比，应用程序吞吐量减少不超过 15%），实现 <strong>任意堆内存大小下都可以把垃圾收集的停顿时间限制在十毫秒以内</strong> 的低延迟。</p>
 <blockquote>
-<p>ZGC 是一款在 JDK 11 中新加入的具有实验性质的低延迟垃圾收集器。如果说 RedHat 公司开发的 Shenandoah 像是 G1 收集器的实际继承者的话，那 Oracle 公司开发的 ZGC 就更像是 Azul System 公司独步天下的 PGC（Pauseless GC）和 C4（Concurrent Continuously Compacting Collector）收集器的同胞兄弟。</p>
+<p>ZGC 是一款在 JDK 11 中加入的具有实验性质的低延迟垃圾收集器。如果说 RedHat 公司开发的 Shenandoah 像是 G1 收集器的实际继承者的话，那 Oracle 公司开发的 ZGC 就更像是 Azul System 公司独步天下的 PGC（Pauseless GC）和 C4（Concurrent Continuously Compacting Collector）收集器的同胞兄弟。</p>
 </blockquote>
 <p>开启 ZGC 收集器：</p>
 <ul>
