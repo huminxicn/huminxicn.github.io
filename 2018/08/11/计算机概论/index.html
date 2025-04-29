@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="21 世纪已经过去了 1&#x2F;5，还没有接触过计算机的朋友应该很少了吧。但是，你真的了解你每天都在使用的计算机吗？计算机由哪些部件组成？内存和硬盘有什么区别？在 Windows 上能运行的软件为什么在 Mac OS 上就不能运行了？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机概论">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%A6%82%E8%AE%BA/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="21 世纪已经过去了 1&#x2F;5，还没有接触过计算机的朋友应该很少了吧。但是，你真的了解你每天都在使用的计算机吗？计算机由哪些部件组成？内存和硬盘有什么区别？在 Windows 上能运行的软件为什么在 Mac OS 上就不能运行了？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/08/common-computer.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/08/computer-definition.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/08/computer-component.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/08/compiler.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/08/os.png">
+<meta property="article:published_time" content="2018-08-11T06:11:52.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.836Z">
+<meta property="article:tag" content="计算机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/08/common-computer.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%A6%82%E8%AE%BA/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%A6%82%E8%AE%BA/","path":"2018/08/11/计算机概论/","title":"计算机概论"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机概论 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">计算机的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">计算机的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E4%BA%94%E5%A4%A7%E7%A1%AC%E4%BB%B6%E5%8D%95%E5%85%83"><span class="nav-number">1.2.</span> <span class="nav-text">计算机的五大硬件单元</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU-%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">1.3.</span> <span class="nav-text">CPU 的种类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">操作系统是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E7%A8%8B%E5%BA%8F%E4%B8%8E%E7%BC%96%E8%AF%91%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.1.</span> <span class="nav-text">机器程序与编译程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="nav-number">2.2.</span> <span class="nav-text">操作系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%A6%82%E8%AE%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计算机概论 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机概论
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-08-11 14:11:52" itemprop="dateCreated datePublished" datetime="2018-08-11T14:11:52+08:00">2018-08-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">计算机系统</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>21 世纪已经过去了 1&#x2F;5，还没有接触过计算机的朋友应该很少了吧。但是，你真的了解你每天都在使用的计算机吗？计算机由哪些部件组成？内存和硬盘有什么区别？在 Windows 上能运行的软件为什么在 Mac OS 上就不能运行了？</p>
+<span id="more"></span>
+
+<h2 id="计算机的结构"><a href="#计算机的结构" class="headerlink" title="计算机的结构"></a>计算机的结构</h2><h3 id="计算机的定义"><a href="#计算机的定义" class="headerlink" title="计算机的定义"></a>计算机的定义</h3><p>生活中常见的如台式电脑、笔记本电脑、平板电脑、智能手机等，这些东西都是计算机。</p>
+<p><code>生活中常见的计算机</code><br><img common-computer src="/img/hufei/2018/08/common-computer.png" width="100%" height="50%"></p>
+<p>这些东西有什么共性呢，它们都是『接受使用者输入的信息，经由 CPU 处理，然后产生有用的资讯』。因此，只要有输入设备(键盘)及输出设备(显示屏)，并且能将你的输入信息转换成有用资讯，就算是一部计算机了。</p>
+<p><code>计算机的定义</code><br><img computer-difinition src="/img/hufei/2018/08/computer-definition.png" width="100%" height="50%"></p>
+<h3 id="计算机的五大硬件单元"><a href="#计算机的五大硬件单元" class="headerlink" title="计算机的五大硬件单元"></a>计算机的五大硬件单元</h3><p>现代的大部分计算机都属于 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%86%AF%C2%B7%E8%AF%BA%E4%BC%8A%E6%9B%BC%E7%BB%93%E6%9E%84">冯·诺伊曼</a> 结构，这是一种将程序指令存储器和数据存储器合并在一起的计算机结构。</p>
+<ul>
+<li>控制单元</li>
+</ul>
+<ul>
+<li>负责从存储单元中取出指令，并对指令进行 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%AF%91%E7%A0%81%E5%99%A8">译码</a>。根据指令的要求，负责向其它各部件发出控制信号，保证各部件协调一致地工作。控制器主要由寄存器、译码器、程序计数器等组成。</li>
+</ul>
+<ul>
+<li>运算单元</li>
+</ul>
+<ul>
+<li>运算单元又称算术逻辑单元(Arithmetic Logic Unit, ALU)。它是计算机对数据进行加工处理的部件，包括算术运算（加、减、乘、除等）和逻辑运算（与、或、非、异或、比较等）。</li>
+</ul>
+<ul>
+<li>存储单元</li>
+</ul>
+<ul>
+<li>存储单元是计算机存储数据的部件。计算机中的全部信息，包括原始的输入信息、经过初步加工的中间数据以及最后处理完成的有效资讯都存放在存储单元中。而且，指挥计算机运行的各种程序也都存放在存储单元中。存储单元可分为内存储器（内存）和外存储器（硬盘、U 盘等）两种。</li>
+</ul>
+<ul>
+<li>输入单元</li>
+</ul>
+<ul>
+<li>输入单元是给计算机输入信息的设备。它是重要的人机交互接口，负责将输入的信息转换成计算机能识别的二进制码，送入存储单元中保存。</li>
+</ul>
+<ul>
+<li>输出单元</li>
+</ul>
+<ul>
+<li>输出单元是输出计算机处理结果的设备。在大多数情况下，它将这些结果转换成人类可读的形式。</li>
+</ul>
+<p> <code>计算机的五大硬件单元</code><br><img computer-component src="/img/hufei/2018/08/computer-component.png" width="100%" height="50%"></p>
+<p>上面图示中的『系统单元』其实指的就是主机壳内的硬件，重点在于 CPU 与内存。特别要注意的是实线部分代表的数据传输方向，基本上数据都是流经内存再转出去的，至于数据会流进&#x2F;流出内存则是由 CPU 所控制的。 <strong>而 CPU 实际要处理的数据则完全来自于内存！</strong> 这是个很重要的概念喔！这也是为什么当你的内存不足时，系统的性能就很糟糕(这也是电脑厂商拼命宣扬自己的电脑内存空间大的原因)。</p>
+<h3 id="CPU-的种类"><a href="#CPU-的种类" class="headerlink" title="CPU 的种类"></a>CPU 的种类</h3><p>其实 CPU 内部已经含有一些微指令，我们所使用的软件都要经过 CPU 内部的微指令集来完成才行。而这些指令集的设计主要分为两种设计理念，这就是目前世界上常见的两种主要 CPU 架构，分别是： <strong>精简指令集</strong> 和 <strong>复杂指令集</strong>。</p>
+<ul>
+<li>精简指令集(Reduced Instruction Set Computing, RISC)</li>
+</ul>
+<ul>
+<li>这种 CPU 的设计中，微指令较为精简，每个指令执行的时间都很短，完成的操作也很单纯，指令的执行性能较佳；但是要做复杂的事情，就要由多个指令来完成。</li>
+</ul>
+<ul>
+<li>复杂指令集(Complex Instruction Set Computing, CISC)</li>
+</ul>
+<ul>
+<li>与 RISC 不同，在 CISC 的微指令集中，每个指令可以执行一些较低阶的硬件操作，指令数目多而且复杂，每条指令的长度并不相同。因为指令执行较为复杂，所以每条指令花费的时间较长，但每条指令可以处理的工作较为丰富。</li>
+</ul>
+<h2 id="操作系统是什么"><a href="#操作系统是什么" class="headerlink" title="操作系统是什么"></a>操作系统是什么</h2><h3 id="机器程序与编译程序"><a href="#机器程序与编译程序" class="headerlink" title="机器程序与编译程序"></a>机器程序与编译程序</h3><p>我们知道计算机只认识 0 和 1，且计算机最重要的运算与逻辑判断都在 CPU 内执行，而 CPU 又有着自己独特的指令集。因此，当我们需要 CPU 帮忙工作时，就得要参考微指令集的内容，然后编写让 CPU 读得懂的指令码给 CPU 执行，这样就能够让 CPU 运行了。理论上这样是行的通的(<a target="_blank" rel="noopener" href="http://www.techug.com/post/the-world-of-programming.html">纸带打孔编程</a>)，但利用这种方式编程存在以下几个难点：</p>
+<ul>
+<li>需要了解机器语言</li>
+</ul>
+<ul>
+<li>机器只认识 0 和 1，因此你必须要学习直接写给机器看的语言。这个相当有挑战！</li>
+</ul>
+<ul>
+<li>需要了解所有硬件的功能函数</li>
+</ul>
+<ul>
+<li>因为你的程序要写给机器看，你就必须要参考机器本身的功能，然后针对该功能去编写程序。例如，你要让 DVD 影片能够放映，那就得要参考 DVD 光碟机的硬件信息才行。万一你的系统有比较冷门的硬件，光是参考技术手册就可能会晕倒。</li>
+</ul>
+<ul>
+<li>程序不具有可移植性</li>
+</ul>
+<ul>
+<li>每个 CPU 都有独特的微指令集，同样，每个硬件都有其独特的功能函数。因此，你为 A 计算机编写的程序，理论上是没有办法在 B 计算机上面运行的。</li>
+</ul>
+<ul>
+<li>程序不可复用</li>
+</ul>
+<ul>
+<li>因为这样的程序必须要针对硬件功能函数来编写，如果已经开发了一个浏览器程序，想要再开发文件管理程序时，还是得重头再参考一遍硬件的功能函数来编写，每天都在挑战『硬件』。</li>
+</ul>
+<p><code>编译器的角色</code><br><img compiler src="/img/hufei/2018/08/compiler.png" width="100%" height="50%"></p>
+<p>针对上述的种种问题，计算机界的前辈们想到了一种解决思路：人为什么要直接去理解计算机语言呢？我们可以设计出一种便于人类理解的语言，用它来编程，然后再通过一个编译程序，将写好的代码翻译成机器能识别的机器码就行了。如此一来，我们编写与修改程序就变得容易多了！这种语言我们称之为高级语言，常见的如 C、C++、Java、Python、Lisp 等。</p>
+<h3 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h3><p>如同前面提到的，在早期想要让电脑执行程序就得要参考一堆硬件功能函数，并且学习机器语言才能够编写程序。同时每次安装程序时都必须要重新改写，因为硬件与软件功能不见得都一致。那么我如果能够将所有的硬件都驱动，并且提供一个开发软件的参考接口来给工程师使用的话，那开发软件不就变的非常简单了？这就是操作系统啦！</p>
+<ul>
+<li>操作系统内核(Kernel)</li>
+</ul>
+<ul>
+<li>操作系统(Operating System, OS)其实也是一组程序，这组程序的重点在于管理电脑的所有活动以及驱动系统中的所有硬件。</li>
+</ul>
+<ul>
+<li>系统调用(System Call)</li>
+</ul>
+<ul>
+<li>既然我的硬件都是由内核管理，那么如果我想要开发软件的话，自然就得去参考这个内核的相关功能。如此一来不是从原本的参考硬件函数变成参考内核功能，换汤没换药啊！</li>
+<li>为了解决这个问题，操作系统通常会提供一整组的开发接口来给工程师开发软件。工程师只需要遵守该开发接口那就很容易开发软件了。</li>
+</ul>
+<p><code>操作系统角色</code><br><img os src="/img/hufei/2018/08/os.png" width="100%" height="50%"></p>
+<h2 id="应用程序"><a href="#应用程序" class="headerlink" title="应用程序"></a>应用程序</h2><p>应用程序是参考操作系统提供的开发接口所开发出来的软件，这些软件会利用计算机的一些硬件功能，来达到用户的目的。</p>
+<ul>
+<li>举例来说，Office 软件主要是用来让用户办公用的；影像处理软件主要是让用户用来处理影音资料的；浏览器软件主要是让用户用来上网浏览网页用的等等。</li>
+</ul>
+<p>需要注意的是，应用程序是与操作系统有关系的，参照上图。因此，如果你想要购买新的软件，请务必查看软件上面的说明，看看该软件是否能够支持你的操作系统。</p>
+<ul>
+<li>举例来说，如果你想要购买线上游戏光碟，务必参考一下该光碟是否支持你的操作系统，例如是否支持 Windows XP&#x2F;Windows 98&#x2F;Mac&#x2F;Linux 等等。不要购买了之后才发现该软件无法安装在你的操作系统上！</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://linux.vbird.org/linux_basic/0105computers.php">《鸟哥的 Linux 私房菜》</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%B2%BE%E7%AE%80%E6%8C%87%E4%BB%A4%E9%9B%86">精简指令集</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/kai8wei/article/details/51030569">精简指令集和复杂指令集的区别</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.techug.com/post/the-world-of-programming.html">编程语言的世界：被历史埋没的先驱</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%AF%91%E7%A0%81%E5%99%A8">译码器</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%86%AF%C2%B7%E8%AF%BA%E4%BC%8A%E6%9B%BC%E7%BB%93%E6%9E%84">冯·诺伊曼结构</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%93%88%E4%BD%9B%E7%BB%93%E6%9E%84">哈佛架构</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/" rel="tag"># 计算机</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/07/03/Web%20%E9%A1%B5%E9%9D%A2%E7%9A%84%E8%AF%B7%E6%B1%82%E5%8E%86%E7%A8%8B/" rel="prev" title="Web 页面的请求历程">
+                  <i class="fa fa-angle-left"></i> Web 页面的请求历程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/11/15/%E7%9B%B4%E6%8E%A5%E7%BB%A7%E6%89%BF%20Thread%20%E7%B1%BB%E5%92%8C%E5%AE%9E%E7%8E%B0%20Runnable%20%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E6%9C%89%E5%92%8C%E5%BC%82%E5%90%8C/" rel="next" title="直接继承 Thread 类和实现 Runnable 接口来创建线程有和异同">
+                  直接继承 Thread 类和实现 Runnable 接口来创建线程有和异同 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

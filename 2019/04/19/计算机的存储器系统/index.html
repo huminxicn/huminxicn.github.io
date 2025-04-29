@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="按照冯·诺伊曼设计的计算机模型，CPU 执行指令，存储器系统负责存放 CPU 执行的指令和数据。在现代计算机中，存储器系统由不同容量、不同成本、不同访问时间的各级存储器组成。为什么要这样设计呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机的存储器系统">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/04/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="按照冯·诺伊曼设计的计算机模型，CPU 执行指令，存储器系统负责存放 CPU 执行的指令和数据。在现代计算机中，存储器系统由不同容量、不同成本、不同访问时间的各级存储器组成。为什么要这样设计呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/04/ram.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/04/ssd.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/04/memory-hierarchy.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/04/memory-access-time.png">
+<meta property="article:published_time" content="2019-04-19T08:06:41.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.816Z">
+<meta property="article:tag" content="计算机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/04/ram.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/04/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E7%B3%BB%E7%BB%9F/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/04/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E7%B3%BB%E7%BB%9F/","path":"2019/04/19/计算机的存储器系统/","title":"计算机的存储器系统"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机的存储器系统 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E6%8A%80%E6%9C%AF"><span class="nav-number">1.</span> <span class="nav-text">存储技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.1.</span> <span class="nav-text">寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAM"><span class="nav-number">1.2.</span> <span class="nav-text">RAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E7%A1%AC%E7%9B%98"><span class="nav-number">1.3.</span> <span class="nav-text">机械硬盘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSD"><span class="nav-number">1.4.</span> <span class="nav-text">SSD</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">局部性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">存储器层次结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">3.1.</span> <span class="nav-text">高速缓存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/04/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计算机的存储器系统 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机的存储器系统
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-19 16:06:41" itemprop="dateCreated datePublished" datetime="2019-04-19T16:06:41+08:00">2019-04-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">计算机系统</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>按照冯·诺伊曼设计的计算机模型，CPU 执行指令，存储器系统负责存放 CPU 执行的指令和数据。在现代计算机中，存储器系统由不同容量、不同成本、不同访问时间的各级存储器组成。为什么要这样设计呢？</p>
+<span id="more"></span>
+
+<h2 id="存储技术"><a href="#存储技术" class="headerlink" title="存储技术"></a>存储技术</h2><p>一般来说，访问速度越快的存储器造价也越高。下面我们介绍几种常见的存储器。</p>
+<h3 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%AF%84%E5%AD%98%E5%99%A8">寄存器</a></h3><p>寄存器(Register)是 CPU 的组成部分。寄存器容量非常小，它们可用来暂存指令、数据和地址。</p>
+<h3 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Random-access_memory">RAM</a></h3><p>随机访问存储器(Random-Access Memory, RAM)分为两类，静态的和动态的。静态 RAM (SRAM) 比动态 RAM (DRAM) 更快，但也贵的多。SRAM 用来做高速缓存，DRAM 用来做主存以及图形系统的帧缓存区。通常来说，一个计算机系统的 SRAM 不会超过几 MB，但是 DRAM 却可以有几 GB。</p>
+<p><code>Mac-pro 15</code><br><img ram src="/img/hufei/2019/04/ram.png" width="100%" height="100%"></p>
+<p>RAM 中的信息需要通电才能维持。</p>
+<h3 id="机械硬盘"><a href="#机械硬盘" class="headerlink" title="机械硬盘"></a><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%A1%AC%E7%9B%98">机械硬盘</a></h3><p>机械硬盘是常见的保存大量数据的存储设备，现代机械硬盘一般能存储几百 GB 的数据，远远大于基于 RAM 的存储器所能存储的数据。不过，从机械硬盘上读取信息的时间为毫秒级，比从 DRAM 读慢了 10 万倍，比从 SRAM 读慢了 100 万倍。</p>
+<p><code>机械硬盘内部的碟片在通电后开始高速转动</code><br><video src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c5/HardDisk1.ogv/HardDisk1.ogv.480p.vp9.webm" controls> 你的浏览器不支持 <code>video</code> 标签。 </video></p>
+<p>机械硬盘中的信息一旦保存后，不通电也能维持。</p>
+<h3 id="SSD"><a href="#SSD" class="headerlink" title="SSD"></a><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9B%BA%E6%80%81%E7%A1%AC%E7%9B%98">SSD</a></h3><p>固态硬盘(Solid-state driver, SSD)是一种主要以 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E9%97%AA%E5%AD%98">闪存</a> 作为永久性存储器的计算机设备。由于价格及存储空间与机械硬盘有巨大差距，固态硬盘目前还无法完全取代机械硬盘。其读写速度比机械硬盘快 2-3 倍，且无噪音。</p>
+<p><code>Mac-pro 15</code><br><img ssd src="/img/hufei/2019/04/ssd.png" width="100%" height="100%"></p>
+<h2 id="局部性"><a href="#局部性" class="headerlink" title="局部性"></a>局部性</h2><p>一个编写良好的计算机程序常常具有良好的访问局部性(Locality of reference)。访问局部性分为两种，一种是时间局部性，一种是空间局部性。</p>
+<ul>
+<li>时间局部性<ul>
+<li>被引用过一次的内存位置很可能在不远的将来再被多次引用。</li>
+</ul>
+</li>
+<li>空间局部性<ul>
+<li>如果一个内存位置被引用了一次，那么程序很可能在不远的将来引用附近的一个内存位置。</li>
+</ul>
+</li>
+</ul>
+<h2 id="存储器层次结构"><a href="#存储器层次结构" class="headerlink" title="存储器层次结构"></a>存储器层次结构</h2><p>在 CPU 和一个较大较慢的设备(例如主存)之间插入一个更快更小的存储设备(例如高速缓存)的想法已经成为了一个普遍的观念。实际上，每个计算机系统中的存储设备都被组织成了一个存储器层次结构。在这个层次结构中，从上至下，设备的访问速度越来越慢，容量越来越大，并且每个字节的造价也越来越便宜。</p>
+<p><code>存储器层次结构</code><br><img memory-hierarchy src="/img/hufei/2019/04/memory-hierarchy.png" width="100%" height="100%"></p>
+<p>寄存器在层次结构中的最顶部，也就是第 0 级或记为 L0。这里我们展示的是三层高速缓存 L1 到 L3，占据存储器层次结构的第 1 层到第 3层。主存在第 4 层，以此类推。</p>
+<h3 id="高速缓存"><a href="#高速缓存" class="headerlink" title="高速缓存"></a>高速缓存</h3><p><strong>存储器层次结构的主要思想是上一层的存储器作为低一层存储器的高速缓存。</strong> 因此，寄存器就是 L1 的高速缓存，L1 是 L2 的高速缓存，L2 是 L3 的高速缓存， L3 是主存的高速缓存，而主存又是磁盘的高速缓存。在某些具有分布式文件系统的网络系统中，本地磁盘就是存储在其他系统中的数据的高速缓存。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>存储器系统之所以设计成层次结构，主要是以下两点因素导致的</p>
+<ul>
+<li>CPU 的周期时间与各级存储器的访问时间相差过大</li>
+<li>节约成本<ul>
+<li>访问速度越快的存储器造价也就越高，我们无法全部用 SRAM 来做存储器。</li>
+<li>根据程序的局部性原理，我们可以利用高一层的存储器作为低一层的存储器的高速缓存，这样总体上也能达到不错的访问速度。</li>
+</ul>
+</li>
+</ul>
+<p><code>CPU 周期时间与各级存储器的访问时间</code><br><img memory-access-time src="/img/hufei/2019/04/memory-access-time.png" width="100%" height="100%"></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/26912767/">《深入理解计算机系统》</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%AF%84%E5%AD%98%E5%99%A8">寄存器</a></li>
+<li><a target="_blank" rel="noopener" href="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c5/HardDisk1.ogv/HardDisk1.ogv.480p.vp9.webm">硬盘内部的碟片在通电后开始高速转动</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9B%BA%E6%80%81%E7%A1%AC%E7%9B%98">固态硬盘</a></li>
+<li><a target="_blank" rel="noopener" href="https://wdxtub.com/images/14612509876691.jpg">memory-access-time</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/" rel="tag"># 计算机</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/29/%E6%B5%AE%E7%82%B9%E6%95%B0%E5%9C%A8%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%AD%E7%9A%84%E8%A1%A8%E7%A4%BA/" rel="prev" title="浮点数在计算机中的表示">
+                  <i class="fa fa-angle-left"></i> 浮点数在计算机中的表示
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/06/05/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" rel="next" title="虚拟内存">
+                  虚拟内存 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

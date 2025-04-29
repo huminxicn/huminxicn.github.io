@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="在现实世界中，桥梁的功能是将河流的两侧连接起来。Bridge 模式的作用也是将两样东西连接起来，它们分别是『类的功能层次结构』和『类的实现层次结构』。那么，『类的功能层次结构』和『类的实现层次结构』分别指的是什么呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bridge">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/12/24/Bridge/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="在现实世界中，桥梁的功能是将河流的两侧连接起来。Bridge 模式的作用也是将两样东西连接起来，它们分别是『类的功能层次结构』和『类的实现层次结构』。那么，『类的功能层次结构』和『类的实现层次结构』分别指的是什么呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/12/display.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/12/display-result.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/12/bridge-pattern.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/12/practice3-1.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/12/practice3-2.png">
+<meta property="article:published_time" content="2018-12-24T05:23:33.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.993Z">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Bridge">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/12/display.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/12/24/Bridge/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/12/24/Bridge/","path":"2018/12/24/Bridge/","title":"Bridge"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Bridge | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">类的层次结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%92%E5%88%86"><span class="nav-number">1.1.</span> <span class="nav-text">划分</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E6%96%B0%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">1.1.1.</span> <span class="nav-text">增加新的功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E6%96%B0%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">增加新的实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.</span> <span class="nav-text">示例程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD-Display"><span class="nav-number">2.1.</span> <span class="nav-text">功能_Display</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD-CountDisplay"><span class="nav-number">2.2.</span> <span class="nav-text">功能_CountDisplay</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-DisplayImpl"><span class="nav-number">2.3.</span> <span class="nav-text">实现_DisplayImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-StringDisplayImpl"><span class="nav-number">2.4.</span> <span class="nav-text">实现_StringDisplayImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Main"><span class="nav-number">2.5.</span> <span class="nav-text">Main</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bridge-%E4%B8%AD%E7%9A%84%E8%A7%92%E8%89%B2"><span class="nav-number">3.</span> <span class="nav-text">Bridge 中的角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%BC%80%E5%90%8E%E6%9B%B4%E5%AE%B9%E6%98%93%E6%89%A9%E5%B1%95"><span class="nav-number">4.1.</span> <span class="nav-text">分开后更容易扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B9%A0%E9%A2%98"><span class="nav-number">4.2.</span> <span class="nav-text">习题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%94%E6%A1%88"><span class="nav-number">4.3.</span> <span class="nav-text">答案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/12/24/Bridge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Bridge | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Bridge
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-24 13:23:33" itemprop="dateCreated datePublished" datetime="2018-12-24T13:23:33+08:00">2018-12-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在现实世界中，桥梁的功能是将河流的两侧连接起来。Bridge 模式的作用也是将两样东西连接起来，它们分别是『类的功能层次结构』和『类的实现层次结构』。那么，『类的功能层次结构』和『类的实现层次结构』分别指的是什么呢？</p>
+<span id="more"></span>
+
+<h2 id="类的层次结构"><a href="#类的层次结构" class="headerlink" title="类的层次结构"></a>类的层次结构</h2><p>在开始阅读 Bridge 模式的示例代码之前，我们需要先来理解一下这两种层次结构。<strong>这是因为如果不能理解河流两边的土地，也就无法理解桥梁存在的意义了。</strong></p>
+<h3 id="划分"><a href="#划分" class="headerlink" title="划分"></a>划分</h3><h4 id="增加新的功能"><a href="#增加新的功能" class="headerlink" title="增加新的功能"></a>增加新的功能</h4><p>假设有一个类 Something。当我们想在 Something 中增加新功能时(想增加一个具体的方法)，会编写一个 Something 类的子类，即 SomethingGood 类。这样就构成了一个小小的层次结构。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Something</span><br><span class="line">    SomethingGood </span><br></pre></td></tr></table></figure>
+<p>这就是为了增加新的功能而产生的层次结构。</p>
+<ul>
+<li>父类具有基础功能</li>
+<li>在子类中增加新的功能</li>
+</ul>
+<p>以上这种层次结构被称为『类的功能层次结构』。</p>
+<h4 id="增加新的实现"><a href="#增加新的实现" class="headerlink" title="增加新的实现"></a>增加新的实现</h4><p>在 <a target="_blank" rel="noopener" href="https://blog.csdn.net/LoveLion/article/details/8299794">Template Method</a> 模式中，我们学习了抽象类的作用。抽象类声明了一些抽象方法，定义好 API，然后由子类去负责实现这些抽象方法。</p>
+<p>这里其实也存在层次结构。例如，当子类 ConcreteClass 实现了父类 AbstractClass 类的抽象方法时，他们之间就构成了一个小小的层次结构。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AbstractClass</span><br><span class="line">    concreteClass</span><br></pre></td></tr></table></figure>
+
+<p>但是，这里的类的层次结构并非用于增加功能。它的真正作用是帮助我们实现下面这样的任务分担。</p>
+<ul>
+<li>父类通过声明抽象方法来定义接口</li>
+<li>子类通过实现具体方法来实现接口</li>
+</ul>
+<p>这种层次结构被称为『类的实现层次结构』。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>通过前面的学习，大家应该理解了类的功能层次结构与类的实现层次结构。那么，当我们想要编写子类时，就需要像这样先确认自己的意图：我是要增加功能呢？还是要增加实现呢？</p>
+<h2 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h2><p>下面我们来看一段使用了 Bridge 模式的示例程序。这段程序的功能是『显示一些东西』。</p>
+<table>
+<thead>
+<tr>
+<th>在桥的哪一侧</th>
+<th>类名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>功能层次</td>
+<td>Display</td>
+<td>负责『显示』的类</td>
+</tr>
+<tr>
+<td>功能层次</td>
+<td>CountDisplay</td>
+<td>增加了『指定显示次数』功能</td>
+</tr>
+<tr>
+<td>实现层次</td>
+<td>DisplayImpl</td>
+<td>负责『显示』的类</td>
+</tr>
+<tr>
+<td>实现层次</td>
+<td>StringDisplayImpl</td>
+<td>『用字符串显示』的类</td>
+</tr>
+<tr>
+<td></td>
+<td>Main</td>
+<td>测试程序行为</td>
+</tr>
+</tbody></table>
+<p><code>类结构图</code><br><img display src="/img/hufei/2018/12/display.png" width="50%" height="50%"></p>
+<h3 id="功能-Display"><a href="#功能-Display" class="headerlink" title="功能_Display"></a>功能_Display</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Display &#123;</span><br><span class="line">    private DisplayImpl impl;</span><br><span class="line"></span><br><span class="line">    public Display(DisplayImpl impl) &#123;</span><br><span class="line">        this.impl = impl;</span><br><span class="line">    &#125;</span><br><span class="line">    public void open() &#123;</span><br><span class="line">        impl.rawOpen();</span><br><span class="line">    &#125;</span><br><span class="line">    public void print() &#123;</span><br><span class="line">        impl.rawPrint();</span><br><span class="line">    &#125;</span><br><span class="line">    public void close() &#123;</span><br><span class="line">        impl.rawClose();</span><br><span class="line">    &#125;</span><br><span class="line">    public final void display() &#123;</span><br><span class="line">        open();</span><br><span class="line">        print();</span><br><span class="line">        close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Display 类的功能是抽象的，负责『显示一些东西』。该类位于『类的功能层次结构』的最上层。</p>
+<ul>
+<li>impl 字段中保存的是实现了 Display 类的具体功能的实例。impl 字段即是类的两个层次结构之间的桥梁。</li>
+<li>open、print、close 这三个方法是 Display 类提供的接口，他们表示显示的步骤。这三个方法都调用了 impl 字段的实现方法。这样，Display 的接口就被转换成为了 DisplayImpl 的接口。</li>
+</ul>
+<h3 id="功能-CountDisplay"><a href="#功能-CountDisplay" class="headerlink" title="功能_CountDisplay"></a>功能_CountDisplay</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class CountDisplay extends Display &#123;</span><br><span class="line">    public CountDisplay(DisplayImpl impl) &#123;</span><br><span class="line">        super(impl);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //循环显示 times 次。</span><br><span class="line">    public void multiDisplay(int times) &#123;</span><br><span class="line">        open();</span><br><span class="line">        for (int i = 0; i &lt; times; i++) &#123;</span><br><span class="line">            print();</span><br><span class="line">        &#125;</span><br><span class="line">        close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CountDisplay 类在 Display 类的基础上增加了一个新功能。Display 类只具有『显示』的功能，CountDisplay 类则具有『显示规定次数』的功能，这就是 multiDisplay 方法。</p>
+<h3 id="实现-DisplayImpl"><a href="#实现-DisplayImpl" class="headerlink" title="实现_DisplayImpl"></a>实现_DisplayImpl</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public abstract class DisplayImpl &#123;</span><br><span class="line">    public abstract void rawOpen();</span><br><span class="line">    public abstract void rawPrint();</span><br><span class="line">    public abstract void rawClose();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>DisplayImpl 类位于『类的实现层次结构』的最上层。DisplayImpl 是抽象类，它声明了 rawOpen、rawPrint、rawClose 这三个抽象方法，他们分别与 Display 类中的 open、print、close 方法相对应。</p>
+<h3 id="实现-StringDisplayImpl"><a href="#实现-StringDisplayImpl" class="headerlink" title="实现_StringDisplayImpl"></a>实现_StringDisplayImpl</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class StringDisplayImpl extends DisplayImpl &#123;</span><br><span class="line">    private String string;</span><br><span class="line">    private int width;</span><br><span class="line"></span><br><span class="line">    public StringDisplayImpl(String s) &#123;</span><br><span class="line">        this.string = s;</span><br><span class="line">        this.width = s.getBytes().length;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void rawOpen() &#123;</span><br><span class="line">        printLine();</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void rawPrint() &#123;</span><br><span class="line">        System.out.println(&quot;|&quot; + string + &quot;|&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void rawClose() &#123;</span><br><span class="line">        printLine();</span><br><span class="line">    &#125;</span><br><span class="line">    private void printLine() &#123;</span><br><span class="line">        System.out.print(&quot;+&quot;);</span><br><span class="line">        for (int i = 0; i &lt; width; i++) &#123;</span><br><span class="line">            System.out.print(&quot;-&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;+&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>StringDisplayImpl 是真正的实现类。它继承了 DisplayImpl 类，实现了 DisplayImpl 中定义的接口。</p>
+<h3 id="Main"><a href="#Main" class="headerlink" title="Main"></a>Main</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Display d1 = new Display(new StringDisplayImpl(&quot;Hello, China.&quot;));</span><br><span class="line">        Display d2 = new CountDisplay(new StringDisplayImpl(&quot;Hello, World.&quot;));</span><br><span class="line">        CountDisplay d3 = new CountDisplay(new StringDisplayImpl(&quot;Hello, Universe.&quot;));</span><br><span class="line">        d1.display();</span><br><span class="line">        d2.display();</span><br><span class="line">        d3.display();</span><br><span class="line">        d3.multiDisplay(5);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>运行结果</code><br><img display-result src="/img/hufei/2018/12/display-result.png" width="100%" height="50%"></p>
+<h2 id="Bridge-中的角色"><a href="#Bridge-中的角色" class="headerlink" title="Bridge 中的角色"></a>Bridge 中的角色</h2><p><code>Bridge 中的角色介绍</code><br><img bridge-pattern src="/img/hufei/2018/12/bridge-pattern.png" width="100%" height="50%"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="分开后更容易扩展"><a href="#分开后更容易扩展" class="headerlink" title="分开后更容易扩展"></a>分开后更容易扩展</h3><p>Bridge 模式的特征是将『类的功能层次结构』与『类的实现层次结构』分离开了。将类的这两个层次结构分离开有利于独立地对它们进行扩展(见习题)。当想要增加功能时，只需要在『类的功能层次结构』一侧增加类即可，不必对『类的实现层次结构』做任何修改。而且，增加后的功能可以被所有的实现使用。</p>
+<ul>
+<li>例如，我们可以将『类的功能层次结构』应用于软件所运行的操作系统上。如果我们将某个程序中依赖于操作系统的部分划分为 Windows 版、Macintosh 版、Unix 版，那么我们就可以用 Bridge 模式中的『类的实现层次结构』来表现这些依赖于操作系统的部分。也就是说，我们需要编写一个定义这些操作系统的共同接口(API)的 Implementor 角色，然后编写 Windows 版、Macintosh 版、Unix 版的 3 个 ConcreteImplementor 角色。这样一来，无论在『类的功能层次结构』中增加多少个功能，它们都可以工作于这 3 个操作系统上。</li>
+</ul>
+<h3 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h3><p>(1) 请在本章的示例程序中增加一个类，实现『显示字符串若干（随机）次』的功能。请注意此时应当扩展（继承）哪个类。<br><strong>提示</strong><code>用于显示的方法是 void randomDisplay(int times)，它的作用是将字符串随机显示 0-times 次。</code></p>
+<p>(2) 请在本章的示例程序中增加一个类，实现『显示文本文件的内容』的功能。请注意此时应当扩展（继承）哪个类。</p>
+<p>(3) 请在本章的示例程序中增加类，以实现下图的输出效果。</p>
+<p><code>输出结果示例1</code><br><img practice3-1 src="/img/hufei/2018/12/practice3-1.png" width="100%" height="50%"><br><code>输出结果示例2</code><br><img practice3-2 src="/img/hufei/2018/12/practice3-2.png" width="100%" height="50%"></p>
+<p>请思考我们是应当在『类的功能层次结构』中增加类呢？还是应当在『类的实现层次结构』中增加类呢？</p>
+<ul>
+<li>需要一种新的显示方式，那么应当是在『类的功能层次结构』中增加类吧？不过，又好像只要增加一个新的显示字符串的方法就可以了，那么还是在『类的实现层次结构』中增加类会更好吧？究竟应该如何在 Bridge 模式中增加这个类呢？</li>
+</ul>
+<h3 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h3><p><a target="_blank" rel="noopener" href="https://github.com/huminxicn/design-pattern">github 地址</a></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/26933281/">图解设计模式</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Bridge/" rel="tag"># Bridge</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/12/19/Builder/" rel="prev" title="Builder">
+                  <i class="fa fa-angle-left"></i> Builder
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/01/03/macOS%20%E7%BC%96%E8%AF%91%20OpenJDK%2010/" rel="next" title="macOS 编译 OpenJDK 10">
+                  macOS 编译 OpenJDK 10 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

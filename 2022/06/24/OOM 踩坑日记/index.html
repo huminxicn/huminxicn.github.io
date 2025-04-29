@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Java 的异常分为两个体系，Error 和 Exception。Error 表示严重的错误，程序对此一般无能为力；而 Exception 则是运行时的错误，它可以被捕获并处理。今天遇到的 OOM（OutOfMemoryError） 就是一种 Error，而且是最严重的一种，它会导致 Java 进程关闭。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OOM 踩坑日记">
+<meta property="og:url" content="https://huminxi.netlify.com/2022/06/24/OOM%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="Java 的异常分为两个体系，Error 和 Exception。Error 表示严重的错误，程序对此一般无能为力；而 Exception 则是运行时的错误，它可以被捕获并处理。今天遇到的 OOM（OutOfMemoryError） 就是一种 Error，而且是最严重的一种，它会导致 Java 进程关闭。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/health-check.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/restart.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/metaspace.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/ps-eden.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/ps-survivor.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/cms-old.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/major-gc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jprofiler-class.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jprofiler-max-object.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/choose-object.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/income-reference.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/stack-trace.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/more.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/full-stack.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/set-flag.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/slow-query.png">
+<meta property="article:published_time" content="2022-06-24T08:32:08.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.127Z">
+<meta property="article:tag" content="OOM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2022/06/health-check.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2022/06/24/OOM%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2022/06/24/OOM%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/","path":"2022/06/24/OOM 踩坑日记/","title":"OOM 踩坑日记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OOM 踩坑日记 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E5%A0%86%E5%86%85%E5%AD%98"><span class="nav-number">2.1.</span> <span class="nav-text">非堆内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%86%85%E5%AD%98"><span class="nav-number">2.2.</span> <span class="nav-text">堆内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">2.3.</span> <span class="nav-text">原因分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E5%89%8D%E5%AF%B9%E8%B1%A1%E9%9B%86"><span class="nav-number">2.4.</span> <span class="nav-text">当前对象集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%BC%95%E7%94%A8%E5%A0%86%E6%A0%88"><span class="nav-number">2.5.</span> <span class="nav-text">查看引用堆栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%85%A2%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.6.</span> <span class="nav-text">慢查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">修复方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2022/06/24/OOM%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OOM 踩坑日记 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OOM 踩坑日记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-24 16:32:08" itemprop="dateCreated datePublished" datetime="2022-06-24T16:32:08+08:00">2022-06-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">踩坑日记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Java 的异常分为两个体系，Error 和 Exception。Error 表示严重的错误，程序对此一般无能为力；而 Exception 则是运行时的错误，它可以被捕获并处理。今天遇到的 OOM（OutOfMemoryError） 就是一种 Error，而且是最严重的一种，它会导致 Java 进程关闭。</p>
+<span id="more"></span>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p><strong>早上来发现服务由于健康检查失败，自动重启了</strong>。回想了一下最近有什么变更，大概率与昨天发版的内容有关。</p>
+<p><code>健康检查失败</code><br><img health-check src="/img/hufei/2022/06/health-check.png" width="100%" height="50%"></p>
+<p><code>服务重启</code><br><img restart src="/img/hufei/2022/06/restart.png" width="100%" height="50%"></p>
+<h2 id="原因定位"><a href="#原因定位" class="headerlink" title="原因定位"></a>原因定位</h2><p>登录 grafana 平台，查看服务相关的监控（环境是 JDK 8，垃圾收集器是 ParNew + CMS）。</p>
+<h3 id="非堆内存"><a href="#非堆内存" class="headerlink" title="非堆内存"></a>非堆内存</h3><p><code>metaspace 空间</code><br><img metaspace src="/img/hufei/2022/06/metaspace.png" width="100%" height="50%"></p>
+<p>metaspace 空间占用平稳，<strong>无异常</strong>。</p>
+<h3 id="堆内存"><a href="#堆内存" class="headerlink" title="堆内存"></a>堆内存</h3><p><code>eden 空间</code><br><img ps-eden src="/img/hufei/2022/06/ps-eden.png" width="100%" height="50%"></p>
+<p>从 09.16 开始，<strong>Eden 空间 gc 频繁</strong>。</p>
+<p><code>survivor 空间</code><br><img ps-survivor src="/img/hufei/2022/06/ps-survivor.png" width="100%" height="50%"></p>
+<p>从 09.20 开始，<strong>新生代存活对象激增，导致 Survivor 空间不足</strong>。</p>
+<blockquote>
+<p>Eden 和两个 Survivor 分区的默认比例是 8:1:1。可以通过 <code>–XX:SurvivorRatio</code> 参数设置。</p>
+</blockquote>
+<p><code>老年代空间</code><br><img cms-old src="/img/hufei/2022/06/cms-old.png" width="100%" height="50%"></p>
+<p>从 09.22 开始，因为老年代存在 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/july-sunny/p/12618054.html">内存分配担保机制</a>，当 Servivor 空间不足时，后续存活对象直接放入老年代，导致老年代空间暴增。</p>
+<p><code>major gc 时间长达 10s</code><br><img major-gc src="/img/hufei/2022/06/major-gc.png" width="100%" height="50%"></p>
+<p>从 09.22 开始，major gc 时间显著增长，<strong>老年代的内存一直回收不掉，最终触发 OOM，导致系统重启</strong>。</p>
+<p>于是让运维同事帮忙下载 dump 文件。这里用到了两个 JVM 参数：</p>
+<ul>
+<li><code>-XX:+HeapDumpOnOutOfMemoryError</code><ul>
+<li>表示当 JVM 发生 OOM 时，自动生成 dump 文件。</li>
+</ul>
+</li>
+<li><code>-XX:HeapDumpPath=$&#123;目录&#125;</code><ul>
+<li>表示生成 dump 文件的路径，也可以指定文件名称。</li>
+</ul>
+</li>
+</ul>
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><p>在等待 dump 文件下载期间，分析了几个可能发生 OOM 的原因：</p>
+<ul>
+<li>metaspace 空间溢出。<ul>
+<li><strong>首先排除</strong>。</li>
+<li>因为 metaspace 空间稳定，没有出现暴增的情况。</li>
+</ul>
+</li>
+<li>内存泄漏。<ul>
+<li><strong>存在一定可能，仔细分析后排除</strong>。</li>
+<li>老年代空间从 09.20 开始增加，仅过了 2 分钟，09.22 就已经将老年代全部占满。如果是内存泄漏，内存占用速度不会这么快。</li>
+</ul>
+</li>
+<li>存在回收不掉的大对象。<ul>
+<li><strong>极有可能</strong>。</li>
+<li>根据 Eden 空间频繁 gc，Survivor 空间又不足以存放存活对象，以至于短时间内老年代空间就被打满，可以推断，存在回收不掉的大对象。</li>
+</ul>
+</li>
+</ul>
+<h3 id="当前对象集"><a href="#当前对象集" class="headerlink" title="当前对象集"></a>当前对象集</h3><p>拿到 dump 文件之后，用 <a target="_blank" rel="noopener" href="https://www.ej-technologies.com/products/jprofiler/overview.html">JProfiler</a> 工具进行分析。</p>
+<p><code>JProfiler 当前对象集</code><br><img jprofiler-class src="/img/hufei/2022/06/jprofiler-class.png" width="100%" height="50%"></p>
+<p>SettlementRecordDaily 对象是一个数据库表 entity。现在居然有 335M，非常可疑。</p>
+<p><code>JProfiler 最大对象</code><br><img jprofiler-max-object src="/img/hufei/2022/06/jprofiler-max-object.png" width="100%" height="50%"></p>
+<p>前三大对象的内存占比达到 96%，无法回收的大对象就隐藏在其中。从 JDBC42ResultSet 和 DefaultResultHandler 可以推断，<strong>大对象与数据库查询结果有关</strong>。</p>
+<h3 id="查看引用堆栈"><a href="#查看引用堆栈" class="headerlink" title="查看引用堆栈"></a>查看引用堆栈</h3><p>选中大对象 -&gt; <code>使用选定对象</code> -&gt; <code>传入引用</code> -&gt; <code>显示更多</code> -&gt; 查看完整堆栈信息</p>
+<p><code>使用选定对象</code><br><img choose-object src="/img/hufei/2022/06/choose-object.png" width="100%" height="50%"></p>
+<p><code>传入引用</code><br><img income-reference src="/img/hufei/2022/06/income-reference.png" width="100%" height="50%"></p>
+<p><code>Java 堆栈</code><br><img stack-trace src="/img/hufei/2022/06/stack-trace.png" width="100%" height="50%"></p>
+<p><code>显示更多</code><br><img more src="/img/hufei/2022/06/more.png" width="100%" height="50%"></p>
+<p><code>完整堆栈信息</code><br><img full-stack src="/img/hufei/2022/06/full-stack.png" width="100%" height="50%"></p>
+<p>根据堆栈信息，定位到 AdditionalRecordInfoServiceImpl 类的第 732 行。</p>
+<p><code>setAllRemainingAmountRefundFlag 方法</code><br><img set-flag src="/img/hufei/2022/06/set-flag.png" width="100%" height="50%"></p>
+<p>再顺藤摸瓜到 getQuery 这个方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static SettlementRecordDaily getQuery(SettlementRecordDaily current, Integer tradeType) &#123;</span><br><span class="line">    if (Objects.equals(CombineVersionEnum.COMBINE.getVersion(), current.getCombineVersion())) &#123;</span><br><span class="line">        return SettlementRecordDaily.builder().showReference(current.getShowReference()).tradeType(tradeType).build();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return SettlementRecordDaily.builder().gatewayPayNo(current.getGatewayPayNo()).tradeType(tradeType).build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这是一个组装数据库查询条件的方法，昨天发版之后，存在 showReference 或者 gatewayPayNo 为空的情况。<strong>这样组装出来的查询条件，会从数据库查询出大量的结果</strong>。</p>
+<h3 id="慢查询"><a href="#慢查询" class="headerlink" title="慢查询"></a>慢查询</h3><p>再登录到慢查询平台，这段时间果然发生了慢查，印证了这个结论。</p>
+<p><code>慢查询</code><br><img slow-query src="/img/hufei/2022/06/slow-query.png" width="100%" height="50%"></p>
+<h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><p>知道原因之后，修复起来就简单了。只需在代码里加个判断，如果 showReference 或者 gatewayPayNo 为空，就不查询数据库，直接返回空集合即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public List&lt;SettlementRecordDaily&gt; queryDailyList(SettlementRecordDaily current, Integer tradeType) &#123;</span><br><span class="line">    String queryKey = null;</span><br><span class="line">    SettlementRecordDaily query = SettlementRecordDaily.builder()</span><br><span class="line">            .channel(current.getChannel())</span><br><span class="line">            .tradeType(tradeType)</span><br><span class="line">            .build();</span><br><span class="line">    if (Objects.equals(CombineVersionEnum.COMBINE.getVersion(), current.getCombineVersion())) &#123;</span><br><span class="line">        queryKey = current.getShowReference();</span><br><span class="line">        query.setShowReference(queryKey);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        queryKey = current.getGatewayPayNo();</span><br><span class="line">        query.setGatewayPayNo(queryKey);</span><br><span class="line">    &#125;</span><br><span class="line">    //如果 queryKey 值为空，则直接返回空集合，防止查询数据库时发生 OOM。</span><br><span class="line">    if (StringUtils.isBlank(queryKey)) &#123;</span><br><span class="line">        return Collections.EMPTY_LIST;</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;SettlementRecordDaily&gt; dailyList = settlementRecordDailyMapper.selectByEqual(query);</span><br><span class="line">    return dailyList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这是一个典型的 OOM 场景，<strong>由于组装查询条件的代码不够严谨，从而发生拖表的情况</strong>。这样查询回来的大对象无法被立即回收，只能放入老年代。当老年代被打满后，就会触发 OOM，导致系统重启。</p>
+<p>改进点：</p>
+<ul>
+<li>发生 OOM 的第一时间，就应该登录慢查询平台，<strong>查看是否发生慢查询</strong>。</li>
+<li>业务代码在组装数据库查询条件时，<strong>需要要考虑是否存在拖表的情况</strong>。</li>
+<li>如果是通用的查询语句，<strong>在不影响业务的情况下，可以考虑增加 limit 限制</strong>。</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1252599548343744/1264734349295520">Java的异常</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OOM/" rel="tag"># OOM</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/06/08/Java%208%20vs%20Java%2017%20%E6%96%B0%E7%89%B9%E6%80%A7/" rel="prev" title="Java 8 vs Java 17 新特性">
+                  <i class="fa fa-angle-left"></i> Java 8 vs Java 17 新特性
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/07/06/Java%208%20vs%20Java%2017%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/" rel="next" title="Java 8 vs Java 17 垃圾收集器">
+                  Java 8 vs Java 17 垃圾收集器 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="看过直播的同学都知道，直播房间里有个订阅按钮，当你点击订阅之后，下次主播再开播时你就能在第一时间收到通知，以免你错过精彩内容。这就是观察者模式的一种经典应用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Observer">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/02/13/Observer/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="看过直播的同学都知道，直播房间里有个订阅按钮，当你点击订阅之后，下次主播再开播时你就能在第一时间收到通知，以免你错过精彩内容。这就是观察者模式的一种经典应用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/02/weather.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/02/observer-pattern.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/02/result.png">
+<meta property="article:published_time" content="2019-02-13T06:59:39.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.119Z">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Observer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/02/weather.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/02/13/Observer/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/02/13/Observer/","path":"2019/02/13/Observer/","title":"Observer"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Observer | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">示例程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="nav-number">1.2.</span> <span class="nav-text">类结构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Observer"><span class="nav-number">1.3.</span> <span class="nav-text">Observer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Subject"><span class="nav-number">1.4.</span> <span class="nav-text">Subject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DisplayElement"><span class="nav-number">1.5.</span> <span class="nav-text">DisplayElement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A9%E6%B0%94"><span class="nav-number">1.6.</span> <span class="nav-text">天气</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E8%80%85-1-%E5%8F%B7"><span class="nav-number">1.7.</span> <span class="nav-text">观察者 1 号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E8%80%85-2-%E5%8F%B7"><span class="nav-number">1.8.</span> <span class="nav-text">观察者 2 号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Main"><span class="nav-number">1.9.</span> <span class="nav-text">Main</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95"><span class="nav-number">2.</span> <span class="nav-text">扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/02/13/Observer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Observer | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Observer
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-13 14:59:39" itemprop="dateCreated datePublished" datetime="2019-02-13T14:59:39+08:00">2019-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>看过直播的同学都知道，直播房间里有个订阅按钮，当你点击订阅之后，下次主播再开播时你就能在第一时间收到通知，以免你错过精彩内容。这就是观察者模式的一种经典应用。</p>
+<span id="more"></span>
+
+<h2 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h2><h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>假设我们有一个记录天气的气象站，它会收集湿度、温度、气压这三个天气数据，需要在不同类型的显示装置中展示天气。如下图所示</p>
+<img  weather src="/img/hufei/2019/02/weather.png" width="100%" height="50%">
+
+<p>现在我们有一个记录天气变化的类 WeatherData。还有不同类型的显示装置类 FullConditionsDisplay 和 PartConditionsDisplay。</p>
+<h3 id="类结构图"><a href="#类结构图" class="headerlink" title="类结构图"></a>类结构图</h3><img  observer-pattern src="/img/hufei/2019/02/observer-pattern.png" width="100%" height="50%">
+
+<h3 id="Observer"><a href="#Observer" class="headerlink" title="Observer"></a>Observer</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface Observer &#123;</span><br><span class="line">    public void update(float temperature, float humidity, float pressure);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Subject"><a href="#Subject" class="headerlink" title="Subject"></a>Subject</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public interface Subject &#123;</span><br><span class="line">    public void addObserver(Observer o);</span><br><span class="line">    public void removeObserver(Observer o);</span><br><span class="line">    public void notifyObservers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="DisplayElement"><a href="#DisplayElement" class="headerlink" title="DisplayElement"></a>DisplayElement</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface DisplayElement &#123;</span><br><span class="line">    public void display();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="天气"><a href="#天气" class="headerlink" title="天气"></a>天气</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class WeatherData implements Subject &#123;</span><br><span class="line">    private ArrayList&lt;Observer&gt; observers;</span><br><span class="line">    private float temperature;</span><br><span class="line">    private float humidity;</span><br><span class="line">    private float pressure;</span><br><span class="line"></span><br><span class="line">    public WeatherData() &#123;</span><br><span class="line">        observers = new ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addObserver(Observer o) &#123;</span><br><span class="line">        observers.add(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void removeObserver(Observer o) &#123;</span><br><span class="line">        observers.remove(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void notifyObservers() &#123;</span><br><span class="line">        for (int i = 0; i &lt; observers.size(); i++) &#123;</span><br><span class="line">            Observer observer = observers.get(i);</span><br><span class="line">            observer.update(temperature, humidity, pressure);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void measurementsChanged() &#123;</span><br><span class="line">        notifyObservers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setMeasurements(float temperature, float humidity, float pressure) &#123;</span><br><span class="line">        this.temperature = temperature;</span><br><span class="line">        this.humidity = humidity;</span><br><span class="line">        this.pressure = pressure;</span><br><span class="line">        measurementsChanged();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="观察者-1-号"><a href="#观察者-1-号" class="headerlink" title="观察者 1 号"></a>观察者 1 号</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">//展示全部的天气数据。</span><br><span class="line">public class FullConditionsDisplay implements Observer, DisplayElement &#123;</span><br><span class="line">    private float temperature;</span><br><span class="line">    private float humidity;</span><br><span class="line">    private float pressure;</span><br><span class="line">    private Subject weatherData;</span><br><span class="line"></span><br><span class="line">    public FullConditionsDisplay(Subject weatherData) &#123;</span><br><span class="line">        this.weatherData = weatherData;</span><br><span class="line">        weatherData.addObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void update(float temperature, float humidity, float pressure) &#123;</span><br><span class="line">        this.temperature = temperature;</span><br><span class="line">        this.humidity = humidity;</span><br><span class="line">        this.pressure = pressure;</span><br><span class="line">        display();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;full conditions:: temperature:&quot; + temperature</span><br><span class="line">                + &quot;\t humidity:&quot; + humidity + &quot;\t pressure:&quot; + pressure);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="观察者-2-号"><a href="#观察者-2-号" class="headerlink" title="观察者 2 号"></a>观察者 2 号</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">//展示部分天气数据。(温度和湿度)</span><br><span class="line">public class PartConditionsDisplay implements Observer, DisplayElement &#123;</span><br><span class="line">    private float temperature;</span><br><span class="line">    private float humidity;</span><br><span class="line">    private Subject weatherData;</span><br><span class="line"></span><br><span class="line">    public PartConditionsDisplay(Subject weatherData) &#123;</span><br><span class="line">        this.weatherData = weatherData;</span><br><span class="line">        weatherData.addObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void update(float temperature, float humidity, float pressure) &#123;</span><br><span class="line">        this.temperature = temperature;</span><br><span class="line">        this.humidity = pressure;</span><br><span class="line">        display();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;part conditions:&quot; + temperature + &quot;F degrees and &quot; + humidity + &quot;% humidity.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Main"><a href="#Main" class="headerlink" title="Main"></a>Main</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        WeatherData weatherData = new WeatherData();</span><br><span class="line">        PartConditionsDisplay partConditionsDisplay = new PartConditionsDisplay(weatherData);</span><br><span class="line">        FullConditionsDisplay fullConditionsDisplay = new FullConditionsDisplay(weatherData);</span><br><span class="line"></span><br><span class="line">        weatherData.setMeasurements(80, 65, (float) 30.44);</span><br><span class="line">        weatherData.setMeasurements(75, 70, (float) 38.44);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>运行结果</code><br><img  result src="/img/hufei/2019/02/result.png" width="100%" height="50%"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/huminxicn/design-pattern">github 代码地址</a></p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><ul>
+<li>JDK 内置了 Observer 模式，但是却在 JDK9 之后将其标记为 @Deprecated，为什么呢？<ul>
+<li>Observable 被定义成一个类，而不是接口。由于 Java 是单继承的，JDK 内置的实现不够灵活(比如你还想额外继承一个自己的类)，无法满足特定场景。</li>
+<li>Observable 没有实现 Serializable 接口，无法进行序列化，导致其无法适用于网络编程。</li>
+</ul>
+</li>
+<li>既然如此，有能替代它的吗？有，在 java.beans 包中。<ul>
+<li>PropertyChangeListener(Observer)。</li>
+<li>PropertyChangeSupport(Observable)。</li>
+</ul>
+</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/2243615/">Head First 设计模式</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/46380073/observer-is-deprecated-in-java-9-what-should-we-use-instead-of-it/46380252#46380252">Observer is deprecated in Java 9. What should we use instead of it?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Observer/" rel="tag"># Observer</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/01/08/POP%20OOP%20and%20AOP/" rel="prev" title="POP OOP and AOP">
+                  <i class="fa fa-angle-left"></i> POP OOP and AOP
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/02/28/%E8%81%8A%E8%81%8A%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" rel="next" title="聊聊内网穿透">
+                  聊聊内网穿透 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

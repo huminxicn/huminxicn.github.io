@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="从 1995 年 JDK Beta 发布至今，Java 已迭代了 18 个大版本。其中 Java 8、11、17 为长期支持（LTS，Long-term support）的版本。 根据 JRebel 2022 年提供的报告，大部分人还在使用 Java 8，其次是 Java 11，但随着 Java 17（2021.09） 的发布，Java 将迎来新的格局。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 8 vs Java 17 新特性">
+<meta property="og:url" content="https://huminxi.netlify.com/2022/06/08/Java%208%20vs%20Java%2017%20%E6%96%B0%E7%89%B9%E6%80%A7/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="从 1995 年 JDK Beta 发布至今，Java 已迭代了 18 个大版本。其中 Java 8、11、17 为长期支持（LTS，Long-term support）的版本。 根据 JRebel 2022 年提供的报告，大部分人还在使用 Java 8，其次是 Java 11，但随着 Java 17（2021.09） 的发布，Java 将迎来新的格局。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jdk-using.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/upgrade-jdk17.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jdk8-jdk17.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jdk17-modules.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/java-naming-module.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/06/npe-detail.png">
+<meta property="article:published_time" content="2022-06-08T11:22:21.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.027Z">
+<meta property="article:tag" content="Java 17">
+<meta property="article:tag" content="新特性">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2022/06/jdk-using.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2022/06/08/Java%208%20vs%20Java%2017%20%E6%96%B0%E7%89%B9%E6%80%A7/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2022/06/08/Java%208%20vs%20Java%2017%20%E6%96%B0%E7%89%B9%E6%80%A7/","path":"2022/06/08/Java 8 vs Java 17 新特性/","title":"Java 8 vs Java 17 新特性"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 8 vs Java 17 新特性 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E7%8E%B0%E7%8A%B6"><span class="nav-number">1.</span> <span class="nav-text">Java 现状</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-9"><span class="nav-number">2.</span> <span class="nav-text">Java 9</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3%E4%B8%AD%E6%94%AF%E6%8C%81-private-%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">接口中支持 private 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E5%8C%96"><span class="nav-number">2.2.</span> <span class="nav-text">模块化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">2.2.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="nav-number">2.2.2.</span> <span class="nav-text">模块化的目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.2.3.</span> <span class="nav-text">模块的类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E5%A3%B0%E6%98%8E"><span class="nav-number">2.2.4.</span> <span class="nav-text">模块声明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E6%8C%87%E4%BB%A4"><span class="nav-number">2.2.5.</span> <span class="nav-text">模块指令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-11"><span class="nav-number">3.</span> <span class="nav-text">Java 11</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD"><span class="nav-number">3.1.</span> <span class="nav-text">支持类型推断</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-14"><span class="nav-number">4.</span> <span class="nav-text">Java 14</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#switch-%E5%A2%9E%E5%BC%BA"><span class="nav-number">4.1.</span> <span class="nav-text">switch 增强</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-15"><span class="nav-number">5.</span> <span class="nav-text">Java 15</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E5%9D%97"><span class="nav-number">5.1.</span> <span class="nav-text">文本块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E8%AF%A6%E7%BB%86%E7%9A%84-NullPointException-%E4%BF%A1%E6%81%AF"><span class="nav-number">5.2.</span> <span class="nav-text">更详细的 NullPointException 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-16"><span class="nav-number">6.</span> <span class="nav-text">Java 16</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0-record-%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">6.1.</span> <span class="nav-text">增加 record 关键字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#instanceof-%E5%A2%9E%E5%BC%BA"><span class="nav-number">6.2.</span> <span class="nav-text">instanceof 增强</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-17"><span class="nav-number">7.</span> <span class="nav-text">Java 17</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%86%E5%B0%81%E7%B1%BB"><span class="nav-number">7.1.</span> <span class="nav-text">密封类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3"><span class="nav-number">7.2.</span> <span class="nav-text">密封接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2022/06/08/Java%208%20vs%20Java%2017%20%E6%96%B0%E7%89%B9%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 8 vs Java 17 新特性 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 8 vs Java 17 新特性
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-08 19:22:21" itemprop="dateCreated datePublished" datetime="2022-06-08T19:22:21+08:00">2022-06-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>从 1995 年 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-my/Java%E7%89%88%E6%9C%AC%E6%AD%B7%E5%8F%B2">JDK Beta</a> 发布至今，Java 已迭代了 18 个大版本。其中 Java 8、11、17 为长期支持（LTS，Long-term support）的版本。 根据 <a target="_blank" rel="noopener" href="https://www.jrebel.com/resources/java-developer-productivity-report-2022">JRebel 2022</a> 年提供的报告，大部分人还在使用 Java 8，其次是 Java 11，但随着 Java 17（2021.09） 的发布，Java 将迎来新的格局。</p>
+<span id="more"></span>
+
+<h2 id="Java-现状"><a href="#Java-现状" class="headerlink" title="Java 现状"></a>Java 现状</h2><p><code>jdk 使用情况</code><br><img jdk-using src="/img/hufei/2022/06/jdk-using.png" width="100%" height="50%"></p>
+<p><strong>Java 8 位居榜首</strong>，其次是 Java 11，Java 7 或更早版本只占了 5%。</p>
+<p><code>jdk17 升级趋势</code><br><img upgrade-jdk17 src="/img/hufei/2022/06/upgrade-jdk17.png" width="100%" height="50%"></p>
+<p>综合来看，62% 的人打算在未来 12 个月内迁移到 JDK 17。<strong>8% 的人则表示不会升级</strong>。</p>
+<h2 id="Java-9"><a href="#Java-9" class="headerlink" title="Java 9"></a>Java 9</h2><h3 id="接口中支持-private-方法"><a href="#接口中支持-private-方法" class="headerlink" title="接口中支持 private 方法"></a>接口中支持 private 方法</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public interface InterfacePrivate &#123;</span><br><span class="line">    /**</span><br><span class="line">     * JDK 9 支持 private 方法。</span><br><span class="line">     */</span><br><span class="line">    private void p() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * JDK 8 支持 default、static 方法。</span><br><span class="line">     */</span><br><span class="line">    default void d() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * JDK 7 版本之前，接口类只能定义一些抽象方法与常量，子类必须重写接口类中定义的全部方法。</span><br><span class="line">     */</span><br><span class="line">    abstract void a();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>各个版本的 JDK 接口对比</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Java 7 及以前</th>
+<th>Java 8</th>
+<th>Java 9</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>常量</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>抽象方法</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>默认方法</td>
+<td></td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>静态方法</td>
+<td></td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>私有方法</td>
+<td></td>
+<td></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>私有静态方法</td>
+<td></td>
+<td></td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<h3 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h3><p>JDK 9 引入了一个新的特性叫做 JPMS（Java Platform Module System），项目代号为 <a target="_blank" rel="noopener" href="https://openjdk.org/projects/jigsaw/">Jigsaw</a>。</p>
+<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>我们知道在 Java 9 之前代码都是按包进行组织的，<strong>而模块则是在包的概念上又增加了一个更高层的抽象</strong>，它将多个逻辑、功能上相关的包及资源文件（如 xml 文件）组织成一个可重用的逻辑单元，这个逻辑单元就称为模块。<strong>听起来是不是和 gradle 或者 maven 中的模块很像</strong>？</p>
+<blockquote>
+<p>通常情况下模块中包含着一个模块描述符文件（module-info.class），用来指定模块的名字、依赖（每个模块必须显式声明依赖的模块）、对外暴露的包（其余的包则对外不可见）、模块提供的服务、模块使用的服务以及允许哪些模块可以对其进行反射等配置信息。模块最终都会打包成 jar 包来分发和使用，那么模块打包的 jar 包和普通的 jar 包有什么区别呢？模块和普通的 jar 包几乎是一样的，只不过比普通的 jar 包在根目录下多了一个模块描述符文件（module-info.class）而已。</p>
+</blockquote>
+<h4 id="模块化的目标"><a href="#模块化的目标" class="headerlink" title="模块化的目标"></a>模块化的目标</h4><p>根据 <a target="_blank" rel="noopener" href="https://openjdk.org/projects/jigsaw/spec/">JSR 376</a> 规范的描述，模块化要实现以下几个目标：</p>
+<ul>
+<li>可靠的配置<ul>
+<li>模块应该提供一种机制来 <strong>显式的声明模块间的依赖</strong>，从而可以寻着依赖路径提取出所有模块的一个子集来支撑系统的运行。</li>
+</ul>
+</li>
+<li>强封装<ul>
+<li>模块化机制要求模块中的包（package）只有在 <strong>显式的导出</strong> 后才可以被其他模块使用，并且其他模块必须 <strong>显式的声明</strong> 它需要这个模块的包之后才能使用这些包。这种机制可以提高安全性，攻击者能够访问的类越少越安全。</li>
+<li>此外，模块的强封装也有助于我们思考如何组织代码，获得更合理的设计。</li>
+</ul>
+</li>
+<li>增强可扩展性和可维护性<ul>
+<li>之前 Java 平台是作为一个整体部署到操作系统之上的，其中包含了不计其数的包和类，无论我们是否使用，它们都在那里。如果某些类需要更新或打补丁，则要替换整个 Java 平台，难以维护和扩展。</li>
+</ul>
+</li>
+<li>可定制的运行环境<ul>
+<li>Java 9 将平台划分成了 95 个模块，通过使用模块化技术，我们可以定制运行环境，只包含硬件和应用需要的包和类即可。</li>
+<li>例如，设备不支持图形界面的话，我们就可以创建一个不包含 GUI 模块的运行环境，这将极大的降低运行环境的大小，节省不少空间。</li>
+</ul>
+</li>
+</ul>
+<p><code>JDK 8 和 JDK 17 的 jar 包对比</code><br><img jdk8-jdk17 src="/img/hufei/2022/06/jdk8-jdk17.png" width="100%" height="50%"></p>
+<h4 id="模块的类型"><a href="#模块的类型" class="headerlink" title="模块的类型"></a>模块的类型</h4><p>Java 9 的模块可以分为 <a target="_blank" rel="noopener" href="https://www.pixelstech.net/article/1460718799-Different-module-types-in-Java-9">3 种类型</a>：</p>
+<ul>
+<li>命名模块（Named Module）<ul>
+<li>命名模块也称应用模块（Application Module），<strong>模块的根目录中存在声明文件 module-info.java</strong>。</li>
+</ul>
+</li>
+<li>无名模块（Unnamed Module）<ul>
+<li><strong>无名模块是在没有声明文件 module-info.java 的情况下构建的 jar</strong>。这意味着在 Java 8 和更早版本构建的所有 jar 都是无名模块。<strong>无名模块可以读取到其他所有的模块，并且也会将自身所有的包暴露出去</strong>，这为当前应用程序使用 Java 9 提供了极大的便利。</li>
+<li>虽然无名模块导出了自身所有的包，但这并不意味着命名模块可以读取无名模块，因为命名模块在 module-info.java 中无法声明对无名模块的依赖，<strong>无名模块导出所有包的目的在于让其他无名模块可以加载这些类</strong>。</li>
+</ul>
+</li>
+<li>自动模块（Automatic Module）<ul>
+<li><strong>如果命名模块想要读取没有 module-info.java 的 jar 怎么办</strong>？自动模块就是为了解决这个问题，你唯一需要做的就是将 jar 文件放在模块路径而不是类路径中。一个没有 module-info.java 的 jar 一旦放入模块路径，它就会自动成为一个自动模块。</li>
+</ul>
+</li>
+</ul>
+<h4 id="模块声明"><a href="#模块声明" class="headerlink" title="模块声明"></a>模块声明</h4><p>安装完 JDK 9 之后可以通过 <code>java --list-modules</code> 命令来列出所有的模块，这些模块都位于 <code>$JAVA_HOME/jmods</code> 目录下。</p>
+<p><code>jdk 17 的模块，@ 后面是版本号</code><br><img jdk17-modules src="/img/hufei/2022/06/jdk17-modules.png" width="100%" height="50%"></p>
+<h4 id="模块指令"><a href="#模块指令" class="headerlink" title="模块指令"></a>模块指令</h4><p><code>java.naming 模块的声明文件</code><br><img java-naming-module src="/img/hufei/2022/06/java-naming-module.png" width="100%" height="50%"></p>
+<ul>
+<li>requires 指令。<ul>
+<li>该指令用于指定当前模块的依赖模块，每个模块必须显式的声明依赖模块。</li>
+</ul>
+</li>
+<li>exports 和 exports to 指令。<ul>
+<li>exports 指令用于指定当前模块的导出包，而 exports to 指令则限定哪些模块可以访问该导出包。</li>
+</ul>
+</li>
+<li>uses 指令。<ul>
+<li>该指令用于说明当前模块所使用的服务，使当前模块成为服务的消费者。</li>
+</ul>
+</li>
+<li>provides with 指令。<ul>
+<li>该指令用于说明当前模块提供了某个服务的实现，使当前模块成为服务的提供者。</li>
+</ul>
+</li>
+<li>…</li>
+</ul>
+<h2 id="Java-11"><a href="#Java-11" class="headerlink" title="Java 11"></a>Java 11</h2><h3 id="支持类型推断"><a href="#支持类型推断" class="headerlink" title="支持类型推断"></a>支持类型推断</h3><ul>
+<li>局部变量支持类型推断，字段不支持类型推断。</li>
+<li>类型推断特别适合 for 循环。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 类型推断特别适合 for 循环。</span><br><span class="line"> */</span><br><span class="line">public class ForTypeInference &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        for (var s : Spiciness.values()) &#123;</span><br><span class="line">            System.out.println(s);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">enum Spiciness &#123;</span><br><span class="line">    NOT, MILD, MEDIUM, HOT, FLAMING</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Java-14"><a href="#Java-14" class="headerlink" title="Java 14"></a>Java 14</h2><h3 id="switch-增强"><a href="#switch-增强" class="headerlink" title="switch 增强"></a>switch 增强</h3><p>switch 中可以使用 <code>-&gt;</code>，这样就不用在每个分支后面增加 break。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 在 colons() 中，为了防止继续向下执行，每个 case 语句（除了最后的 default）后面都要加上 break。</span><br><span class="line"> * 而 arrows() 中将冒号替换为箭头之后，便不再需要 break 语句了。</span><br><span class="line"> *</span><br><span class="line"> * 注意：不能在一个 switch 中同时用冒号和箭头。</span><br><span class="line"> *</span><br><span class="line"> */</span><br><span class="line">public class ArrowInSwitch &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        range(0, 4).forEach(i -&gt; colons(i));</span><br><span class="line">        range(0, 4).forEach(i -&gt; arrows(i));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static void colons(int i) &#123;</span><br><span class="line">        switch (i) &#123;</span><br><span class="line">            case 1:</span><br><span class="line">                System.out.println(1);</span><br><span class="line">                break;</span><br><span class="line">            case 2:</span><br><span class="line">                System.out.println(2);</span><br><span class="line">                break;</span><br><span class="line">            case 3:</span><br><span class="line">                System.out.println(3);</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">                System.out.println(0);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static void arrows(int i) &#123;</span><br><span class="line">        switch (i) &#123;</span><br><span class="line">            case 1 -&gt; System.out.println(1);</span><br><span class="line">            case 2 -&gt; System.out.println(2);</span><br><span class="line">            case 3 -&gt; System.out.println(3);</span><br><span class="line">            default -&gt; System.out.println(0);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>switch 一直以来都只是一个语句，不会生成结果。现在使用新的关键字 yield 可以从 switch 中返回结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * jdk14 使得 switch 还可以作为一个表达式来使用，因此它可以得到一个值。使用新的关键字 yield 可以从 switch 中返回结果。</span><br><span class="line"> * 如果一个 case 需要多个语句，就将他们放在一对花括号中。</span><br><span class="line"> */</span><br><span class="line">public class SwitchExpression &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        for (var s : new String[]&#123;&quot;i&quot;, &quot;j&quot;, &quot;k&quot;&#125;) &#123;</span><br><span class="line">            System.out.format(&quot;%s %d %d \n&quot;, s, colon(s), arrow(s));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    static int colon(String s) &#123;</span><br><span class="line">        var result = switch (s) &#123;</span><br><span class="line">            case &quot;i&quot;:</span><br><span class="line">                yield 1;</span><br><span class="line">            case &quot;j&quot;:</span><br><span class="line">                yield 2;</span><br><span class="line">            default:</span><br><span class="line">                yield 0;</span><br><span class="line">        &#125;;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static int arrow(String s) &#123;</span><br><span class="line">        var result = switch (s) &#123;</span><br><span class="line">            case &quot;i&quot; -&gt; 1;</span><br><span class="line">            case &quot;j&quot; -&gt; 2;</span><br><span class="line">            default -&gt; &#123;</span><br><span class="line">                System.out.println(&quot;default&quot;);</span><br><span class="line">                yield 0;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Java-15"><a href="#Java-15" class="headerlink" title="Java 15"></a>Java 15</h2><h3 id="文本块"><a href="#文本块" class="headerlink" title="文本块"></a>文本块</h3><p>jdk 15 中添加了文本块（text block），这是从 python 借鉴而来的一个新特性。<strong>但 <code>&quot;&quot;&quot;你好&quot;&quot;&quot;</code> 这种不换行的写法是不支持的</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 我们使用三引号来表示包含换行符的文本块。文本块可以让我们更轻松地创建多行文本。</span><br><span class="line"> */</span><br><span class="line">public class TextBlocks &#123;</span><br><span class="line">    public static final String OLD=&quot;Yesterday, upon the stair,\n&quot;+&quot;I met a man who wasn&#x27;t there\n&quot;;</span><br><span class="line">    public static final String NEW = &quot;&quot;&quot;</span><br><span class="line">            Yesterday, upon the stair,</span><br><span class="line">            I met a man who wasn&#x27;t there</span><br><span class="line">            &quot;&quot;&quot;;</span><br><span class="line">    //不支持的写法。</span><br><span class="line">    //public static final String NO_SUPPORT = &quot;&quot;&quot;你好&quot;&quot;&quot;;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(OLD.equals(NEW));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了支持文本块，String 类里添加了一个新的 formatted() 方法。formatted() 是一个成员方法，是为了仿照 String.format() 这个静态方法而设计的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 文本块的结果是一个常规的字符串，所以其它字符串能做的事情，它也可以做。</span><br><span class="line"> */</span><br><span class="line">public class DataPoint &#123;</span><br><span class="line">    private String location;</span><br><span class="line">    private Double temperature;</span><br><span class="line"></span><br><span class="line">    public DataPoint(String loc, Double temp) &#123;</span><br><span class="line">        location = loc;</span><br><span class="line">        temperature = temp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 支持格式化输出</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;&quot;&quot;</span><br><span class="line">                location: %s</span><br><span class="line">                temperature: %.2f</span><br><span class="line">                &quot;&quot;&quot;.formatted(location, temperature);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        var hill = new DataPoint(&quot;hill&quot;, 45.2);</span><br><span class="line">        var dale = new DataPoint(&quot;dale&quot;, 65.2);</span><br><span class="line">        System.out.println(hill);</span><br><span class="line">        System.out.println(dale);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="更详细的-NullPointException-信息"><a href="#更详细的-NullPointException-信息" class="headerlink" title="更详细的 NullPointException 信息"></a>更详细的 NullPointException 信息</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 更详细的 NullPointerException 信息。</span><br><span class="line"> *</span><br><span class="line"> */</span><br><span class="line">public class BetterNullPointerReports &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        C[] cs = &#123;new C(new B(new A(null))),</span><br><span class="line">                new C(new B(null)),</span><br><span class="line">                new C(null)</span><br><span class="line">        &#125;;</span><br><span class="line">        for (C c : cs) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                System.out.println(c.b.a.s);</span><br><span class="line">            &#125; catch (NullPointerException e) &#123;</span><br><span class="line">                System.out.println(e);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class A &#123;</span><br><span class="line">    String s;</span><br><span class="line"></span><br><span class="line">    A(String s) &#123;</span><br><span class="line">        this.s = s;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class B &#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    B(A a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class C &#123;</span><br><span class="line">    B b;</span><br><span class="line"></span><br><span class="line">    C(B b) &#123;</span><br><span class="line">        this.b = b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>执行结果</code><br><img npe-detail src="/img/hufei/2022/06/npe-detail.png" width="100%" height="50%"></p>
+<h2 id="Java-16"><a href="#Java-16" class="headerlink" title="Java 16"></a>Java 16</h2><h3 id="增加-record-关键字"><a href="#增加-record-关键字" class="headerlink" title="增加 record 关键字"></a>增加 record 关键字</h3><p>要让一个类的对象可以用作 Map（或 Set ）中的键，需要重写 equals() 和 hashCode() 方法。写对很难，如果以后要修改这个类的话，还很容易破坏它们。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * JDK16 增加了 record 关键字。record 定义的是希望成为数据传输对象的类。</span><br><span class="line"> * 当使用 record 关键字时，编译器会自动生成：</span><br><span class="line"> * 1.不可变字段。</span><br><span class="line"> * 2.一个全参的构造器。</span><br><span class="line"> * 3.每个元素都有的访问方法。</span><br><span class="line"> * 4.equals()</span><br><span class="line"> * 5.hashCode()</span><br><span class="line"> * 6.toString()</span><br><span class="line"> * 对于大多数 record，我们只需要给它一个名字和参数，不需要在定义体中添加任何东西。</span><br><span class="line"> * 不能向 record 中添加字段，只能将其定义在头部。不过可以加入静态的方法、字段和初始化器。</span><br><span class="line"> */</span><br><span class="line">public class CopyRecord &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        var r1 = new R(1, 2.0, &#x27;r&#x27;);</span><br><span class="line">        var r2 = new R(r1.a(), r1.b(), r1.c());</span><br><span class="line">        System.out.println(r1.equals(r2));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">record R(int a, double b, char c) &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="instanceof-增强"><a href="#instanceof-增强" class="headerlink" title="instanceof 增强"></a>instanceof 增强</h3><p>一旦确定类型后，就永远不需要对其转型了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * jdk16 中增加了针对 instanceof 的模式匹配（Pattern Matching for instanceof）。</span><br><span class="line"> */</span><br><span class="line">public class SmartCasting &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        dumb(&quot;dumb&quot;);</span><br><span class="line">        smart(&quot;smart&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static void dumb(Object x) &#123;</span><br><span class="line">        if (x instanceof String) &#123;</span><br><span class="line">            String s = (String) x;</span><br><span class="line">            if (s.length() &gt; 0) &#123;</span><br><span class="line">                System.out.format(&quot;%d %s %n&quot;, s.length(), s.toLowerCase());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static void smart(Object x) &#123;</span><br><span class="line"></span><br><span class="line">        if (x instanceof String s &amp;&amp; s.length() &gt; 0) &#123;</span><br><span class="line">            System.out.format(&quot;%d %s %n&quot;, s.length(), s.toLowerCase());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 在 if 智能转型表达式中只能使用 &amp;&amp;。使用 || 则意味着可能 x 是个 instanceof String，或者 s.length &gt; 0。</span><br><span class="line">     * 这意味着 x 可能不是 String，在这种情况下，Java 就不会将 x 智能转型生成 s，因此 s 在 || 右侧是不可用的。</span><br><span class="line">     *</span><br><span class="line">     * @param x</span><br><span class="line">     */</span><br><span class="line">    static void wrong(Object x) &#123;</span><br><span class="line">        //|| 永远不会生效。</span><br><span class="line">        //if (x instanceof String s || s.length() &gt; 0) &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Java-17"><a href="#Java-17" class="headerlink" title="Java 17"></a>Java 17</h2><h3 id="密封类"><a href="#密封类" class="headerlink" title="密封类"></a>密封类</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 密封类。</span><br><span class="line"> * 只有指定的类才能继承 BaseClass。</span><br><span class="line"> */</span><br><span class="line">sealed class BaseClass permits C1, C2, SubBaseClass &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 继承密封类的必须是 final 或 non-sealed。</span><br><span class="line"> */</span><br><span class="line">public final class C1 extends BaseClass &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 继承密封类的必须是 final 或 non-sealed。</span><br><span class="line"> */</span><br><span class="line">public final class C2 extends BaseClass &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 1. 一个 sealed 的基类无法阻止 non-sealed 的子类的使用，因此可以随时开放限制。</span><br><span class="line"> * 2. non-sealed 类可以允许任意数量的子类。</span><br><span class="line"> */</span><br><span class="line">public non-sealed class SubBaseClass extends BaseClass &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * non-sealed 类可以被子类继承。</span><br><span class="line"> */</span><br><span class="line">public class SC1 extends SubBaseClass &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="密封接口"><a href="#密封接口" class="headerlink" title="密封接口"></a>密封接口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 密封接口。</span><br><span class="line"> * jdk 16 的 record 也可以用作接口的密封实现。因为 record 是隐式的 final，所以它们不需要在前面加 final 关键字。</span><br><span class="line"> */</span><br><span class="line">public sealed interface BaseInterface permits I1,R1 &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * record 是隐式的 final，所以不需要再前面加 final 关键字。</span><br><span class="line"> */</span><br><span class="line">public record R1(String type) implements BaseInterface &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/huminxicn/jdk17">代码库链接</a></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>细细想来，连 JDK 8（2014.3）的发布都已经是 8 年前的事情，更别说 JDK 5（2004.9），是时候拥抱变化，迎接 JDK 17 了。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/618778">Java9模块化遇坑</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.pixelstech.net/article/1460718799-Different-module-types-in-Java-9">Java 9 中的不同模块类型</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7065273545768566792">JDK 9 - 17 新特性 &#x2F; 语法概览</a></li>
+<li><a target="_blank" rel="noopener" href="https://malloc.se/blog/zgc-jdk17">ZGC | What’s new in JDK 17</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jdon.com/57736">JDK 17垃圾回收GC性能飞跃提升</a></li>
+<li><a target="_blank" rel="noopener" href="https://ost.51cto.com/posts/3824">盘点Java中的那些常用的Garbage Collector</a></li>
+<li><a target="_blank" rel="noopener" href="https://heapdump.cn/article/233480">译：谁是 JDK8 中最快的 GC</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/418331009/answer/1443666273">为什么 JDK 8 默认使用 Parallel Scavenge 收集器？</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/170572432">新一代垃圾回收器ZGC的探索与实践</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java-17/" rel="tag"># Java 17</a>
+              <a href="/tags/%E6%96%B0%E7%89%B9%E6%80%A7/" rel="tag"># 新特性</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/19/%E7%89%B9%E6%AE%8A%E7%A9%BA%E6%A0%BC%200xC2A0%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="prev" title="特殊空格 0xC2A0 踩坑日记">
+                  <i class="fa fa-angle-left"></i> 特殊空格 0xC2A0 踩坑日记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/06/24/OOM%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="next" title="OOM 踩坑日记">
+                  OOM 踩坑日记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

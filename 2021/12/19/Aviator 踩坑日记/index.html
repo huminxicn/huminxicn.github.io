@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Aviator 是一个高性能、轻量级的 Java 语言实现的表达式求值引擎，主要用于各种表达式的动态求值。Aviator 的实现思路与其他轻量级的求值器不同，其他求值器一般都是通过解释的方式运行，而 Aviator 则是直接将表达式编译成 Java 字节码，交给 JVM 去执行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Aviator 踩坑日记">
+<meta property="og:url" content="https://huminxi.netlify.com/2021/12/19/Aviator%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="Aviator 是一个高性能、轻量级的 Java 语言实现的表达式求值引擎，主要用于各种表达式的动态求值。Aviator 的实现思路与其他轻量级的求值器不同，其他求值器一般都是通过解释的方式运行，而 Aviator 则是直接将表达式编译成 Java 字节码，交给 JVM 去执行。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/log.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/poc-qps.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/Metaspace.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/class-loading2.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/executor-pool.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/compile.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/inner-compile.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/class-loader.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/asm.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/Metaspace-lifecycle-allocation.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/Metaspace-lifecycle-deallocation.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/no-cache.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/cache.png">
+<meta property="article:published_time" content="2021-12-19T02:16:55.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.988Z">
+<meta property="article:tag" content="Aviator">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2021/12/log.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2021/12/19/Aviator%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2021/12/19/Aviator%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/","path":"2021/12/19/Aviator 踩坑日记/","title":"Aviator 踩坑日记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Aviator 踩坑日记 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Metaspace-%E7%A9%BA%E9%97%B4%E6%9A%B4%E6%B6%A8"><span class="nav-number">1.1.</span> <span class="nav-text">Metaspace 空间暴涨</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%88%86%E9%85%8D-Metaspace-%E7%A9%BA%E9%97%B4"><span class="nav-number">2.1.</span> <span class="nav-text">什么时候分配 Metaspace 空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%9B%9E%E6%94%B6-Metaspace-%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.</span> <span class="nav-text">什么时候回收 Metaspace 空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">修复方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2021/12/19/Aviator%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Aviator 踩坑日记 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Aviator 踩坑日记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-19 10:16:55" itemprop="dateCreated datePublished" datetime="2021-12-19T10:16:55+08:00">2021-12-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">踩坑日记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://code.google.com/archive/p/aviator/wikis/User_Guide_zh.wiki">Aviator</a> 是一个高性能、轻量级的 Java 语言实现的表达式求值引擎，主要用于各种表达式的动态求值。Aviator 的实现思路与其他轻量级的求值器不同，其他求值器一般都是通过解释的方式运行，而 Aviator 则是直接将表达式编译成 Java 字节码，交给 JVM 去执行。</p>
+<span id="more"></span>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p><strong>今天发版，监控线上 JVM 信息。发现日志量暴涨，而同时期业务量也增长了一倍多，所以一开始并没有觉着有什么不正常的地方。</strong></p>
+<p><code>日志量暴涨</code><br><img log src="/img/hufei/2021/12/log.png" width="100%" height="50%"><br><code>qps</code><br><img poc-qps src="/img/hufei/2021/12/poc-qps.png" width="30%" height="30%"></p>
+<h3 id="Metaspace-空间暴涨"><a href="#Metaspace-空间暴涨" class="headerlink" title="Metaspace 空间暴涨"></a>Metaspace 空间暴涨</h3><p>直到看到类加载的信息，发现系统在不断地加载类，导致 Metaspace 空间快速增长，频繁触发 <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/41922036">major GC(full GC)</a>。<strong>这是一个极其不正常的现象，因为一个系统运行一段时间之后，其加载的类数量应该是趋于稳定的，不应该存在如此大的波动。</strong><br><code>Metaspace</code><br><img Metaspace src="/img/hufei/2021/12/Metaspace.png" width="100%" height="50%"></p>
+<p><code>class-loading</code><br><img class-loading2 src="/img/hufei/2021/12/class-loading2.png" width="100%" height="50%"></p>
+<h2 id="原因定位"><a href="#原因定位" class="headerlink" title="原因定位"></a>原因定位</h2><p><strong>继续查看监控，发现有一个线程池的调用量暴涨，比平时多了几十倍。</strong><br><code>executor-pool</code><br><img executor-pool src="/img/hufei/2021/12/executor-pool.png" width="100%" height="50%"></p>
+<p>使用这个线程池的是支付路由业务，<strong>里面涉及到了表达式求值的逻辑，用到了 Aviator 框架。</strong><br><code>业务使用的方法</code><br><img compile src="/img/hufei/2021/12/compile.png" width="100%" height="50%"></p>
+<p><strong>compile 方法的关键代码如下：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 将表达式编译为 Expression 对象。</span><br><span class="line"> *</span><br><span class="line"> * @param cacheKey 默认为表达式。</span><br><span class="line"> * @param expression 表达式。 </span><br><span class="line"> * @param cached 是否缓存编译结果。</span><br><span class="line"> * @return</span><br><span class="line"> */</span><br><span class="line">public Expression compile(final String cacheKey, final String expression, final boolean cached) &#123;</span><br><span class="line">  if (expression == null || expression.trim().length() == 0) &#123;</span><br><span class="line">    throw new CompileExpressionErrorException(&quot;Blank expression&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  if (cacheKey == null || cacheKey.trim().length() == 0) &#123;</span><br><span class="line">    throw new CompileExpressionErrorException(&quot;Blank cacheKey&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  //提供两种缓存模式，LRU 缓存和普通缓存。使用 LRU 缓存需要手动指定 LRUMap 容量。</span><br><span class="line">  //默认使用普通缓存。</span><br><span class="line">  if (cached) &#123;</span><br><span class="line">    FutureTask&lt;Expression&gt; existedTask = null;</span><br><span class="line">    if (this.expressionLRUCache != null) &#123;</span><br><span class="line">      boolean runTask = false;</span><br><span class="line">      synchronized (this.expressionLRUCache) &#123;</span><br><span class="line">        //如果命中缓存，直接返回结果，不需要重新编译。</span><br><span class="line">        existedTask = this.expressionLRUCache.get(cacheKey);</span><br><span class="line">        if (existedTask == null) &#123;</span><br><span class="line">          existedTask = newCompileTask(expression, cached);</span><br><span class="line">          runTask = true;</span><br><span class="line">          this.expressionLRUCache.put(cacheKey, existedTask);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      //缓存中不存在时，再重新编译表达式。</span><br><span class="line">      if (runTask) &#123;</span><br><span class="line">        existedTask.run();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      FutureTask&lt;Expression&gt; task = this.expressionCache.get(cacheKey);</span><br><span class="line">      if (task != null) &#123;</span><br><span class="line">        //如果命中缓存，直接返回结果，不需要重新编译。</span><br><span class="line">        return getCompiledExpression(expression, task);</span><br><span class="line">      &#125;</span><br><span class="line">      task = newCompileTask(expression, cached);</span><br><span class="line">      existedTask = this.expressionCache.putIfAbsent(cacheKey, task);</span><br><span class="line">      //缓存中不存在时，再重新编译表达式。</span><br><span class="line">      if (existedTask == null) &#123;</span><br><span class="line">        existedTask = task;</span><br><span class="line">        existedTask.run();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //直接返回之前的编译结果，也就是 Expression 类。</span><br><span class="line">    return getCompiledExpression(cacheKey, existedTask);</span><br><span class="line"></span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    //不开启缓存的情况下，每个表达式都需要重新编译。将会产生大量的 AviatorClassLoader 和 Expression 类。</span><br><span class="line">    return innerCompile(expression, cached);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>在不开启缓存的情况下，innerCompile 方法将会产生大量的类加载器和内部类。这也是 class-loading 图中 class 数量一直增长的原因。</strong></p>
+<p><code>inner-compile 方法</code><br><img inner-compile src="/img/hufei/2021/12/inner-compile.png" width="100%" height="50%"></p>
+<p><code>AviatorClassLoader</code><br><img class-loader src="/img/hufei/2021/12/class-loader.png" width="100%" height="50%"></p>
+<p><code>ASMCodeGenerator</code><br><img asm src="/img/hufei/2021/12/asm.png" width="100%" height="50%"></p>
+<h3 id="什么时候分配-Metaspace-空间"><a href="#什么时候分配-Metaspace-空间" class="headerlink" title="什么时候分配 Metaspace 空间"></a><a target="_blank" rel="noopener" href="https://stuefe.de/posts/Metaspace/what-is-Metaspace/">什么时候分配 Metaspace 空间</a></h3><p><strong>当一个类被加载时，它的类加载器会在 Metaspace 中分配空间用于存放这个类的元数据。</strong> 如下图所示，类加载器 Id 第一次加载类 X 和 Y 的时候，会在 Metaspace 中为它们开辟空间存放元信息。</p>
+<p><code>Metaspace 分配</code><br><img Metaspace-lifecycle-allocation src="/img/hufei/2021/12/Metaspace-lifecycle-allocation.png" width="100%" height="50%"></p>
+<h3 id="什么时候回收-Metaspace-空间"><a href="#什么时候回收-Metaspace-空间" class="headerlink" title="什么时候回收 Metaspace 空间"></a>什么时候回收 Metaspace 空间</h3><p><strong>分配给类的 Metaspace 空间，是归属于这个类的类加载器的。只有当这个类加载器被卸载的时候，这个空间才会释放。</strong> </p>
+<p>所以，只有当这个类加载器加载的所有类都没有存活的对象，并且没有到达这些类和类加载器的引用时，相应的 Metaspace 空间才会被 GC 释放。（<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-12.html#jls-12.7">JLS 12.7. Unloading of Classes and Interfaces</a>）</p>
+<p><code>Metaspace 回收</code><br><img Metaspace-lifecycle-deallocation src="/img/hufei/2021/12/Metaspace-lifecycle-deallocation.png" width="100%" height="50%"></p>
+<h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><p><strong>今天的问题之所以发生，是因为 Aviator 框架会不断地生成新的类加载器和类。</strong> 我们只需要开启缓存，这样表达式的编译结果就会被缓存起来。下次碰到相同的表达式，直接从缓存中返回结果，不用再编译。避免了因为 Metaspace 空间快速增长而导致频繁 major GC 的问题。</p>
+<p><code>修复前</code><br><img no-cache src="/img/hufei/2021/12/no-cache.png" width="100%" height="50%"></p>
+<p><code>修复后</code><br><img cache src="/img/hufei/2021/12/cache.png" width="100%" height="50%"></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li><strong>对于 JVM 里面的内存需要在启动时进行限制，</strong> 包括我们熟悉的堆内存、直接内存和 Metaspace 空间，这是保证线上服务正常运行的兜底措施。</li>
+<li><strong>对于使用了 ASM 等字节码增强工具的类库，在使用他们时请多加小心（尤其是 JDK1.8 以后）</strong>。使用类库时，多注意代码的写法，尽量不要出现明显的内存泄漏。</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://javadoop.com/post/Metaspace">深入理解堆外内存 Metaspace</a></li>
+<li><a target="_blank" rel="noopener" href="https://stuefe.de/posts/Metaspace/what-is-Metaspace/">What is Metaspace?</a></li>
+<li><a target="_blank" rel="noopener" href="https://note.youdao.com/ynoteshare/index.html?id=2c10176144b55c66d553eb03cb5634d1&type=note&_time=1639879624569">问题 metaSpace 频繁FullGC</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/365436606">为什么JVM开启指针压缩后支持的最大堆内存是32G?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Aviator/" rel="tag"># Aviator</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/12/08/Lombok%20%E4%B8%8E%20Mybatis%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="prev" title="Lombok 与 Mybatis 踩坑日记">
+                  <i class="fa fa-angle-left"></i> Lombok 与 Mybatis 踩坑日记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/19/%E7%89%B9%E6%AE%8A%E7%A9%BA%E6%A0%BC%200xC2A0%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="next" title="特殊空格 0xC2A0 踩坑日记">
+                  特殊空格 0xC2A0 踩坑日记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

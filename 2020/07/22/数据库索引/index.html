@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="提到数据库索引，我们并不陌生，在日常工作中会经常接触到。比如某一个 SQL 查询比较慢，分析完原因之后，我们可能就会说『给某个字段加个索引吧』之类的解决方案。但到底什么是索引，索引又是如何工作的呢？今天就一起来聊聊这个话题吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库索引">
+<meta property="og:url" content="https://huminxi.netlify.com/2020/07/22/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="提到数据库索引，我们并不陌生，在日常工作中会经常接触到。比如某一个 SQL 查询比较慢，分析完原因之后，我们可能就会说『给某个字段加个索引吧』之类的解决方案。但到底什么是索引，索引又是如何工作的呢？今天就一起来聊聊这个话题吧。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2020/07/mysql-index-hash.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2020/07/mysql-index-array.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2020/07/mysql-index-b-tree.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2020/07/innodb-index.png">
+<meta property="article:published_time" content="2020-07-22T03:15:21.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.867Z">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2020/07/mysql-index-hash.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2020/07/22/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2020/07/22/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95/","path":"2020/07/22/数据库索引/","title":"数据库索引"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据库索引 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">什么是索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">索引模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">哈希表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84"><span class="nav-number">1.3.</span> <span class="nav-text">有序数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="nav-number">1.4.</span> <span class="nav-text">二叉搜索树</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB-%E7%9A%84%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">InnoDB 的索引模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%B4%E6%8A%A4"><span class="nav-number">3.</span> <span class="nav-text">索引维护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%A2%9E%E4%B8%BB%E9%94%AE"><span class="nav-number">3.1.</span> <span class="nav-text">自增主键</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E4%B8%BB%E9%94%AE"><span class="nav-number">3.2.</span> <span class="nav-text">业务主键</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2020/07/22/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据库索引 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据库索引
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-22 11:15:21" itemprop="dateCreated datePublished" datetime="2020-07-22T11:15:21+08:00">2020-07-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>提到数据库索引，我们并不陌生，在日常工作中会经常接触到。比如某一个 SQL 查询比较慢，分析完原因之后，我们可能就会说『给某个字段加个索引吧』之类的解决方案。但到底什么是索引，索引又是如何工作的呢？今天就一起来聊聊这个话题吧。</p>
+<span id="more"></span>
+
+<h2 id="什么是索引"><a href="#什么是索引" class="headerlink" title="什么是索引"></a>什么是索引</h2><p>简单来说，索引的出现是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，估计你可得找一会儿。同样，对于数据库的表而言，索引就是它的『目录』。</p>
+<h3 id="索引模型"><a href="#索引模型" class="headerlink" title="索引模型"></a>索引模型</h3><p>理论上来说，只要能提高读写效率的数据结构都可以作为索引模型。这里只介绍三种常见的数据结构，它们分别是哈希表、有序数组和搜索树。</p>
+<h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><p>哈希表是一种以键-值（key-value）形式来存储数据的结构，我们只要输入待查找的键（key），就可以找到其对应的值（Value）。哈希表的思路很简单，把值放在数组里，用一个哈希函数把 key 换算成一个确定的位置，然后把 value 放在数组的这个位置上。</p>
+<p>我们知道，多个 key 经过哈希函数的换算，可能会映射到同一个位置（<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/29520044">哈希冲突</a>）。处理这种情况的一种方法是，在这个位置上生成一个链表。</p>
+<p>假设，你现在维护着一个身份证信息和姓名的表，需要根据身份证号查找对应的名字，这时对应的哈希索引的示意图如下所示：</p>
+<p><code>哈希索引示意图</code><br><img mysql-index-hash src="/img/hufei/2020/07/mysql-index-hash.png" width="100%" height="50%"></p>
+<p>图中，User2 和 User4 根据身份证号算出来的值都是 N，但没关系，后面跟了一个链表。假设，这时候你要查 id_4 对应的名字是什么，处理步骤就是：首先，将 id_4 通过哈希函数算出 N；然后，按顺序遍历，找到 User4。</p>
+<p>需要注意的是，图中四个 id_n 对应的值并不是递增的，这样做的好处是增加新的 User 时速度会很快，只需要做一次哈希计算。但缺点是，**因为不是有序的，所以哈希索引做区间查询的速度是很慢的。**你可以设想下，如果你现在要找身份证号在 [id_x, id_y] 这个区间的所有用户，就必须全部扫描一遍了。</p>
+<p>所以，<strong>哈希表这种结构适用于只有等值查询的场景</strong>，比如 Memcached 及其他一些 NoSQL 引擎。</p>
+<h3 id="有序数组"><a href="#有序数组" class="headerlink" title="有序数组"></a>有序数组</h3><p><strong>有序数组在等值查询和范围查询场景中的性能都非常优秀</strong>。还是上面这个根据身份证号查名字的例子，如果我们使用有序数组来实现的话，示意图如下所示：</p>
+<p><code>有序数组索引示意图</code><br><img mysql-index-array src="/img/hufei/2020/07/mysql-index-array.png" width="100%" height="50%"></p>
+<p>我们假设身份证号没有重复，这个数组就是按照身份证号递增的顺序保存的。这时候如果你要查 id_4 对应的名字，用二分法就可以快速查到，这个时间复杂度是 \(O(\log n)\)。</p>
+<p>显然，这个索引结构支持范围查询。你要查身份证号在 [id_x, id_y] 区间的 User，可以先用二分法找到 id_x（如果不存在 id_x，就找到大于 id_x 的第一个 User），然后向右遍历，直到查到第一个大于 id_y 的身份证号，退出循环。</p>
+<p>如果仅仅看查询效率，有序数组就是最好的数据结构了。但是，在需要更新数据的时候就麻烦了，你往中间插入一个记录就必须得挪动后面所有的记录，成本太高。所以，<strong>有序数组索引只适用于静态存储引擎</strong>，比如你要保存的是 2017 年某个城市的所有人口信息，这类不会再修改的数据。</p>
+<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><p>二叉搜索树也是课本里经典的数据结构了。还是上面根据身份证号查名字的例子，如果我们用二叉搜索树来实现的话，示意图如下所示：</p>
+<p><code>二叉搜索树索引示意图</code><br><img mysql-index-b-tree src="/img/hufei/2020/07/mysql-index-b-tree.png" width="100%" height="50%"></p>
+<p>二叉搜索树的特点是：每个节点的左儿子小于父节点，父节点又小于右儿子。这样你要查 id_4 的话，按照图中的搜索顺序就是 UserA -&gt; UserC -&gt; UserG -&gt; User4 这个路径得到。这个时间复杂度是 \(O(\log n)\)。</p>
+<p>当然，为了维持 \(O(\log n)\) 的查询复杂度，你就需要保持这棵树是平衡二叉树，所以更新的时间复杂度也是 \(O(\log n)\)。</p>
+<p>树可以是二叉，也可以是多叉。多叉树就是每个节点有多个儿子，儿子之间的大小保证从左到右递增。二叉树是搜索效率最高的，但实际上大多数的数据库存储却不使用二叉树。其原因是，<strong>索引不止保存在内存中，还要写到磁盘上</strong>。</p>
+<p>你可以想象一下一棵 100 万节点的平衡二叉树，树高 20。一次查询可能需要访问 20 个数据块。在机械硬盘时代，从磁盘随机读一个数据块需要 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2019/04/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E7%B3%BB%E7%BB%9F/">10 ms</a> 左右的寻址时间。也就是说，对于一个 100 万行的表，如果使用二叉树来存储，单独访问一个行可能需要 200 ms 的时间，这是我们无法接受的。</p>
+<p>为了提高查询效率，我们不应该使用二叉树，而是要使用 N 叉树。N 叉树中的 N 取决于数据块的大小。N 叉树凭借在读写上的性能优势，以及适配磁盘的访问模式，已经被广泛应用在数据库引擎中了。</p>
+<blockquote>
+<p>以 InnoDB 的一个整数字段索引为例，这个 N 差不多是 1200。这棵树高是 4 的时候，就可以存 1200 的 3 次方个值，这已经 17 亿了。考虑到树根的数据块总是在内存中的，一个 10 亿行的表上一个整数字段的索引，查找一个值最多只需要访问 3 次磁盘。其实，树的第二层也有很大概率在内存中，那么访问磁盘的平均次数就更少了。</p>
+</blockquote>
+<blockquote>
+<p>不管是哈希还是有序数组，或者 N 叉树，它们都是不断迭代、不断优化的产物或者解决方案。数据库技术发展到今天，跳表、LSM 树等数据结构也被用于引擎设计中，这里就不再一一展开了。</p>
+</blockquote>
+<p><strong>你心里要有个概念，数据库底层存储的核心就是基于这些索引模型的</strong>。每碰到一个新数据库，我们需要先关注它的索引模型，这样才能从理论上分析出这个数据库的适用场景。</p>
+<h2 id="InnoDB-的索引模型"><a href="#InnoDB-的索引模型" class="headerlink" title="InnoDB 的索引模型"></a>InnoDB 的索引模型</h2><p>在 MySQL 中，索引是在存储引擎层实现的，所以并没有统一的索引标准，即不同存储引擎的索引的工作方式不一样。在 InnoDB 中，表都是根据主键顺序以索引的形式存放的，这种表被称为<a target="_blank" rel="noopener" href="https://blog.csdn.net/pianzif/article/details/32106971">索引组织表</a>。<strong>InnoDB 使用了 B+ 树索引模型，所以数据都是存储在 B+ 树中的。</strong></p>
+<p>假设，我们有一个主键列为 ID 的表，表中有字段 k，并且在 k 上有索引。</p>
+<p><code>建表语句</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create table T( id int primary key, k int not null, index (k))engine=InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>表中 R1~R5 的 (ID,k) 值分别为 (100,1)、(200,2)、(300,3)、(500,5) 和 (600,6)，两棵树的示意图如下：</p>
+<p><code>InnoDB 的索引组织结构</code><br><img innodb-index src="/img/hufei/2020/07/innodb-index.png" width="100%" height="50%"></p>
+<p>从图中不难看出，根据叶子节点的内容，索引类型分为主键索引和非主键索引。<strong>主键索引的叶子节点存的是整行数据。</strong> 在 InnoDB 里，主键索引也被称为聚簇索引（clustered index）。<strong>非主键索引的叶子节点存的是主键的值。</strong> 在 InnoDB 里，非主键索引也被称为二级索引（secondary index）。</p>
+<p>根据上面的说明，我们来讨论一个问题：<strong>基于主键索引和普通索引的查询有什么区别？</strong></p>
+<ul>
+<li>如果语句是 select * from T where ID&#x3D;500，即主键查询方式，则只需要搜索 ID 这棵 B+ 树；</li>
+<li>如果语句是 select * from T where k&#x3D;5，即普通索引查询方式，则需要先搜索 k 索引树，得到 ID 的值为 500，再到 ID 索引树搜索一次。这个过程称为回表。</li>
+</ul>
+<p><strong>也就是说，基于非主键索引的查询需要多扫描一棵索引树。因此，我们在应用中尽量要使用主键来查询。</strong></p>
+<h2 id="索引维护"><a href="#索引维护" class="headerlink" title="索引维护"></a>索引维护</h2><p>B+ 树为了维护索引有序性，在插入新值的时候需要做必要的维护。</p>
+<blockquote>
+<p>以上面这个图为例，如果插入行的 ID 值为 700，只需要在 R5 这条记录的后面插入一个新记录即可。如果新插入的 ID 值为 400，就相对麻烦了，需要逻辑上挪动后面的数据，空出位置。而更糟的情况是，如果 R5 所在的数据页已经满了，根据 B+ 树的算法，这时候需要申请一个新的数据页，然后挪动部分数据过去。这个过程称为页分裂。在这种情况下，性能自然会受影响。除了性能外，页分裂操作还影响数据页的利用率。原本放在一个页的数据，现在分到两个页中，整体空间利用率降低大约 50%。</p>
+</blockquote>
+<blockquote>
+<p>当然有分裂就有合并。当相邻两个页由于删除了数据，利用率很低之后，数据页将被合并。合并的过程可以认为是分裂的逆过程。</p>
+</blockquote>
+<p>基于上面索引维护过程的说明，我们来讨论一个案例：</p>
+<blockquote>
+<p>你可能在一些建表规范里面见到过类似的描述，<strong>要求建表语句里一定要有自增主键</strong>。这是为什么呢？</p>
+</blockquote>
+<h3 id="自增主键"><a href="#自增主键" class="headerlink" title="自增主键"></a>自增主键</h3><p>自增主键是指自增列上定义的主键，在建表语句中一般是这么定义的：<code>NOT NULL PRIMARY KEY AUTO_INCREMENT</code>。插入新记录的时候可以不指定 ID 的值，系统会获取当前 ID 最大值加 1 作为下一条记录的 ID 值。</p>
+<p><strong>也就是说，自增主键的插入数据模式，正好符合了我们前面提到的递增插入的场景</strong>。每次插入一条新记录，都是追加操作，都不涉及到挪动其他记录，也不会触发叶子节点的分裂。<strong>当有业务逻辑的字段做主键时，则往往不容易保证有序插入，这样写数据的成本相对较高。</strong></p>
+<p>除了性能方面的考虑，我们还可以从存储空间的角度来看。假设你的表中确实有一个唯一字段，比如字符串类型的身份证号，那应该用身份证号做主键，还是用自增字段做主键呢？</p>
+<p><strong>由于每个非主键索引的叶子节点上存的是主键的值</strong>。如果用身份证号做主键，那么每个二级索引的叶子节点占用约 20 个字节，而如果用整型做主键，则只要 4 个字节，如果是长整型（bigint），则是 8 个字节。<strong>显然，主键长度越小，普通索引的叶子节点就越小，普通索引占用的空间也就越小</strong>。所以，从性能和存储空间方面考量，自增主键往往是更合理的选择。</p>
+<h3 id="业务主键"><a href="#业务主键" class="headerlink" title="业务主键"></a>业务主键</h3><p>那什么场景适合用业务字段直接做主键呢？例如，有些业务的场景是这样的：</p>
+<ul>
+<li>只有一个索引。</li>
+<li>该索引必须是唯一索引。</li>
+</ul>
+<p>你一定看出来了，这就是典型的 KV 场景。由于没有其它索引，所以也就不用考虑其他索引的叶子节点大小。这时候我们就要优先考虑上一段提到的『尽量使用主键查询』原则，直接将这个索引设置为主键，可以避免每次查询时都搜索两棵索引树。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>今天，我们分析了数据库引擎常用的几个数据结构，以及为什么 InnoDB 要选择 B+ 树这个结构。<strong>B+ 树能够很好地配合磁盘的读写特性，减少单次查询的磁盘访问次数。</strong> 由于 InnoDB 是索引组织表，<strong>一般情况下建议创建一个自增主键，这样非主键索引占用的空间最小。</strong> 但事无绝对，也存在使用业务逻辑字段做主键的应用场景，要学会具体场景具体分析。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://time.geekbang.org/column/article/69236">深入浅出索引（上）</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/110178282">MySQL InnoDB索引的存储结构
+</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag"># 索引</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/09/MySQL%20%E4%BA%8B%E5%8A%A1/" rel="prev" title="MySQL 事务">
+                  <i class="fa fa-angle-left"></i> MySQL 事务
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/03/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95%E7%BB%AD/" rel="next" title="数据库索引续">
+                  数据库索引续 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

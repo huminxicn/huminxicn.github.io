@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="因为 Java 代码到机器码之间还存在着字节码，所以 Java 语言的『编译期』其实是一段不确定的过程。它可能是指一个前端编译器把 *.java 文件转变成 *.class 文件的过程；也可能是指虚拟机的运行期编译器（JIT 编译器，Just In Time Compiler）把字节码转变成机器码的过程；还可能是指使用提前编译器（AOT 编译器，Ahead Of Time Compiler）直接把">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 程序编译与代码优化">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/12/10/Java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="因为 Java 代码到机器码之间还存在着字节码，所以 Java 语言的『编译期』其实是一段不确定的过程。它可能是指一个前端编译器把 *.java 文件转变成 *.class 文件的过程；也可能是指虚拟机的运行期编译器（JIT 编译器，Just In Time Compiler）把字节码转变成机器码的过程；还可能是指使用提前编译器（AOT 编译器，Ahead Of Time Compiler）直接把">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/openjdk-8.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-source-code.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-main.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-console.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-helloworld.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-helloworld-class.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-jdk.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/module-dependency.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-compilation-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-compile.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-compile2.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/12/javac-processor.png">
+<meta property="article:published_time" content="2019-12-10T06:00:18.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.034Z">
+<meta property="article:tag" content="编译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/12/openjdk-8.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/12/10/Java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/12/10/Java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/","path":"2019/12/10/Java 程序编译与代码优化/","title":"Java 程序编译与代码优化"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 程序编译与代码优化 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E4%BC%98%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">编译期优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Javac-%E7%BC%96%E8%AF%91%E5%99%A8"><span class="nav-number">2.1.</span> <span class="nav-text">Javac 编译器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.1.1.</span> <span class="nav-text">源码下载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C-main-%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">执行 main 方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E6%96%AD%E7%82%B9"><span class="nav-number">2.1.3.</span> <span class="nav-text">加断点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Javac-%E7%9A%84%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">Javac 的编译过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="nav-number">2.3.</span> <span class="nav-text">语法糖</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E4%B8%8E%E7%B1%BB%E5%9E%8B%E6%93%A6%E9%99%A4"><span class="nav-number">2.3.1.</span> <span class="nav-text">泛型与类型擦除</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">示例 1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">示例 2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1%E3%80%81%E6%8B%86%E7%AE%B1%E4%B8%8E%E9%81%8D%E5%8E%86%E5%BE%AA%E7%8E%AF"><span class="nav-number">2.3.2.</span> <span class="nav-text">自动装箱、拆箱与遍历循环</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-3"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">示例 3</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E7%BC%96%E8%AF%91"><span class="nav-number">2.3.3.</span> <span class="nav-text">条件编译</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-4"><span class="nav-number">2.3.3.1.</span> <span class="nav-text">示例 4</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">2.3.4.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">2.4.</span> <span class="nav-text">编写一个注解处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E6%88%98%E7%9B%AE%E6%A0%87"><span class="nav-number">2.4.1.</span> <span class="nav-text">实战目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.4.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E4%B8%8E%E6%B5%8B%E8%AF%95"><span class="nav-number">2.4.3.</span> <span class="nav-text">运行与测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E5%AE%83%E5%BA%94%E7%94%A8%E6%A1%88%E4%BE%8B"><span class="nav-number">2.4.4.</span> <span class="nav-text">其它应用案例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E6%9C%9F%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">运行期优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/12/10/Java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 程序编译与代码优化 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 程序编译与代码优化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-10 14:00:18" itemprop="dateCreated datePublished" datetime="2019-12-10T14:00:18+08:00">2019-12-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>因为 Java 代码到机器码之间还存在着字节码，所以 Java 语言的『编译期』其实是一段不确定的过程。它可能是指一个前端编译器把 <code>*.java</code> 文件转变成 <code>*.class</code> 文件的过程；也可能是指虚拟机的运行期编译器（JIT 编译器，Just In Time Compiler）把字节码转变成机器码的过程；还可能是指使用提前编译器（AOT 编译器，Ahead Of Time Compiler）直接把 <code>*.java</code> 文件编译成机器码的过程。</p>
+<span id="more"></span>
+
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>下面列举了这 3 类编译过程中一些比较有代表性的编译器。</p>
+<ul>
+<li>前端编译器：Sun 的 Javac、Eclipse JDT 中的增量式编译器（ECJ）。</li>
+<li>JIT 编译器：HotSpot VM 的 C1、C2 编译器。</li>
+<li>AOT 编译器：GNU Compiler for the Java（GCJ）、Excelsior JET。</li>
+</ul>
+<blockquote>
+<p>这 3 类中最符合大家对 Java 程序编译认知的应该是第一类。在限定了编译范围之后，我们需要放宽『代码优化』的定义，因为 Javac 这类编译器对代码的运行效率几乎没有任何优化措施。虚拟机设计团队把对性能的优化集中到了后端的即时编译器中，这样可以让那些不是由 Javac 产生的 Class 文件（如 JRuby、Groovy 等语言的 Class 文件）也同样能享受到编译器优化所带来的好处。不过 Javac 也做了许多针对 Java 语言编码过程的优化来改善程序员的编码风格和提高编码效率。许多新生的 Java 语法特性，都是靠编译器的『语法糖』来实现，而不是依赖虚拟机的底层改进来支持。<strong>总的来说，前端编译器在编译期的优化过程对于程序编码来说更重要，即时编译器在运行期的优化过程对于程序运行来说更重要。</strong></p>
+</blockquote>
+<h2 id="编译期优化"><a href="#编译期优化" class="headerlink" title="编译期优化"></a>编译期优化</h2><h3 id="Javac-编译器"><a href="#Javac-编译器" class="headerlink" title="Javac 编译器"></a>Javac 编译器</h3><p>了解一项技术的实现内幕的最有效的手段是分析源码。Javac 编译器不像 HotSpot 虚拟机那样使用 C++ 语言实现，它本身就是一个由 Java 语言编写的程序，这为纯 Java 的程序员了解它的编译过程带来了很大的便利。</p>
+<h4 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a>源码下载</h4><p>去 <a target="_blank" rel="noopener" href="http://hg.openjdk.java.net/jdk8/jdk8/langtools">OpenJDK</a> 的官网下载源码。<br><img openjdk-8 src="/img/hufei/2019/12/openjdk-8.png" width="100%" height="50%"></p>
+<p><code>openjdk 8 源码目录</code><br><img javac-source-code src="/img/hufei/2019/12/javac-source-code.png" width="100%" height="50%"></p>
+<p>创建一个 javac-source-code 项目，将 src&#x2F;share&#x2F;classes&#x2F;com 目录下的所有内容拷贝至 src 目录。</p>
+<h4 id="执行-main-方法"><a href="#执行-main-方法" class="headerlink" title="执行 main 方法"></a>执行 main 方法</h4><p>导入 Javac 的源码后，就可以运行 com.sun.tools.javac.Main 的 main 方法来执行编译了，这与直接在命令行中使用 Javac 没有什么区别。<br><code>Javac 主函数入口</code><br><img javac-main src="/img/hufei/2019/12/javac-main.png" width="100%" height="50%"></p>
+<p>运行 main 方法，由于我们没有指定要编译的源代码路径，控制台会输出下面的内容。<br><img javac-console src="/img/hufei/2019/12/javac-console.png" width="100%" height="50%"></p>
+<p>新建一个 HelloWorld.java 文件，并在启动配置中加入这个文件的<strong>绝对路径</strong>。<br><img javac-helloworld src="/img/hufei/2019/12/javac-helloworld.png" width="100%" height="50%"></p>
+<p>再次运行 main 方法，最终会在 HelloWorld.java 的同级目录下生成 HelloWorld.class 文件。<br><img javac-helloworld-class src="/img/hufei/2019/12/javac-helloworld-class.png" width="100%" height="50%"></p>
+<h4 id="加断点"><a href="#加断点" class="headerlink" title="加断点"></a>加断点</h4><p>在 Main.java 中打上断点，然后发现不管怎么设置，调试时总会进入 JDK 自带的 Main.java 方法，没有进入自己打断点的地方。<br><img javac-jdk src="/img/hufei/2019/12/javac-jdk.png" width="100%" height="50%"></p>
+<p>打开 Project Structure 页面（File-&gt;Project Structure），选中图中 Dependencies 选项，将 <code>&lt;Module source&gt;</code> 顺序调整到 JDK 之前。<br><img module-dependency src="/img/hufei/2019/12/module-dependency.png" width="100%" height="50%"></p>
+<p>再次调试就可以进入到项目中的断点了。</p>
+<h3 id="Javac-的编译过程"><a href="#Javac-的编译过程" class="headerlink" title="Javac 的编译过程"></a>Javac 的编译过程</h3><p>将一组源文件编译为一组相应的类文件的过程并不简单，但通常可以分为 <a target="_blank" rel="noopener" href="http://openjdk.java.net/groups/compiler/doc/compilation-overview/index.html">三个过程</a>：</p>
+<ul>
+<li>解析与填充符号表过程<ul>
+<li>读取命令行上指定的源文件，将其解析为语法树，然后输出到符号表中。</li>
+</ul>
+</li>
+<li>注解处理过程<ul>
+<li>调用注解处理器。如果注解处理器生成了新的源文件，则重新编译，直到没有新文件创建为止。</li>
+</ul>
+</li>
+<li>分析和字节码生成过程<ul>
+<li>最后，分析语法树并将其转换为类文件。</li>
+</ul>
+</li>
+</ul>
+<p><code>Javac 的编译过程</code><br><img javac-compilation-process src="/img/hufei/2019/12/javac-compilation-process.png" width="100%" height="50%"></p>
+<p>Javac 编译动作的入口是 com.sun.tools.javac.main.JavaCompiler 类，上述 3 个过程的逻辑集中在这个类的 compile 和 compile2 方法中，其中主体代码如下图所示。整个编译最关键的处理就由图中标注的 8 个方法来完成。<br><code>compile 代码片段</code><br><img javac-compile src="/img/hufei/2019/12/javac-compile.png" width="100%" height="50%"><br><code>compile2 代码片段</code><br><img javac-compile2 src="/img/hufei/2019/12/javac-compile2.png" width="100%" height="50%"></p>
+<h3 id="语法糖"><a href="#语法糖" class="headerlink" title="语法糖"></a>语法糖</h3><p>几乎各种语言都提供过一些语法糖来方便程序员的代码开发，这些语法糖虽然不会提供实质性的功能改进，但是它们或能提高开发效率，或能提升语法的严谨性，或能减少编码出错的机会。不过也有一种观点认为语法糖并不一定都是有益的，大量添加和使用含糖的语法，容易让程序员产生依赖，无法看清语法糖背后程序代码的真实面目。</p>
+<h4 id="泛型与类型擦除"><a href="#泛型与类型擦除" class="headerlink" title="泛型与类型擦除"></a>泛型与类型擦除</h4><p>泛型是 JDK 1.5 带来的一项新特性，它的本质是参数化类型（Parameterized Type）。也就是说，所操作的数据类型被指定为一个参数。这种参数可以用在类、接口和方法的创建中，分别称为泛型类、泛型接口和泛型方法。</p>
+<p>Java 语言中的泛型只在程序源码中存在，在编译后的字节码文件中就已经替换成原来的类型了，并且在相应的地方插入了强制类型转换代码。因此，对于运行期的 Java 语言来说，<code>ArrayList&lt;int&gt;</code> 与 <code>ArrayList&lt;String&gt;</code> 就是同一个类，所以泛型技术实际上是 Java 语言的一颗语法糖，Java 语言中的泛型实现方法称为类型擦除，基于这种方法实现的泛型称为伪泛型。</p>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例 1"></a>示例 1</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Map&lt;String, String&gt; map = new HashMap&lt;&gt;();</span><br><span class="line">    map.put(&quot;hello&quot;, &quot;你好&quot;);</span><br><span class="line">    map.put(&quot;how are you&quot;, &quot;吃了没&quot;);</span><br><span class="line">    System.out.println(map.get(&quot;hello&quot;));</span><br><span class="line">    System.out.println(map.get(&quot;how are you&quot;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>把这段 Java 代码编译成 Class 文件，然后利用反编译工具<a target="_blank" rel="noopener" href="https://github.com/java-decompiler/jd-gui/releases/tag/v1.4.2">(jd-gui-1.4.2)</a>进行反编译后，发现泛型不见了，程序又变回了原生类型（Raw Type）。<br><code>反编译后</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Map&lt;String, String&gt; map = new HashMap();</span><br><span class="line">    map.put(&quot;hello&quot;, &quot;你好&quot;);</span><br><span class="line">    map.put(&quot;how are you&quot;, &quot;吃了没&quot;);</span><br><span class="line">    System.out.println((String) map.get(&quot;hello&quot;)); //这里进行了强制类型转换</span><br><span class="line">    System.out.println((String) map.get(&quot;how are you&quot;)); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例 2"></a>示例 2</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Class&lt;? extends ArrayList&gt; aClass = new ArrayList&lt;String&gt;().getClass();</span><br><span class="line">    Class&lt;? extends ArrayList&gt; bClass = new ArrayList&lt;Integer&gt;().getClass();</span><br><span class="line">    System.out.println(aClass == bClass);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>反编译后</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Class&lt;? extends ArrayList&gt; aClass = new ArrayList().getClass(); //实际上创建的依然是 ArraysList 对象。</span><br><span class="line">    Class&lt;? extends ArrayList&gt; bClass = new ArrayList().getClass(); </span><br><span class="line">    System.out.println(aClass == bClass);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码的输出结果为 <code>true</code>。可以看出，新建的两个不同的 <code>ArraysList&lt;&gt;</code> 对象，编译之后都是 <code>ArraysList</code>，没有了泛型信息。</p>
+<h4 id="自动装箱、拆箱与遍历循环"><a href="#自动装箱、拆箱与遍历循环" class="headerlink" title="自动装箱、拆箱与遍历循环"></a>自动装箱、拆箱与遍历循环</h4><p>从纯技术的角度来讲，自动装箱、自动拆箱与遍历循环（Foreach 循环）这些语法糖，无论是实现上还是思想上都不能和上文介绍的泛型相比，两者的难度和深度都有很大差距。专门拿出一节来讲解它们只有一个理由：它们是 Java 语言里使用得最多的语法糖。</p>
+<h5 id="示例-3"><a href="#示例-3" class="headerlink" title="示例 3"></a>示例 3</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    List&lt;Integer&gt; list = Arrays.asList(1, 2, 3, 4);</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for (int i : list) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>反编译后</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    List&lt;Integer&gt; list = Arrays.asList(new Integer[]&#123;Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)&#125;);</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for (Iterator localIterator = list.iterator(); localIterator.hasNext(); ) &#123;</span><br><span class="line">        int i = ((Integer) localIterator.next()).intValue();</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例 3 中一共包含了泛型、自动装箱、自动拆箱、遍历循环与变长参数 5 种语法糖，我们一起来分析一下反编译后的代码。泛型就不必说了；自动装箱、拆箱在编译之后被转化成了对应的包装方法和还原方法，如本例中的 Integer.valueOf() 与 Integer.intValue() 方法；而遍历循环则把代码还原成了迭代器的实现，这也是为何遍历循环要求被遍历的类实现 Iterable 接口的原因；最后再看看变长参数，它在调用的时候变成了一个数组类型的参数，在变长参数出现之前，程序员就是使用数组来完成类似功能的。</p>
+<h4 id="条件编译"><a href="#条件编译" class="headerlink" title="条件编译"></a>条件编译</h4><blockquote>
+<p>许多程序设计语言都提供了条件编译的途径，如 C、C++ 中使用预处理器指示符 <code>#ifdef</code> 来完成条件编译。C、C++ 的预处理器最初的任务是解决编译时的代码依赖关系（如常用的 <code>#include</code> 预处理命令），而在 Java 语言之中并没有使用预处理器，因为 Java 语言的编译方式无须使用预处理器（编译器并非一个个地编译 Java 文件，而是将所有编译单元的语法树顶级节点输入到待处理列表后再进行编译，因此各个文件之间能够互相提供符号信息）。</p>
+</blockquote>
+<p>那 Java 语言是否有办法实现条件编译呢？Java 语言当然也可以进行条件编译，方法就是使用条件是常量的 if 语句。</p>
+<h5 id="示例-4"><a href="#示例-4" class="headerlink" title="示例 4"></a>示例 4</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class ConditionCompile &#123;</span><br><span class="line">    public static final int a = 1;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        if (true) &#123;</span><br><span class="line">            System.out.println(&quot;block 1&quot;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            System.out.println(&quot;block 2&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (a == 1) &#123;</span><br><span class="line">            System.out.println(&quot;block 3&quot;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            System.out.println(&quot;block 4&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>反编译后</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import java.io.PrintStream;</span><br><span class="line"></span><br><span class="line">public class ConditionCompile &#123;</span><br><span class="line"></span><br><span class="line">    public static final int a = 1;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;block 1&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;block 3&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如示例 4 所示，此代码中的 if 语句不同于其他 Java 代码，它在编译阶段就会被『运行』，生成的字节码之中只包括 <code>System.out.println(&quot;block 1&quot;)</code> <code>System.out.println(&quot;block 1&quot;)</code> 两条语句，并不会包含 if 语句及另外一个分支中的 <code>System.out.println(&quot;block 2&quot;)</code> <code>System.out.println(&quot;block 4&quot;)</code> 语句。</p>
+<blockquote>
+<p>Java 语言中条件编译的实现，也是 Java 语言的一颗语法糖，根据布尔常量值的真假，编译器将会把分支中不成立的代码块消除掉，这一工作将在编译器解除语法糖阶段（com.sun.tools.javac.comp.Lower 类中）完成。由于这种条件编译的实现方式使用了 if 语句，所以它必须遵循最基本的 Java 语法，只能写在方法体内部，因此它只能实现语句基本块（Block）级别的条件编译，而没有办法实现根据条件调整整个 Java 类的结构。</p>
+</blockquote>
+<h4 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public enum Week &#123;</span><br><span class="line">    Mon,Tue,Wed,Thu, Fri, Sat,Sun;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>使用 javap -p Week.class 反编译之后</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public final class jvm.javac.suger.Week extends java.lang.Enum&lt;jvm.javac.suger.Week&gt; &#123;</span><br><span class="line">    public static final jvm.javac.suger.Week Mon;</span><br><span class="line">    public static final jvm.javac.suger.Week Tue;</span><br><span class="line">    public static final jvm.javac.suger.Week Wed;</span><br><span class="line">    public static final jvm.javac.suger.Week Thu;</span><br><span class="line">    public static final jvm.javac.suger.Week Fri;</span><br><span class="line">    public static final jvm.javac.suger.Week Sat;</span><br><span class="line">    public static final jvm.javac.suger.Week Sun;</span><br><span class="line">    private static final jvm.javac.suger.Week[] $VALUES;</span><br><span class="line">    public static jvm.javac.suger.Week[] values();</span><br><span class="line">    public static jvm.javac.suger.Week valueOf(java.lang.String);</span><br><span class="line">    private jvm.javac.suger.Week();</span><br><span class="line">    static &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>可以看到，字节码中并不存在 enum 类型，所有的枚举类都继承自 <code>java.lang.Enum</code> 这个类。 Javac 编译器将 Week 类改成了 final 类型，这样就不能被继承，同时还将它的构造方法改成了 private，这样就不能通过 new 的方式来新增 Week 类的实例。</p>
+<h3 id="编写一个注解处理器"><a href="#编写一个注解处理器" class="headerlink" title="编写一个注解处理器"></a>编写一个注解处理器</h3><h4 id="实战目标"><a href="#实战目标" class="headerlink" title="实战目标"></a>实战目标</h4><p>通过阅读 Javac 编译器的源码，我们知道编译器在把 Java 程序源码编译为字节码的时候，会对 Java 程序源码做各方面的检查校验。这些校验主要以程序『写得对不对』为出发点，虽然也有各种 Warning 的信息，但总体来讲还是较少去校验程序『写得好不好』。有鉴于此，业界出现了许多针对程序『写得好不好』的辅助校验工具，如 CheckStyle、FindBug、Klocwork 等。这些代码校验工具有一些是基于 Java 的源码进行校验，还有一些是通过扫描字节码来完成，在本节的实战中，我们将会使用注解处理器 API 来编写一款拥有自己编码风格的校验工具：NameCheckProcessor。</p>
+<p>当然，由于我们的实战都是为了学习和演示技术原理，而不是为了做出一款能媲美 CheckStyle 等工具的产品来，所以 NameCheckProcessor 的目标也仅定为对 Java 程序命名进行检查，根据<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.2">《Java语言规范》</a>中的要求，Java 程序命名应当符合下列格式的书写规范：</p>
+<ul>
+<li>类（或接口）：符合驼式命名法，首字母大写。</li>
+<li>方法：符合驼式命名法，首字母小写。</li>
+<li>字段：<ul>
+<li>类或实例变量：符合驼式命名法，首字母小写。</li>
+<li>常量：要求全部由大写字母或下划线构成，并且第一个字符不能是下划线。</li>
+</ul>
+</li>
+</ul>
+<p>上文提到的驼式命名法（Camel Case Name），正如它的名称所表示的那样，是指混合使用大小写字母来分割构成变量或函数的名字，犹如驼峰一般，这是当前 Java 语言中主流的命名规范，我们的实战目标就是为 Javac 编译器添加一个额外的功能，在编译程序时检查程序名是否符合上述对类（或接口）、方法、字段的命名要求(参照 JDK 中的 com.sun.tools.javac.processing.PrintingProcessor 类)。</p>
+<h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h4><p>要通过注解处理器 API 实现一个编译器插件，首先需要了解这组 API 的一些基本知识。我们实现注解处理器的代码需要继承抽象类 javax.annotation.processing.AbstractProcessor，这个抽象类中有一个必须要覆盖的 process 方法，它是 Javac 编译器在执行注解处理器代码时要调用的过程。我们可以从这个方法的第一个参数 annotations 中获取到此注解处理器所要处理的注解集合，从第二个参数 roundEnv 中访问到当前这个 Round 中的语法树节点，每个语法树节点在这里表示为一个 Element。</p>
+<p>除了 process 方法的入参之外，还有一个很常用的实例变量 processingEnv，它是 AbstractProcessor 中的一个 protected 变量，在注解处理器初始化的时候创建，继承了 AbstractProcessor 的类可以直接访问到它。它代表了注解处理器框架提供的一个上下文环境，要创建新的代码、向编译器输出信息、获取其他工具类等都需要用到这个实例变量。</p>
+<p>注解处理器还有两个可以配合使用的 Annotations：@SupportedAnnotationTypes 和 @SupportedSourceVersion，前者代表了这个注解处理器对哪些注解感兴趣，可以使用星号 * 作为通配符代表对所有的注解都感兴趣，后者指出这个注解处理器可以处理哪些版本的 Java 代码。</p>
+<p>每一个注解处理器在运行的时候都是单例的，如果不需要改变语法树的内容，process 方法就可以返回一个值为 false 的布尔值，通知编译器这个 Round 中的代码未发生变化，无须构造新的 JavaCompiler 实例，在这次实战的注解处理器中只对程序命名进行检查，不需要改变语法树的内容，因此 process 方法的返回值为 false。</p>
+<p><code>NameCheckProcessor</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">package jvm.javac.processor;</span><br><span class="line"></span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">import javax.annotation.processing.AbstractProcessor;</span><br><span class="line">import javax.annotation.processing.ProcessingEnvironment;</span><br><span class="line">import javax.annotation.processing.RoundEnvironment;</span><br><span class="line">import javax.annotation.processing.SupportedAnnotationTypes;</span><br><span class="line">import javax.annotation.processing.SupportedSourceVersion;</span><br><span class="line">import javax.lang.model.SourceVersion;</span><br><span class="line">import javax.lang.model.element.Element;</span><br><span class="line">import javax.lang.model.element.TypeElement;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 在代码的根目录(src)下依次执行:</span><br><span class="line"> * javac jvm/javac/processor/NameCheckProcessor.java</span><br><span class="line"> * javac -processor jvm.javac.processor.NameCheckProcessor jvm/javac/processor/BADLY_NAMED_CODE.java</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * 可以用 * 表示支持所有 Annotations</span><br><span class="line"> * 只支持 JDK 1.8 的 Java 代码</span><br><span class="line"> */</span><br><span class="line">@SupportedAnnotationTypes(&quot;*&quot;)</span><br><span class="line">@SupportedSourceVersion(value = SourceVersion.RELEASE_8)</span><br><span class="line">public class NameCheckProcessor extends AbstractProcessor &#123;</span><br><span class="line"></span><br><span class="line">    private NameChecker nameChecker;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 初始化名称检查插件</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void init(ProcessingEnvironment processingEnv) &#123;</span><br><span class="line">        super.init(processingEnv);</span><br><span class="line">        nameChecker = new NameChecker(processingEnv);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 对输入的语法树的各个节点进行进行名称检查</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public boolean process(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv) &#123;</span><br><span class="line">        if (!roundEnv.processingOver()) &#123;</span><br><span class="line">            for (Element element : roundEnv.getRootElements())</span><br><span class="line">                nameChecker.checkNames(element);</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面代码可以看出，NameCheckProcessor 能处理基于 JDK 1.8 的源码，它不限于特定的注解，对任何注解都感兴趣，而在 process 方法中是把当前 Round 中的每一个 RootElement 传递到一个名为 NameChecker 的检查器中执行名称检查逻辑，NameChecker 的代码如代码如下所示。<br><code>NameChecker</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br></pre></td><td class="code"><pre><span class="line">package jvm.javac.processor;</span><br><span class="line"></span><br><span class="line">import javax.annotation.processing.Messager;</span><br><span class="line">import javax.annotation.processing.ProcessingEnvironment;</span><br><span class="line">import javax.lang.model.element.*;</span><br><span class="line">import javax.lang.model.util.ElementScanner8;</span><br><span class="line">import javax.tools.Diagnostic.Kind;</span><br><span class="line">import java.util.EnumSet;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 程序名称规范的编译器插件：</span><br><span class="line"> * 如果程序命名不合规范，将会输出一个编译器的 WARNING 信息</span><br><span class="line"> */</span><br><span class="line">public class NameChecker &#123;</span><br><span class="line">    private final Messager messager;</span><br><span class="line"></span><br><span class="line">    NameCheckScanner nameCheckScanner = new NameCheckScanner();</span><br><span class="line"></span><br><span class="line">    NameChecker(ProcessingEnvironment processsingEnv) &#123;</span><br><span class="line">        this.messager = processsingEnv.getMessager();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 对Java程序命名进行检查，根据《Java语言规范》第三版第 6.8 节的要求，Java程序命名应当符合下列格式：</span><br><span class="line">     *</span><br><span class="line">     * &lt;ul&gt;</span><br><span class="line">     * &lt;li&gt;类或接口：符合驼式命名法，首字母大写。</span><br><span class="line">     * &lt;li&gt;方法：符合驼式命名法，首字母小写。</span><br><span class="line">     * &lt;li&gt;字段：</span><br><span class="line">     * &lt;ul&gt;</span><br><span class="line">     * &lt;li&gt;类、实例变量: 符合驼式命名法，首字母小写。</span><br><span class="line">     * &lt;li&gt;常量: 要求全部大写。</span><br><span class="line">     * &lt;/ul&gt;</span><br><span class="line">     * &lt;/ul&gt;</span><br><span class="line">     */</span><br><span class="line">    public void checkNames(Element element) &#123;</span><br><span class="line">        nameCheckScanner.scan(element);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 名称检查器实现类，继承了 JDK 1.8 中提供的 ElementScanner8</span><br><span class="line">     * 将会以 Visitor 模式访问抽象语法树中的元素</span><br><span class="line">     */</span><br><span class="line">    private class NameCheckScanner extends ElementScanner8&lt;Void, Void&gt; &#123;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 此方法用于检查 Java 类</span><br><span class="line">         */</span><br><span class="line">        @Override</span><br><span class="line">        public Void visitType(TypeElement e, Void p) &#123;</span><br><span class="line">            scan(e.getTypeParameters(), p);</span><br><span class="line">            checkCamelCase(e, true);</span><br><span class="line">            super.visitType(e, p);</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 检查方法命名是否合法</span><br><span class="line">         */</span><br><span class="line">        @Override</span><br><span class="line">        public Void visitExecutable(ExecutableElement e, Void p) &#123;</span><br><span class="line">            if (e.getKind() == ElementKind.METHOD) &#123;</span><br><span class="line">                Name name = e.getSimpleName();</span><br><span class="line">                if (name.contentEquals(e.getEnclosingElement().getSimpleName()))</span><br><span class="line">                    messager.printMessage(Kind.WARNING, &quot;一个普通方法“&quot; + name + &quot;”不应当与类名重复，避免与构造函数产生混淆&quot;, e);</span><br><span class="line">                checkCamelCase(e, false);</span><br><span class="line">            &#125;</span><br><span class="line">            super.visitExecutable(e, p);</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 检查变量命名是否合法</span><br><span class="line">         */</span><br><span class="line">        @Override</span><br><span class="line">        public Void visitVariable(VariableElement e, Void p) &#123;</span><br><span class="line">            // 如果这个Variable是枚举或常量，则按大写命名检查，否则按照驼式命名法规则检查</span><br><span class="line">            if (e.getKind() == ElementKind.ENUM_CONSTANT || e.getConstantValue() != null || heuristicallyConstant(e))</span><br><span class="line">                checkAllCaps(e);</span><br><span class="line">            else</span><br><span class="line">                checkCamelCase(e, false);</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 判断一个变量是否是常量</span><br><span class="line">         */</span><br><span class="line">        private boolean heuristicallyConstant(VariableElement e) &#123;</span><br><span class="line">            if (e.getEnclosingElement().getKind() == ElementKind.INTERFACE)</span><br><span class="line">                return true;</span><br><span class="line">            else if (e.getKind() == ElementKind.FIELD &amp;&amp; e.getModifiers().containsAll(EnumSet.of(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.STATIC, javax.lang.model.element.Modifier.FINAL)))</span><br><span class="line">                return true;</span><br><span class="line">            else &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 检查传入的 Element 是否符合驼式命名法，如果不符合，则输出警告信息</span><br><span class="line">         */</span><br><span class="line">        private void checkCamelCase(Element e, boolean initialCaps) &#123;</span><br><span class="line">            String name = e.getSimpleName().toString();</span><br><span class="line">            boolean previousUpper = false;</span><br><span class="line">            boolean conventional = true;</span><br><span class="line">            int firstCodePoint = name.codePointAt(0);</span><br><span class="line"></span><br><span class="line">            if (Character.isUpperCase(firstCodePoint)) &#123;</span><br><span class="line">                previousUpper = true;</span><br><span class="line">                if (!initialCaps) &#123;</span><br><span class="line">                    messager.printMessage(Kind.WARNING, &quot;名称“&quot; + name + &quot;”应当以小写字母开头&quot;, e);</span><br><span class="line">                    return;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else if (Character.isLowerCase(firstCodePoint)) &#123;</span><br><span class="line">                if (initialCaps) &#123;</span><br><span class="line">                    messager.printMessage(Kind.WARNING, &quot;名称“&quot; + name + &quot;”应当以大写字母开头&quot;, e);</span><br><span class="line">                    return;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else</span><br><span class="line">                conventional = false;</span><br><span class="line"></span><br><span class="line">            if (conventional) &#123;</span><br><span class="line">                int cp = firstCodePoint;</span><br><span class="line">                for (int i = Character.charCount(cp); i &lt; name.length(); i += Character.charCount(cp)) &#123;</span><br><span class="line">                    cp = name.codePointAt(i);</span><br><span class="line">                    if (Character.isUpperCase(cp)) &#123;</span><br><span class="line">                        if (previousUpper) &#123;</span><br><span class="line">                            conventional = false;</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                        previousUpper = true;</span><br><span class="line">                    &#125; else</span><br><span class="line">                        previousUpper = false;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (!conventional)</span><br><span class="line">                messager.printMessage(Kind.WARNING, &quot;名称“&quot; + name + &quot;”应当符合驼式命名法（Camel Case Names）&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 大写命名检查，要求第一个字母必须是大写的英文字母，其余部分可以是下划线或大写字母</span><br><span class="line">         */</span><br><span class="line">        private void checkAllCaps(Element e) &#123;</span><br><span class="line">            String name = e.getSimpleName().toString();</span><br><span class="line"></span><br><span class="line">            boolean conventional = true;</span><br><span class="line">            int firstCodePoint = name.codePointAt(0);</span><br><span class="line"></span><br><span class="line">            if (!Character.isUpperCase(firstCodePoint))</span><br><span class="line">                conventional = false;</span><br><span class="line">            else &#123;</span><br><span class="line">                boolean previousUnderscore = false;</span><br><span class="line">                int cp = firstCodePoint;</span><br><span class="line">                for (int i = Character.charCount(cp); i &lt; name.length(); i += Character.charCount(cp)) &#123;</span><br><span class="line">                    cp = name.codePointAt(i);</span><br><span class="line">                    if (cp == (int) &#x27;_&#x27;) &#123;</span><br><span class="line">                        if (previousUnderscore) &#123;</span><br><span class="line">                            conventional = false;</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                        previousUnderscore = true;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        previousUnderscore = false;</span><br><span class="line">                        if (!Character.isUpperCase(cp) &amp;&amp; !Character.isDigit(cp)) &#123;</span><br><span class="line">                            conventional = false;</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (!conventional)</span><br><span class="line">                messager.printMessage(Kind.WARNING, &quot;常量“&quot; + name + &quot;”应当全部以大写字母或下划线命名，并且以字母开头&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>NameChecker 的代码看起来有点长，但实际上注释占了很大一部分，其实即使算上注释也不到 180 行。它通过一个继承于 javax.lang.model.util.ElementScanner8 的 NameCheckScanner 类，以 Visitor 模式来完成对语法树的遍历，分别执行 visitType、visitVariable 和 visitExecutable 方法来访问类、字段和方法，这 3 个 visit 方法对各自的命名规则做相应的检查，checkCamelCase 与 checkAllCaps 方法则用于实现驼式命名法和全大写命名规则的检查。</p>
+<p>整个注解处理器只需 NameCheckProcessor 和 NameChecker 两个类就可以全部完成，为了验证我们的实战成果，我们编写一个反面教材代码，其中的每一个类、方法及字段的命名都存在问题，但是使用普通的 Javac 编译这段代码时不会提示任何一个 Warning 信息。</p>
+<p><code>BADLY_NAMED_CODE</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class BADLY_NAMED_CODE &#123;</span><br><span class="line"></span><br><span class="line">    enum colors &#123;</span><br><span class="line">        red, blue, green;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static final int _FORTY_TWO = 42;</span><br><span class="line"></span><br><span class="line">    public static int NOT_A_CONSTANT = _FORTY_TWO;</span><br><span class="line"></span><br><span class="line">    protected void BADLY_NAMED_CODE() &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void NOTcamelCASEmethodNAME() &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="运行与测试"><a href="#运行与测试" class="headerlink" title="运行与测试"></a>运行与测试</h4><p>我们可以通过 Javac 命令的 -processor 参数来执行编译时需要附带的注解处理器，如果有多个注解处理器的话，用逗号分隔。<br><img javac-processor src="/img/hufei/2019/12/javac-processor.png" width="100%" height="50%"></p>
+<h4 id="其它应用案例"><a href="#其它应用案例" class="headerlink" title="其它应用案例"></a>其它应用案例</h4><p>NameCheckProcessor 的实战例子只演示了 JSR-269 嵌入式注解处理器 API 中的一部分功能，基于这组 API 支持的项目还有用于校验 Hibernate 标签使用正确性的 Hibernate Validator Annotation Processor（本质上与 NameCheckProcessor 所做的事情差不多）、自动为字段生成 getter 和 setter 方法的 Project Lombok（根据已有元素生成新的语法树元素）等，有兴趣的读者可以参阅它们的官方文档。</p>
+<h2 id="运行期优化"><a href="#运行期优化" class="headerlink" title="运行期优化"></a>运行期优化</h2><p>鉴于篇幅限制，运行期优化的相关内容我们留到 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2019/12/23/java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96%E7%BB%AD/#more">下一篇</a> 中再进行介绍。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5d22898be51d4555fc1acd15">Javac 源码调试教程</a></li>
+<li><a target="_blank" rel="noopener" href="http://openjdk.java.net/groups/compiler/doc/compilation-overview/index.html">Compilation Overview</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%96%E8%AF%91/" rel="tag"># 编译</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/11/21/new%20%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/" rel="prev" title="new 一个对象的过程中发生了什么">
+                  <i class="fa fa-angle-left"></i> new 一个对象的过程中发生了什么
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/12/23/Java%20%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96%E7%BB%AD/" rel="next" title="Java 程序编译与代码优化续">
+                  Java 程序编译与代码优化续 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

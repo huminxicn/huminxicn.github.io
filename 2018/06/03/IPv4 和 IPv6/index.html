@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="接触过网络编程的人会听到这样一种说法：IPv4 的地址马上就不够用了，快去用 IPv6 吧，因为它的地址有 2¹²⁸ 个，不会面临 IP 地址短缺的情况。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IPv4 和 IPv6">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/06/03/IPv4%20%E5%92%8C%20IPv6/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="接触过网络编程的人会听到这样一种说法：IPv4 的地址马上就不够用了，快去用 IPv6 吧，因为它的地址有 2¹²⁸ 个，不会面临 IP 地址短缺的情况。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/06/ipv4-datagram-format.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/06/ipv6-datagram-format.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/06/ipv4-compare-with-ipv6.png">
+<meta property="article:published_time" content="2018-06-03T04:35:42.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.010Z">
+<meta property="article:tag" content="IP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/06/ipv4-datagram-format.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/06/03/IPv4%20%E5%92%8C%20IPv6/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/06/03/IPv4%20%E5%92%8C%20IPv6/","path":"2018/06/03/IPv4 和 IPv6/","title":"IPv4 和 IPv6"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IPv4 和 IPv6 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">IP 协议简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IPv4"><span class="nav-number">2.</span> <span class="nav-text">IPv4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IPv6"><span class="nav-number">3.</span> <span class="nav-text">IPv6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/06/03/IPv4%20%E5%92%8C%20IPv6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IPv4 和 IPv6 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IPv4 和 IPv6
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-06-03 12:35:42" itemprop="dateCreated datePublished" datetime="2018-06-03T12:35:42+08:00">2018-06-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>接触过网络编程的人会听到这样一种说法：IPv4 的地址马上就不够用了，快去用 IPv6 吧，因为它的地址有 2¹²⁸ 个，不会面临 IP 地址短缺的情况。</p>
+<span id="more"></span>
+
+
+<h2 id="IP-协议简介"><a href="#IP-协议简介" class="headerlink" title="IP 协议简介"></a>IP 协议简介</h2><p>现行的 IP 协议存在两个版本，<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/IPv4">IPv4</a>（Internet Protocol version 4）和 IPv6。</p>
+<blockquote>
+<p>IPv4 是网际协议开发过程中的第四个修订版本，也是此协议第一个被广泛部署的版本。<strong>IPv4 是互联网的核心，也是使用最广泛的网际协议版本，其后继版本为 IPv6</strong>。直到 2011 年，IANA IPv4 地址完全用尽时，IPv6 仍处在部署的初期。</p>
+</blockquote>
+<blockquote>
+<p>设计 IPv6 的目的是取代 IPv4，然而长期以来 IPv4 在互联网流量中占据主要地位，IPv6 的使用增长缓慢。在 2017 年 7 月，通过 IPv6 使用 Google 服务的用户首次超过 20%。</p>
+</blockquote>
+<h2 id="IPv4"><a href="#IPv4" class="headerlink" title="IPv4"></a>IPv4</h2><p><code>IPv4 数据报</code><br><img ipv4-datagram-format src="/img/hufei/2018/06/ipv4-datagram-format.png" width="100%" height="100%"></p>
+<p>IPv4 数据数据报的关键字段如下：</p>
+<ul>
+<li>Version 版本号。<ul>
+<li>这 4 bit 规定了数据报的 IP 协议版本，IPv4&#x3D;0100。</li>
+<li>通过查看版本号，路由器能确定如何解释 IP 数据报的剩余部分（不同 IP 版本使用的数据报格式不同）。</li>
+</ul>
+</li>
+<li>Header length 首部长度。<ul>
+<li>包括了 Options 的长度，但不包括 Data 长度。</li>
+<li>这个字段占 4 个 bit，其中每一个 bit 表示 4 个字节（units of 32 bits）。这个字段的最大值是 0xFFFF (15)，所以 Header 最长占 60 个字节，去掉 Header 中固定的 20 个字节，剩下 40 个字节留给 Options。</li>
+</ul>
+</li>
+<li>Type of service TOS。<ul>
+<li>该字段用来区分 IP 数据报的类型。</li>
+<li>可以将实时流量（如 IP 电话应用）与非实时流量（如 FTP）区分开。</li>
+</ul>
+</li>
+<li>Datagram length（bytes）数据报长度。<ul>
+<li>这是 IP 数据报的总长度（Header+Data），以字节计。</li>
+<li>因为该字段长 16 bit，所以 IP 数据报理论上最大长度为 65535 字节。然而，数据报很少有超过 1500 字节的。</li>
+</ul>
+</li>
+<li>16-bit Identifier、Flags、13-bit Fragmentation offset 标识、标志、片偏移。（<strong>IPv6 中已废除</strong>）<ul>
+<li>这三个字段与 IP 分组分片有关。</li>
+<li><strong><a target="_blank" rel="noopener" href="https://www.cxybb.com/article/Robert_30/122387420">IPv6 不允许在路由器上对分组分片</a></strong> 。</li>
+</ul>
+</li>
+<li>Time-to-live TTL。<ul>
+<li>该字段用来确保数据报不会一直在网络中循环（当路由选择存在环路时）。</li>
+<li>每当数据报由一台路由器处理时，该字段的值减 1。若 TTL 值减为 0，则数据报被丢弃。</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">Upper-layer protocol</a> 协议号。<ul>
+<li>该字段仅在 IP 数据报到达其最终目的地才会有用。</li>
+<li>该字段值指示了 IP 数据报的数据部分应交给哪个特定的运输层协议。例如，值为 6 表明数据部分要交给 TCP，而值为 17 表明数据要交给 UDP。</li>
+<li><strong>该字段在 IP 数据报中所起的作用，类似于端口号字段在传输层报文中所起的作用</strong>。协议号是将网络层与传输层绑定到一起的粘合剂，而端口号是将传输层和应用层绑定到一起的粘合剂。</li>
+</ul>
+</li>
+<li>Header checksum 首部校验和。（<strong>IPv6 中已废除</strong>）<ul>
+<li><strong>首部检验和帮助路由器检测收到的 IP 数据报中的比特差错</strong>。首部校验和的计算可以参考 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF">这篇博客</a>。</li>
+<li><strong>路由器要对收到的每个 IP 数据报计算其首部检验和（因为 TTL 字段以及 Options 字段会改变）</strong>，如果首部中携带的检验和与计算得到的检验和不一致，则检测出比特差错。路由器一般会丢弃检测出差错的数据报。</li>
+</ul>
+</li>
+<li>32-bit Source&#x2F;Destination IP address 源和目的 IP 地址。<ul>
+<li>源主机可以通过 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/03/03/dns/">DNS</a> 来查找目的地址。</li>
+</ul>
+</li>
+<li>Options(if any) 。（<strong>IPv6 中已废除</strong>）<ul>
+<li>选项字段允许 IP 首部被扩展。</li>
+<li>选项的存在的确是件复杂的事，因为数据报头长度可变，故不能预先确定数据字段从何处开始。而且还因为有些数据报要求处理选项，而有些数据报则不要求，故导致一台路由器处理一个 IP 数据报所需的时间变化很大。</li>
+</ul>
+</li>
+<li>Data 有效载荷。<ul>
+<li>这是最后的也是最重要的字段！</li>
+<li>大多数情况下 IP 数据报中的数据字段是要交付给目的地的传输层报文（TCP 或 UDP）。当然，该数据字段也可承载其他类型的数据，如 <a target="_blank" rel="noopener" href="https://blog.csdn.net/u011784495/article/details/71743516">ICMP 报文</a>。</li>
+</ul>
+</li>
+</ul>
+<p><strong>一个 IPv4 数据报的首部长度为 20 字节（假设无选项字段）</strong>。</p>
+<h2 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h2><p><code>IPv6 数据报</code><br><img ipv6-datagram-format src="/img/hufei/2018/06/ipv6-datagram-format.png" width="100%" height="100%"></p>
+<p>IPv6 数据数据报的关键字段如下：</p>
+<ul>
+<li>Version 版本号。<ul>
+<li>IPv6&#x3D;0110。</li>
+</ul>
+</li>
+<li>Traffic class 流量类型。<ul>
+<li>该字段占 8 bit ，与 IPv4 中 TOS 字段的含义相似。</li>
+</ul>
+</li>
+<li>Flow label 流标签。<ul>
+<li>它提醒路由器重复使用之前的接力路径，这样 IP 包可以自动保持出发时的顺序。这对于流媒体之类的应用有帮助。</li>
+<li>Flow label 的进一步使用还在开发中。</li>
+</ul>
+</li>
+<li>Payload length 有效载荷长度。<ul>
+<li>该 16 bit 值作为一个无符号整数，给出了 IPv6 数据报中 Data 部分的长度。</li>
+<li>与 IPv4 中 Datagram length 字段类似，但 IPv4 中表示的是整个数据报的长度，IPv6 只表示有效载荷的长度。</li>
+</ul>
+</li>
+<li>Next header。<ul>
+<li>该字段与 IPv4 首部中 Upper-layer protocol 字段含义类似。</li>
+</ul>
+</li>
+<li>Hop limit 跳限制。<ul>
+<li>该字段与 IPv4 首部中 TTL 字段含义类似。</li>
+</ul>
+</li>
+<li>Source&#x2F;Destination address 源和目的地址。</li>
+<li>Data 有效载荷。</li>
+</ul>
+<p><strong>一个 IPv6 数据报的首部长度固定为 40 字节</strong>。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p><code>IPv4 与 IPv6 首部字段对比图</code><br><img ipv4-compare-with-ipv6 src="/img/hufei/2018/06/ipv4-compare-with-ipv6.png" width="100%" height="100%"></p>
+<p>IPv6 对比于 IPv4 有以下几点重要变化：</p>
+<ul>
+<li>拓展了地址空间（由 2³² 变为 2¹²⁸）。<ul>
+<li>解决了 IP 地址不足的问题。</li>
+</ul>
+</li>
+<li>IPv6 数据报不允许在路由器上分片，这个操作只能在源和目的执行。<ul>
+<li>如果中间链路的 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%9C%80%E5%A4%A7%E4%BC%A0%E8%BE%93%E5%8D%95%E5%85%83">MTU</a> 较小，这时候路由器就直接丢包，然后向发送发发一个『分组太大』的 ICMP 报文，然后源就根据这个报文，把数据报分成更小的几个再重传。</li>
+<li>这种设计是合理的，因为路由器的分片是耗时的操作，这样可以提升 IP 数据报转发的速度。</li>
+</ul>
+</li>
+<li>去掉了首部校验和字段。<ul>
+<li>把这个字段去掉之后，可以提升 IP 数据报转发的速度。</li>
+<li>因为在传输层、数据链路层中，有很多协议都有具备错误检测的功能，而首部校验和因为有 TTL 等参数变化，计算的开销很大。</li>
+</ul>
+</li>
+<li>去掉了首部中的 Options 字段。<ul>
+<li>固定首部长度，使路由器在处理数据报首部时更加明确。</li>
+</ul>
+</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/26176870/">《计算机网络:自定向下方法》</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/IPv4_header_checksum">IPv4 header checksum</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/IPv4">IPv4</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">Protocol Numbers</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/vamei/archive/2012/12/02/2796988.html">IPv4 与 IPv6 头部的对比</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/iczyh/article/details/3918497">IPv4 header 分析</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/IP/" rel="tag"># IP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF/" rel="prev" title="比特差错检测和纠正技术">
+                  <i class="fa fa-angle-left"></i> 比特差错检测和纠正技术
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/10/Linear%20Regression/" rel="next" title="Linear Regression">
+                  Linear Regression <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

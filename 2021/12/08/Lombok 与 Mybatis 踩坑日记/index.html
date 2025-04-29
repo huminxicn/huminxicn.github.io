@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Lombok 是一种 Java 实用工具，可帮助开发人员消除 Java 的冗长，尤其是对于简单的 Java 对象（POJO），它通过注解来实现这一目的。但是当 Lombok 和 Mybatis 相遇时，会产生一些意想不到的结果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lombok 与 Mybatis 踩坑日记">
+<meta property="og:url" content="https://huminxi.netlify.com/2021/12/08/Lombok%20%E4%B8%8E%20Mybatis%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="Lombok 是一种 Java 实用工具，可帮助开发人员消除 Java 的冗长，尤其是对于简单的 Java 对象（POJO），它通过注解来实现这一目的。但是当 Lombok 和 Mybatis 相遇时，会产生一些意想不到的结果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/error-log-1.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/mapper.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/error-log-2.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/args-constructor.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/route-table.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/route-class.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/no-args-constructor.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/builder.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2021/12/builder-all.png">
+<meta property="article:published_time" content="2021-12-08T10:57:25.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.081Z">
+<meta property="article:tag" content="Lombok">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2021/12/error-log-1.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2021/12/08/Lombok%20%E4%B8%8E%20Mybatis%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2021/12/08/Lombok%20%E4%B8%8E%20Mybatis%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/","path":"2021/12/08/Lombok 与 Mybatis 踩坑日记/","title":"Lombok 与 Mybatis 踩坑日记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Lombok 与 Mybatis 踩坑日记 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">修复方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80"><span class="nav-number">3.1.</span> <span class="nav-text">方案一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">方案二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2021/12/08/Lombok%20%E4%B8%8E%20Mybatis%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Lombok 与 Mybatis 踩坑日记 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lombok 与 Mybatis 踩坑日记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-08 18:57:25" itemprop="dateCreated datePublished" datetime="2021-12-08T18:57:25+08:00">2021-12-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">踩坑日记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32779910">Lombok</a> 是一种 Java 实用工具，可帮助开发人员消除 Java 的冗长，尤其是对于简单的 Java 对象（POJO），它通过注解来实现这一目的。但是当 Lombok 和 Mybatis 相遇时，会产生一些意想不到的结果。</p>
+<span id="more"></span>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p><strong>今天发版，监控线上日志。发现存在如下报错：</strong></p>
+<p><code>日志截图</code><br><img error-log-1 src="/img/hufei/2021/12/error-log-1.png" width="100%" height="50%"></p>
+<p><code>关键堆栈信息</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">org.apache.ibatis.executor.result.ResultMapException: Error attempting to get column &#x27;rule_desc_code&#x27; from result set.  Cause: java.sql.SQLException: Bad format for Timestamp &#x27;301&#x27; in column 13.</span><br><span class="line">	at org.apache.ibatis.type.BaseTypeHandler.getResult(BaseTypeHandler.java:83)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.createUsingConstructor(DefaultResultSetHandler.java:671)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.createByConstructorSignature(DefaultResultSetHandler.java:654)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.createResultObject(DefaultResultSetHandler.java:618)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.createResultObject(DefaultResultSetHandler.java:591)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.getRowValue(DefaultResultSetHandler.java:397)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.handleRowValuesForSimpleResultMap(DefaultResultSetHandler.java:354)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.handleRowValues(DefaultResultSetHandler.java:328)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.handleResultSet(DefaultResultSetHandler.java:301)</span><br><span class="line">	at org.apache.ibatis.executor.resultset.DefaultResultSetHandler.handleResultSets(DefaultResultSetHandler.java:194)</span><br><span class="line">	at org.apache.ibatis.executor.statement.PreparedStatementHandler.query(PreparedStatementHandler.java:65)</span><br><span class="line">	at org.apache.ibatis.executor.statement.RoutingStatementHandler.query(RoutingStatementHandler.java:79)</span><br></pre></td></tr></table></figure>
+
+<p><strong>产生疑问：rule_desc_code 明明是 String 类型，怎么会映射成 Timestamp 类型呢？它跟第 13 列又有什么关系？</strong></p>
+<h2 id="原因定位"><a href="#原因定位" class="headerlink" title="原因定位"></a>原因定位</h2><p>根据完整堆栈中的信息（未贴出），定位到报错的是 PayRouteRuleRecordMapper.xml 中的 selectByGatewayPayNos 方法。</p>
+<img mapper src="/img/hufei/2021/12/mapper.png" width="100%" height="50%">
+
+<p><strong>仔细检查了一遍，发现 SQL 没有问题。</strong> </p>
+<p>继续查看堆栈信息，找到了如下报错类。</p>
+<img error-log-2 src="/img/hufei/2021/12/error-log-2.png" width="100%" height="50%">
+
+<p>于是按照方法一步一步点进去，终于找到了这里。<strong>发现 Mybatis 会将构造器中的入参与查询结果中的参数一一对应起来。</strong></p>
+<img args-constructor src="/img/hufei/2021/12/args-constructor.png" width="100%" height="50%">
+
+<p>再来查看实体类、建表语句、构造方法。<strong>仔细查看建表语句和构造方法中的第 13 个字段。</strong></p>
+<p><code>实体类</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">@Builder</span><br><span class="line">public class PayRouteRuleRecord implements Serializable &#123;</span><br><span class="line">    private Long id;</span><br><span class="line">    private Long memberId;</span><br><span class="line">    private String gatewayPayNo;</span><br><span class="line">    private String merchantOrderNo;</span><br><span class="line">    private String siteId;</span><br><span class="line">    private String siteUid;</span><br><span class="line">    private String payMethod;</span><br><span class="line">    private String ruleType;</span><br><span class="line">    private String ruleDesc;</span><br><span class="line">    private String ruleDescCode;</span><br><span class="line">    private String ruleTrack;</span><br><span class="line">    private Date createTime;</span><br><span class="line">    private Date lastUpdateTime;</span><br><span class="line">    private Boolean isDel;</span><br><span class="line">    private Integer retryFlag;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p><code>建表语句</code><br><img route-table src="/img/hufei/2021/12/route-table.png" width="100%" height="50%"></p>
+<p><code>构造方法</code><br><img route-class src="/img/hufei/2021/12/route-class.png" width="100%" height="50%"></p>
+<p>一切疑惑都解开了。</p>
+<ul>
+<li>因为 PayRouteRuleRecord 类中加了 <a target="_blank" rel="noopener" href="https://www.huminxi.com/2018/12/19/builder/">@Builder 注解，Lombok 会自动生成全参构造方法</a>，构造器中的参数顺序与实体类中定义的顺序保持一致。</li>
+<li><strong>ruleDescCode 字段是后加的，实体类中字段的顺序与 sql 语句中的顺序不一致，从而导致 Mybatis 将 ruleDescCode 字段映射到了 lastUpdateTime 字段上。</strong> 也就有了开头的报错 <code>Error attempting to get column &#39;rule_desc_code&#39; from result set.  Cause: java.sql.SQLException: Bad format for Timestamp &#39;301&#39; in column 13.</code>。</li>
+</ul>
+<h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>既然知道了问题是因为字段顺序不一致导致的，那么调整一下实体类的字段顺序，使其与 sql 语句中的顺序一致即可。</p>
+<ul>
+<li>优点<ul>
+<li>修复快。</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>没有从根本上修复该问题。</li>
+<li>如果其他人调整了实体类的字段顺序，此问题还会出现。</li>
+</ul>
+</li>
+</ul>
+<p>还有更优的修复方案吗？</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>阅读 DefaultResultSetHandler.createResultObject() 方法时发现，<strong>如果实体类中存在无参构造方法，就会通过 objectFactory.create(resultType) 方法直接生成结果对象（利用反射实现），不用再一一比对实体类和返回结果中的字段。</strong></p>
+<img no-args-constructor src="/img/hufei/2021/12/no-args-constructor.png" width="100%" height="50%">
+
+<p><strong>所以只需要给实体类加上 @AllArgsConstructor 和 @NoArgsConstructor 注解，让实体类拥有无参构造方法即可。</strong></p>
+<p><code>修复前</code><br><img builder src="/img/hufei/2021/12/builder.png" width="100%" height="50%"></p>
+<p><code>修复后</code><br><img builder-all src="/img/hufei/2021/12/builder-all.png" width="100%" height="50%"></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>@Data 注解会给实体类的所有属性生成 get&#x2F;set 方法，以及实现 hashCode()、toString()、equals() 方法，<strong>并且生成一个无参数的构造方法。</strong></li>
+<li>@Builder 注解除了会生成相应的 Build 模式的代码外，<strong>还会生成一个全参数的构造方法，参数的顺序就是属性定义的顺序</strong>。</li>
+<li><strong>但如果 @Data 注解和 @Builder 注解一块使用的话就只会生成全参构造方法，不会有无参构造方法。</strong> </li>
+<li><strong>鉴于许多开源框架都会用到实体类的无参构造方法，因此建议 @Data、@Builder、@AllArgsConstructor、@NoArgsConstructor 四个注解同时使用，避免踩坑。</strong></li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904114694946824">踩坑笔记：Lombok的Builder注解和Data注解撞上MyBatis</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Lombok/" rel="tag"># Lombok</a>
+              <a href="/tags/Mybatis/" rel="tag"># Mybatis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/30/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="prev" title="代理模式">
+                  <i class="fa fa-angle-left"></i> 代理模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/12/19/Aviator%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="next" title="Aviator 踩坑日记">
+                  Aviator 踩坑日记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

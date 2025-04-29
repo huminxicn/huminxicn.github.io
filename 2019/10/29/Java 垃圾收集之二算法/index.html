@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="从如何判定对象消亡的角度出发，垃圾收集算法可以划分为 引用计数式垃圾收集（Reference Counting GC）和 追踪式垃圾收集（Tracing GC）两大类。本文介绍的均属于追踪式垃圾收集的范畴。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 垃圾收集二 算法">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="从如何判定对象消亡的角度出发，垃圾收集算法可以划分为 引用计数式垃圾收集（Reference Counting GC）和 追踪式垃圾收集（Tracing GC）两大类。本文介绍的均属于追踪式垃圾收集的范畴。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/mark-sweep.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/mark-copying.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/mark-compact.png">
+<meta property="article:published_time" content="2019-10-29T15:35:52.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.046Z">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="垃圾收集">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/10/mark-sweep.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/","path":"2019/10/29/Java 垃圾收集之二算法/","title":"Java 垃圾收集二 算法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 垃圾收集二 算法 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA"><span class="nav-number">1.</span> <span class="nav-text">分代收集理论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">垃圾收集算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">标记-清除算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">标记-复制算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">标记-整理算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86"><span class="nav-number">3.</span> <span class="nav-text">分代收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 垃圾收集二 算法 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 垃圾收集二 算法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-29 23:35:52" itemprop="dateCreated datePublished" datetime="2019-10-29T23:35:52+08:00">2019-10-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>从如何判定对象消亡的角度出发，垃圾收集算法可以划分为 <strong>引用计数式垃圾收集</strong>（Reference Counting GC）和 <strong>追踪式垃圾收集</strong>（Tracing GC）两大类。本文介绍的均属于追踪式垃圾收集的范畴。</p>
+<span id="more"></span>
+
+<h2 id="分代收集理论"><a href="#分代收集理论" class="headerlink" title="分代收集理论"></a>分代收集理论</h2><p>当前商业虚拟机的垃圾收集器，大多数都遵循了分代收集（Generational Collection）的理论进行设计。分代收集名为理论，实质上是一套符合大多数程序运行实际情况的经验法则，它建立在两个分代假说之上：</p>
+<ul>
+<li>弱分代假说（Weak Generational Hypothesis）：<strong>绝大多数对象都是朝生夕灭的。</strong></li>
+<li>强分代假说（Strong Generational Hypothesis）：<strong>熬过越多次垃圾收集过程的对象就越难以消亡。</strong></li>
+</ul>
+<p>这两个分代假说共同奠定了多款常用的垃圾收集器的一致设计原则：<strong>收集器应该讲 Java 堆划分出不同的区域，然后将回收对象依据其年龄（即对象熬过垃圾收集过程的次数）分配到不同的区域之中存储。</strong> </p>
+<blockquote>
+<p>显而易见，如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只关注如何保留少量存活而不是那些大量将要被回收的对象，就能以较低的代价回收到大量的空间；如果剩下的都是难以消亡的对象，那么把它们集中放在一起，虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。</p>
+</blockquote>
+<p><strong>在 Java 堆划分出不同的区域之后，垃圾收集器才可以每次只回收其中一个或者部分区域——所以有了 Minor GC、Major GC、Full GC 这样的回收类型划分。</strong> 这才能够针对不同的区域安排与它存储对象存亡特征相匹配的垃圾收集算法——因而发展出了『标记-清除』算法、『标记-复制』算法、『标记-整理』算法等针对性的垃圾收集算法。</p>
+<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>最基础的收集算法是『标记-清除』（Mark-Sweep）算法，如同它的名字。算法分为『标记』和『清除』两个阶段：<strong>首先标记出所有需要回收的对象，然后统一回收所有被标记的对象。</strong></p>
+<p>之所以说它是最基础的收集算法，<strong>是因为后续的收集算法都是基于这种思路并对其不足之处进行改进而得到的</strong>。它的主要不足之处有两个：</p>
+<ul>
+<li><strong>一个是执行效率不稳定</strong><ul>
+<li>如果 Java 堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除这两个过程的执行效率都随对象数量增长而降低。</li>
+</ul>
+</li>
+<li><strong>一个是内存空间碎片化问题</strong><ul>
+<li>标记、清除之后会产生大量不连续的内存碎片。空间碎片太多可能会导致程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+</ul>
+</li>
+</ul>
+<p><code>标记—清除算法的执行过程</code><br><img mark-sweep src="/img/hufei/2019/10/mark-sweep.png" width="100%" height="100%"></p>
+<h3 id="标记-复制算法"><a href="#标记-复制算法" class="headerlink" title="标记-复制算法"></a>标记-复制算法</h3><p>为了解决效率低的问题，『标记-复制』（Mark-Copying）算法出现了。<strong>它将内存划分为大小相等的两块，每次只使用其中的一块</strong>。当某一块的内存用完了，就将还存活的对象复制到另外一块上面，然后再把已使用过的内存空间一次性清理掉。这样一来，每次都是对整个半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。<strong>缺点是这种算法将可用内存缩小为原来的一半，代价太高了。</strong></p>
+<p><code>复制算法的执行过程</code><br><img mark-copying src="/img/hufei/2019/10/mark-copying.png" width="100%" height="100%"></p>
+<blockquote>
+<p>现在的商业虚拟机都采用这种收集算法来回收新生代，IBM 公司的专门研究表明，新生代中的对象 98% 是『朝生夕死』的，所以并不需要按照 1:1 的比例来划分内存空间，而是将内存分为一块较大的 Eden 空间和两块较小的 Survivor 空间，每次使用 Eden 和其中一块 Survivor。当回收时，将 Eden 和 Survivor 中还存活着的对象一次性地复制到另外一块 Survivor 空间上，最后清理掉 Eden 和刚才用过的 Survivor 空间。HotSpot 虚拟机默认 Eden 和 Survivor 的大小比例是 8:1。也就是说，每次新生代中可用内存空间为整个新生代容量的 90%（80%+10%），只有 10%的内存会被『浪费』。当然，98% 的对象可回收只是一般场景下的数据，我们没有办法保证每次回收都只有不多于 10% 的对象存活，当 Survivor 空间不够用时，需要依赖其他内存（这里指老年代）进行分配担保（Handle Promotion）。</p>
+</blockquote>
+<h3 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h3><p><strong>『标记-复制』算法在对象存活率较高时就要进行较多的复制操作，效率将变低。</strong> 更关键的是，如果不想浪费 50% 的空间，就需要有额外的空间进行分配担保，以应对被使用的内存中所有对象 100% 存活的极端情况，所以在老年代一般不能直接选用这种算法。</p>
+<p>根据老年代的存亡特征，1974 年 Edward Lueders 提出了另外一种有针对性的『标记-整理』（Mark-Compact）算法。标记过程仍然与『标记-清除』算法一样，但后续步骤不是直接对可回收对象进行清理，<strong>而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</strong></p>
+<p><code>标记-整理算法的执行过程</code><br><img mark-compact src="/img/hufei/2019/10/mark-compact.png" width="100%" height="100%"></p>
+<h2 id="分代收集"><a href="#分代收集" class="headerlink" title="分代收集"></a><a target="_blank" rel="noopener" href="https://javadoop.com/post/metaspace">分代收集</a></h2><p>当前商业虚拟机的垃圾收集都采用『分代收集』（Generational Collection）算法，<strong>这种算法并没有什么新的思想，只是根据对象存活周期的不同将内存划分为几块</strong>。一般是把 Java 堆分为新生代和老年代，这样就可以根据各个年代的特点采用不同的垃圾收集算法。</p>
+<ul>
+<li>在新生代中，每次垃圾收集时都有大批对象死去，只有少量存活，那就选用『标记-复制』算法，只需要付出少量存活对象的复制成本就可以完成收集。</li>
+<li>而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用『标记—清理』或者『标记—整理』算法来进行回收。</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21539353">垃圾回收机制中，引用计数法是如何维护所有对象引用的？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.w3resource.com/java-tutorial/garbage-collection-in-java.php">Garbage Collection in Java</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86/" rel="tag"># 垃圾收集</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/10/28/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%80%E8%83%8C%E6%99%AF/" rel="prev" title="Java 垃圾收集一 背景">
+                  <i class="fa fa-angle-left"></i> Java 垃圾收集一 背景
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/10/31/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%89%E5%AE%9E%E7%8E%B0/" rel="next" title="Java 垃圾收集三 实现">
+                  Java 垃圾收集三 实现 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

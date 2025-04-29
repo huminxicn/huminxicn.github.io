@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="大家在浏览网站时，都遇到过需要输入用户名和密码的情况，然后网站会对你的输入信息进行校验。如果用户名密码正确，接下来你就可以正常访问受限资源了。反之，网站就会给你相应的错误提示。今天我们就用 tomcat + servlet 和一点点的 jsp 来编写简单的登录页面。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tomcat + servlet + jsp 开发登录页面实例">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/01/13/tomcat-servlet-jsp-%E5%BC%80%E5%8F%91%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E5%AE%9E%E4%BE%8B/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="大家在浏览网站时，都遇到过需要输入用户名和密码的情况，然后网站会对你的输入信息进行校验。如果用户名密码正确，接下来你就可以正常访问受限资源了。反之，网站就会给你相应的错误提示。今天我们就用 tomcat + servlet 和一点点的 jsp 来编写简单的登录页面。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/01/tomcat-servlet-login.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/01/project-structure.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/01/login.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/01/login-success.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/01/login-fail.png">
+<meta property="article:published_time" content="2018-01-13T08:46:41.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.162Z">
+<meta property="article:tag" content="Tomcat">
+<meta property="article:tag" content="Servlet">
+<meta property="article:tag" content="JSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/01/tomcat-servlet-login.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/01/13/tomcat-servlet-jsp-%E5%BC%80%E5%8F%91%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E5%AE%9E%E4%BE%8B/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/01/13/tomcat-servlet-jsp-%E5%BC%80%E5%8F%91%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E5%AE%9E%E4%BE%8B/","path":"2018/01/13/tomcat-servlet-jsp-开发登录页面实例/","title":"tomcat + servlet + jsp 开发登录页面实例"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>tomcat + servlet + jsp 开发登录页面实例 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">2.1.</span> <span class="nav-text">登录流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.1.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginInfo"><span class="nav-number">2.2.2.</span> <span class="nav-text">LoginInfo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginServlet"><span class="nav-number">2.2.3.</span> <span class="nav-text">LoginServlet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#web-xml"><span class="nav-number">2.2.4.</span> <span class="nav-text">web.xml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#login-jsp"><span class="nav-number">2.2.5.</span> <span class="nav-text">login.jsp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#login-fail-jsp"><span class="nav-number">2.2.6.</span> <span class="nav-text">login_fail.jsp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#login-success-jsp"><span class="nav-number">2.2.7.</span> <span class="nav-text">login_success.jsp</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2"><span class="nav-number">2.3.</span> <span class="nav-text">登录界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">运行结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/01/13/tomcat-servlet-jsp-%E5%BC%80%E5%8F%91%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E5%AE%9E%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="tomcat + servlet + jsp 开发登录页面实例 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tomcat + servlet + jsp 开发登录页面实例
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-01-13 16:46:41" itemprop="dateCreated datePublished" datetime="2018-01-13T16:46:41+08:00">2018-01-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>大家在浏览网站时，都遇到过需要输入用户名和密码的情况，然后网站会对你的输入信息进行校验。如果用户名密码正确，接下来你就可以正常访问受限资源了。反之，网站就会给你相应的错误提示。今天我们就用 tomcat + servlet 和一点点的 jsp 来编写简单的登录页面。</p>
+<span id="more"></span>
+
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><blockquote>
+<p>Tomcat 是由 Apache 软件基金会下属的 Jakarta 项目开发的一个 Servlet 容器，按照 Sun MicroSystems 提供的技术规范，实现了对 Servlet 和 JavaServer Page（JSP）的支持，并提供了作为 Web 服务器的一些特有功能，如 Tomcat 管理和控制平台、安全域管理和 Tomcat 阀等。由于 Tomcat 本身也内含了一个 HTTP 服务器，它也可以被视作一个单独的 Web 服务器。但是，不能将 Tomcat 和 Apache HTTP 服务器混淆，Apache HTTP 服务器是一个用 C 语言实现的 HTTP Web server；这两个 HTTP web server 不是捆绑在一起的。Apache Tomcat 包含了一个配置管理工具，也可以通过编辑 XML 格式的配置文件来进行配置。</p>
+</blockquote>
+<blockquote>
+<p>Servlet 是一个在 Web 服务器中运行的小型 Java 程序。Servlet 的接收和响应来自Web客户端的请求，通常通过 HTTP(超文本传输协议)。</p>
+</blockquote>
+<blockquote>
+<p>JSP（全称 Java Server Pages）是由 Sun MicroSystems 公司倡导和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成 HTML、XML 或其他格式文档的 Web 网页的技术标准。JSP 技术是以 Java 语言作为脚本语言的，JSP 网页为整个服务器端的 Java 库单元提供了一个接口来服务于 HTTP 的应用程序。JSP 使 Java 代码和特定的预定义动作可以嵌入到静态页面中。JSP 句法增加了被称为 JSP 动作的 XML 标签，它们用来调用内建功能。另外，可以创建 JSP 标签库，然后像使用标准 HTML 或 XML 标签一样使用它们。标签库提供了一种和平台无关的扩展服务器性能的方法。JSP 被 JSP 编译器编译成 Java Servlets。一个 JSP 编译器可以把 JSP 编译成 Java 代码写的 servlet 然后再由 Java 编译器来编译成机器码，也可以直接编译成二进制码。</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="登录流程图"><a href="#登录流程图" class="headerlink" title="登录流程图"></a>登录流程图</h3><img  tomcat-servlet-login src="/img/hufei/2018/01/tomcat-servlet-login.png" width="100%" height="50%">
+
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><h4 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h4><img  project-structure src="/img/hufei/2018/01/project-structure.png" width="50%" height="30%">
+
+<h4 id="LoginInfo"><a href="#LoginInfo" class="headerlink" title="LoginInfo"></a>LoginInfo</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">package entity;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 登录信息</span><br><span class="line"> */</span><br><span class="line">public class LoginInfo &#123;</span><br><span class="line"></span><br><span class="line">    private String username;</span><br><span class="line">    private String password;</span><br><span class="line"></span><br><span class="line">    public String getUsername() &#123;</span><br><span class="line">        return username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setUsername(String username) &#123;</span><br><span class="line">        this.username = username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getPassword() &#123;</span><br><span class="line">        return password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPassword(String password) &#123;</span><br><span class="line">        this.password = password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="LoginServlet"><a href="#LoginServlet" class="headerlink" title="LoginServlet"></a>LoginServlet</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">package servlet;</span><br><span class="line"></span><br><span class="line">import entity.LoginInfo;</span><br><span class="line"></span><br><span class="line">import javax.servlet.ServletException;</span><br><span class="line">import javax.servlet.http.HttpServlet;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 登录servlet</span><br><span class="line"> */</span><br><span class="line">public class LoginServlet extends HttpServlet &#123;</span><br><span class="line">    private static final String USERNAME = &quot;admin&quot;;</span><br><span class="line">    private static final String PASSWORD = &quot;admin&quot;;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        //让doGet执行与doPost相同操作</span><br><span class="line">        System.out.println(&quot;doGet方法被执行..&quot;);</span><br><span class="line">        doPost(req, resp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        System.out.println(&quot;doPost方法被执行..&quot;);</span><br><span class="line">        LoginInfo loginInfo = new LoginInfo();</span><br><span class="line">        String username = req.getParameter(&quot;username&quot;);</span><br><span class="line">        String password = req.getParameter(&quot;password&quot;);</span><br><span class="line">        loginInfo.setUsername(username);</span><br><span class="line">        loginInfo.setPassword(password);</span><br><span class="line"></span><br><span class="line">        //判断用户名和密码是否正确</span><br><span class="line">        if (USERNAME.equals(loginInfo.getUsername()) &amp;&amp; PASSWORD.equals(loginInfo.getPassword())) &#123;</span><br><span class="line">            resp.sendRedirect(req.getContextPath() + &quot;/login_success.jsp&quot;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            resp.sendRedirect(req.getContextPath() + &quot;/login_fail.jsp&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="web-xml"><a href="#web-xml" class="headerlink" title="web.xml"></a>web.xml</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;web-app xmlns=&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span><br><span class="line">         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">         xsi:schemaLocation=&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd&quot;</span><br><span class="line">         version=&quot;3.1&quot;&gt;</span><br><span class="line">    &lt;welcome-file-list&gt;</span><br><span class="line">        &lt;welcome-file&gt;login.jsp&lt;/welcome-file&gt;</span><br><span class="line">    &lt;/welcome-file-list&gt;</span><br><span class="line">    &lt;servlet&gt;</span><br><span class="line">        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;</span><br><span class="line">        &lt;servlet-class&gt;servlet.LoginServlet&lt;/servlet-class&gt;</span><br><span class="line">    &lt;/servlet&gt;</span><br><span class="line">    &lt;servlet-mapping&gt;</span><br><span class="line">        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;</span><br><span class="line">        &lt;url-pattern&gt;/servlet/LoginServlet&lt;/url-pattern&gt;</span><br><span class="line">    &lt;/servlet-mapping&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="login-jsp"><a href="#login-jsp" class="headerlink" title="login.jsp"></a>login.jsp</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;登录&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form action=&quot;/servlet/LoginServlet&quot;&gt;</span><br><span class="line">    用户名: &lt;input type=&quot;text&quot; name=&quot;username&quot;&gt;&lt;br&gt;</span><br><span class="line">    密码: &lt;input type=&quot;password&quot; name=&quot;password&quot;&gt;&lt;br&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;登录&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="login-fail-jsp"><a href="#login-fail-jsp" class="headerlink" title="login_fail.jsp"></a>login_fail.jsp</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;登录失败&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;h1&gt;登录失败，请检查用户名和密码!&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="login-success-jsp"><a href="#login-success-jsp" class="headerlink" title="login_success.jsp"></a>login_success.jsp</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;登录成功&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;h1&gt;恭喜你，登录成功!&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt; </span><br></pre></td></tr></table></figure>
+
+
+<h3 id="登录界面"><a href="#登录界面" class="headerlink" title="登录界面"></a>登录界面</h3><img  login src="/img/hufei/2018/01/login.png" width="100%" height="50%">
+
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><img  login-success src="/img/hufei/2018/01/login-success.png" width="100%" height="50%">
+<img  login-fail src="/img/hufei/2018/01/login-fail.png" width="100%" height="50%">
+
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://www.imooc.com/learn/269">JAVA遇见HTML——Servlet篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kancloud.cn/shx_ky/java/109714">java 学习总结</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Apache_Tomcat">Apache Tomcat</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/Java_Servlet">Java Servlet</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/JSP">JSP</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+              <a href="/tags/Servlet/" rel="tag"># Servlet</a>
+              <a href="/tags/JSP/" rel="tag"># JSP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/31/mac%20%E4%B8%8A%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" rel="prev" title="mac 上如何搭建个人博客">
+                  <i class="fa fa-angle-left"></i> mac 上如何搭建个人博客
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/01/21/%E8%B0%88%E8%B0%88%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%AD%E7%9A%84%E5%9B%9B%E5%88%99%E8%BF%90%E7%AE%97/" rel="next" title="谈谈计算机中的四则运算">
+                  谈谈计算机中的四则运算 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

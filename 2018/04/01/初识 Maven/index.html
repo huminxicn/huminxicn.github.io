@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="相信从事 Java 开发的小伙伴们对 Maven 这个词都不陌生。目前来说，只要存在外部依赖的 Java 项目基本上都是 Maven 项目，而每个 Maven 项目都有一个明显的特征——pom.xml 文件。   今天，我们就一起来学习一下什么是 Maven 项目。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识 Maven">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/04/01/%E5%88%9D%E8%AF%86%20Maven/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="相信从事 Java 开发的小伙伴们对 Maven 这个词都不陌生。目前来说，只要存在外部依赖的 Java 项目基本上都是 Maven 项目，而每个 Maven 项目都有一个明显的特征——pom.xml 文件。   今天，我们就一起来学习一下什么是 Maven 项目。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/pom.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/install-maven.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/creating-a-project.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/build-total-time.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/my-app.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/idea-open-project.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/mvn-package.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/package-success.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/target-directory.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/04/java-cp-jar.png">
+<meta property="article:published_time" content="2018-04-01T12:55:30.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.769Z">
+<meta property="article:tag" content="Maven">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/04/pom.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/04/01/%E5%88%9D%E8%AF%86%20Maven/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/04/01/%E5%88%9D%E8%AF%86%20Maven/","path":"2018/04/01/初识 Maven/","title":"初识 Maven"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>初识 Maven | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA-Maven-%E9%A1%B9%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text">新建一个 Maven 项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-JDK"><span class="nav-number">1.1.</span> <span class="nav-text">安装 JDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Maven"><span class="nav-number">1.2.</span> <span class="nav-text">安装 Maven</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE"><span class="nav-number">1.3.</span> <span class="nav-text">创建一个项目</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.1.</span> <span class="nav-text">目录结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POM-%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.2.</span> <span class="nav-text">POM 文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%93%E5%8C%85"><span class="nav-number">1.3.3.</span> <span class="nav-text">打包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C"><span class="nav-number">1.3.4.</span> <span class="nav-text">校验</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/04/01/%E5%88%9D%E8%AF%86%20Maven/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="初识 Maven | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          初识 Maven
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-04-01 20:55:30" itemprop="dateCreated datePublished" datetime="2018-04-01T20:55:30+08:00">2018-04-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>相信从事 Java 开发的小伙伴们对 Maven 这个词都不陌生。目前来说，只要存在外部依赖的 Java 项目基本上都是 Maven 项目，而每个 Maven 项目都有一个明显的特征——pom.xml 文件。</p>
+<img pom src="/img/hufei/2018/04/pom.png" width="100%" height="50%">
+
+<p>今天，我们就一起来学习一下什么是 Maven 项目。</p>
+<span id="more"></span>
+
+<h2 id="新建一个-Maven-项目"><a href="#新建一个-Maven-项目" class="headerlink" title="新建一个 Maven 项目"></a>新建一个 Maven 项目</h2><h3 id="安装-JDK"><a href="#安装-JDK" class="headerlink" title="安装 JDK"></a>安装 JDK</h3><p>Maven 是一个 Java 工具，因此必须先 <a target="_blank" rel="noopener" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">安装 Java 开发环境</a> 之后才能继续。</p>
+<h3 id="安装-Maven"><a href="#安装-Maven" class="headerlink" title="安装 Maven"></a>安装 Maven</h3><p>首先，<a target="_blank" rel="noopener" href="http://maven.apache.org/download.cgi#Installation">下载 Maven</a> 并按照 <a target="_blank" rel="noopener" href="http://maven.apache.org/install.html">安装说明</a> 进行操作。之后，在终端输入以下命令:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn -v</span><br></pre></td></tr></table></figure>
+
+<p>它会打印出你刚才安装的 Maven 版本，如下图所示:</p>
+<p><code>Maven 版本</code><br><img install-maven src="/img/hufei/2018/04/install-maven.png" width="100%" height="50%"></p>
+<h3 id="创建一个项目"><a href="#创建一个项目" class="headerlink" title="创建一个项目"></a>创建一个项目</h3><p>新建一个空目录 maven，然后执行下列命令创建一个新的 Maven 项目</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=Maven-archetype-quickstart -DinteractiveMode=false</span><br></pre></td></tr></table></figure>
+
+<p><code>creating a project</code><br><img creating-a-project src="/img/hufei/2018/04/creating-a-project.png" width="100%" height="50%"></p>
+<p>如果是刚刚安装了 Maven，则第一次运行可能需要一段时间。这是因为 Maven 正在将插件的 jar 包以及其它的文件下载到本地存储库中。</p>
+<p><code>total time</code><br><img build-total-time src="/img/hufei/2018/04/build-total-time.png" width="100%" height="50%"></p>
+<p>再次查看该目录，多了一个 my-app 目录。进入 my-app 目录，并查看其目录结构，发现它果然也包含了 pom.xml 文件。</p>
+<p><code>my-app</code><br><img my-app src="/img/hufei/2018/04/my-app.png" width="100%" height="50%"></p>
+<h4 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h4><p>接下来用你惯用的 IDE 打开 my-app 项目，这里使用的是 IDEA。</p>
+<p><code>利用 IDEA 打开 my-app 项目</code><br><img idea-open-project src="/img/hufei/2018/04/idea-open-project.png" width="100%" height="50%"></p>
+<p>目录结构如下</p>
+<ul>
+<li>src&#x2F;main&#x2F;java 项目源码</li>
+<li>src&#x2F;test&#x2F;java 测试代码</li>
+<li>pom.xml 项目对象模型(Project Object Model)</li>
+</ul>
+<h4 id="POM-文件"><a href="#POM-文件" class="headerlink" title="POM 文件"></a>POM 文件</h4><p>pom.xml 文件是 Maven 项目配置的核心。它是一个单独的配置文件，其中包含以您想要的方式构建项目所需的大部分信息。my-app 项目的 pom.xml 如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;project xmlns=&quot;http://Maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">  xsi:schemaLocation=&quot;http://Maven.apache.org/POM/4.0.0 http://Maven.apache.org/Maven-v4_0_0.xsd&quot;&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;groupId&gt;com.mycompany.app&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;my-app&lt;/artifactId&gt;</span><br><span class="line">  &lt;packaging&gt;jar&lt;/packaging&gt;</span><br><span class="line">  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;name&gt;my-app&lt;/name&gt;</span><br><span class="line">  &lt;url&gt;http://Maven.apache.org&lt;/url&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;3.8.1&lt;/version&gt;</span><br><span class="line">      &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">  &lt;/dependencies&gt;</span><br><span class="line">&lt;/project&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h4><p>执行下列命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn package</span><br></pre></td></tr></table></figure>
+<img mvn-package src="/img/hufei/2018/04/mvn-package.png" width="100%" height="50%">
+
+<p>打包成功后，其结果输出到 target 目录中。</p>
+<p><code>package success</code><br><img package-success src="/img/hufei/2018/04/package-success.png" width="100%" height="50%"></p>
+<p><code>在 IDEA 中查看 target 目录</code><br><img target-directory src="/img/hufei/2018/04/target-directory.png" width="100%" height="50%"></p>
+<h4 id="校验"><a href="#校验" class="headerlink" title="校验"></a>校验</h4><p>可以使用下面的命令来测试新打的 jar 包:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App</span><br></pre></td></tr></table></figure>
+<p><code>在命令行执行 Java 程序</code><br><img java-cp-jar src="/img/hufei/2018/04/java-cp-jar.png" width="100%" height="50%"></p>
+<p>到这里，我们已经知道该如何新建一个 Maven 项目了。那么，为什么现在大多数的 Java 项目都是 Maven 项目呢？我们下期再聊。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">Maven in 5 Minutes</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/shixiaoguo90/article/details/50607716">java -cp 用法介绍</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Maven/" rel="tag"># Maven</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/03/23/%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%8D%E5%8A%A1%E7%BB%AD/" rel="prev" title="可靠数据传输服务续">
+                  <i class="fa fa-angle-left"></i> 可靠数据传输服务续
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/04/22/%E7%94%A8%20Java%20%E6%80%8E%E4%B9%88%E5%AF%BC%E5%87%BA%20CSV%20%E6%A0%BC%E5%BC%8F%E7%9A%84%E6%96%87%E4%BB%B6/" rel="next" title="用 Java 怎么导出 CSV 格式的文件">
+                  用 Java 怎么导出 CSV 格式的文件 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

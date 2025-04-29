@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据在链路层传输时，比特差错是一个无法回避的问题。当比特差错发生之后我们如何检测和纠正呢？本文主要介绍检测比特差错的基本思想和三种实现技术，它们分别是：奇偶校验、校验和、循环冗余检测。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="比特差错检测和纠正技术">
+<meta property="og:url" content="https://huminxi.netlify.com/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="数据在链路层传输时，比特差错是一个无法回避的问题。当比特差错发生之后我们如何检测和纠正呢？本文主要介绍检测比特差错的基本思想和三种实现技术，它们分别是：奇偶校验、校验和、循环冗余检测。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/05/edc-scenario.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/05/even-parity.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/05/two-dimensional-even-parity.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/06/ipv4-datagram-format.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/05/crc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2018/05/sample-crc-calculation.png">
+<meta property="article:published_time" content="2018-05-19T02:41:14.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.762Z">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="差错检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2018/05/edc-scenario.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF/","path":"2018/05/19/比特差错检测和纠正技术/","title":"比特差错检测和纠正技术"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>比特差错检测和纠正技术 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8F%91%E7%8E%B0%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99"><span class="nav-number">1.</span> <span class="nav-text">如何发现比特差错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%87%E5%81%B6%E6%A0%A1%E9%AA%8C%EF%BC%88Parity-Checks%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">奇偶校验（Parity Checks）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B"><span class="nav-number">2.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E6%A3%80%E6%B5%8B%E5%87%BA%E7%9A%84%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99"><span class="nav-number">2.2.</span> <span class="nav-text">未检测出的比特差错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A0%E9%94%99"><span class="nav-number">2.3.</span> <span class="nav-text">纠错</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C%E5%92%8C%EF%BC%88Checksum%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">校验和（Checksum）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%A0%E7%89%B9%E7%BD%91%E6%A0%A1%E9%AA%8C%E5%92%8C"><span class="nav-number">3.1.</span> <span class="nav-text">因特网校验和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">3.2.</span> <span class="nav-text">举个例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E6%96%B9"><span class="nav-number">3.2.1.</span> <span class="nav-text">发送方</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A5%E6%94%B6%E6%96%B9"><span class="nav-number">3.2.2.</span> <span class="nav-text">接收方</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.</span> <span class="nav-text">应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%86%97%E4%BD%99%E6%A3%80%E6%B5%8B%EF%BC%88Cyclic-Redundancy-Check%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">循环冗余检测（Cyclic Redundancy Check）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%A1%B9%E5%BC%8F%E7%BC%96%E7%A0%81"><span class="nav-number">4.1.</span> <span class="nav-text">多项式编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90-1"><span class="nav-number">4.2.</span> <span class="nav-text">举个例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2018/05/19/%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="比特差错检测和纠正技术 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          比特差错检测和纠正技术
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-05-19 10:41:14" itemprop="dateCreated datePublished" datetime="2018-05-19T10:41:14+08:00">2018-05-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>数据在链路层传输时，比特差错是一个无法回避的问题。当比特差错发生之后我们如何检测和纠正呢？本文主要介绍检测比特差错的基本思想和三种实现技术，它们分别是：奇偶校验、校验和、循环冗余检测。</p>
+<span id="more"></span>
+
+<h2 id="如何发现比特差错"><a href="#如何发现比特差错" class="headerlink" title="如何发现比特差错"></a>如何发现比特差错</h2><p>如图 5-3 所示，左侧的发送结点为了保护数据比特，使用差错检测和纠正比特（Error-Detection and-Correction, EDC）来增强数据 D。要保护的数据不仅包括从网络层传递下来的数据报（Datagram），还包括链路层帧（Frame）首部中的 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MAC%E5%9C%B0%E5%9D%80">MAC</a> 地址、以太类型等字段。链路层的 D 和 EDC 都被发送到接收结点，右侧的接收结点接收到比特序列 D’ 和 EDC’。<strong>由于传输中可能会发生比特翻转（由 0 变成 1 或 由 1 变成 0），所以 D’ 和 EDC’ 可能与 D 和 EDC 不同</strong>。</p>
+<p><code>图 5-3 差错检测与纠正场景</code><br><img edc-scenario src="/img/hufei/2018/05/edc-scenario.png" width="100%" height="50%"></p>
+<p><strong>接收方的挑战是在它只收到 D’ 和 EDC’ 的情况下，如何确定 D’ 是否和初始的 D 相同</strong>。差错检测和纠正技术使接收方有时（并非总是）检测出比特差错。也就是说，<strong>接收方可能无法知道接收的信息中包含比特差错</strong>，从而向网络层交付一个受损的数据报。</p>
+<p>因此，我们需要选择一个使这种事件发生的概率更低的差错检测方案。一般来说，<strong>差错检测和纠错技术越复杂，发生的概率就越低，但同时开销就越大（这意味着需要更多的计算和更多的差错检测和纠正比特）</strong>。</p>
+<h2 id="奇偶校验（Parity-Checks）"><a href="#奇偶校验（Parity-Checks）" class="headerlink" title="奇偶校验（Parity Checks）"></a>奇偶校验（Parity Checks）</h2><h3 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h3><p><strong>最简单的差错检测就是用单个奇偶校验位（parity bit）</strong>。假设要发送的信息 D 有 d 个比特。在偶校验方案中，发送方只需要包含一个附加的比特（即校验比特）并选择它的值，使得这 d+1 个比特中有偶数个 1。同理，在奇校验方案中，选择校验比特值使得有奇数个 1。图 5-4 就描述了一个偶校验方案，校验比特被存放在一个单独的字段中。</p>
+<p><code>图 5-4 一比特位的偶校验</code><br><img even-parity src="/img/hufei/2018/05/even-parity.png" width="100%" height="50%"></p>
+<p>采用单个奇偶校验位的方式，接收方的操作也很简单。接收方只需要数一数 d+1 比特中 1 的数量即可。<strong>如果在采用偶校验方案中发现了奇数个值为 1 的比特，接收方就知道至少出现了一个比特差错（更精确的说法是，出现了奇数个比特差错）</strong>。</p>
+<h3 id="未检测出的比特差错"><a href="#未检测出的比特差错" class="headerlink" title="未检测出的比特差错"></a>未检测出的比特差错</h3><p><strong>当出现了偶数个比特差错，会发生什么现象呢？这将导致一个未检测出的差错</strong>。如果发生比特差错的概率小，而且比特之间的差错可看作是独立发生的，那么在同一个分组中出现多个比特差错的概率将是极小的。在这种情况下，单个奇偶校验位可能足够了。但是，现实场景中差错经常以突发的方式聚集在一起，而不是独立的发生。<strong>在突发差错的情况下，使用单比特奇偶校验保护的一组数据中未检测出差错的概率是 50%。</strong> 显然，我们需要一个更加健壮的差错检测方案。</p>
+<h3 id="纠错"><a href="#纠错" class="headerlink" title="纠错"></a>纠错</h3><p>在检测出存在比特差错之后应该如何纠错呢？我们以单比特奇偶校验方案为例，图 5-5 显示了单比特奇偶校验方案的二维实现。数据 D 中的 d 个比特被划分为 i 行 j 列。对每行和每列计算奇偶值。产生的 i+j+1 奇偶比特构成了链路层帧的差错检测比特。</p>
+<p><code>图 5-5 二维偶校验</code><br><img two-dimensional-even-parity src="/img/hufei/2018/05/two-dimensional-even-parity.png" width="100%" height="50%"></p>
+<p>现在假设在初始 d 比特信息中出现了单个比特差错。<strong>使用这种二维奇偶校验（two-dimensional parity）方案，包含差错比特的行和列的校验值都会出现差错</strong>。因此，接收方不仅可以检测到发生了单个比特差错，而且可以利用行和列的索引来定位差错比特并纠正它！</p>
+<p>接收方检测和纠正差错的能力被称为前向纠错（Forward Error Correction, FEC）。这些技术通常用于像音频 CD 这样的存储和回放设备中。FEC 技术很有价值，因为它们可以减少发送方重发的次数。<strong>更重要的是，它们允许在接收方立即纠正差错</strong>。FEC 能避免一些往返时延，这些时延是发送方收到 NAK 分组并向接收方重传数据时所花费的，这对于实时网络应用或具有长传播时延的链路来说是一种非常重要的优点。</p>
+<h2 id="校验和（Checksum）"><a href="#校验和（Checksum）" class="headerlink" title="校验和（Checksum）"></a>校验和（Checksum）</h2><h3 id="因特网校验和"><a href="#因特网校验和" class="headerlink" title="因特网校验和"></a>因特网校验和</h3><p>在检验和技术中， 图 5-4 中的 d 比特数据被视为一个 k 比特的整数序列。<strong>一个简单的检验和方法就是将这 k 比特整数加起来，并用得到的和作为差错检测比特</strong>。<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/IPv4_header_checksum">因特网检验和</a> 就基于这种方法，将每 2 字节的数据视作 16 比特的整数并求和，<strong>这个和的反码就是首部的检验和字段（Header checksum）</strong>。</p>
+<p><code>下图 IPv4 数据报的首部中就存在着一个 16 bit 的校验和字段</code><br><img ipv4-datagram-format src="/img/hufei/2018/06/ipv4-datagram-format.png" width="100%" height="100%"></p>
+<h3 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h3><h4 id="发送方"><a href="#发送方" class="headerlink" title="发送方"></a>发送方</h4><p>假设一个 20 字节的 IPv4 首部数据如下（采用 16 进制表示），加粗的为校验和字段。</p>
+<p>4500 0073 0000 4000 4011 <strong>b861</strong> c0a8 0001 c0a8 00c7</p>
+<p>(1) 跳过校验和字段，我们计算首部中每个 16 位值的总和。<br>4500 + 0073 + 0000 + 4000 + 4011 + c0a8 + 0001 + c0a8 + 00c7 &#x3D; 2479c </p>
+<p>(2) 我们将 2479c 转换为二进制。<br>0010 0100 0111 1001 1100</p>
+<p>(3) 前 4 位是进位，我们将其加到最低位。<br>(0010) + (0100 0111 1001 1100) &#x3D; 0100 0111 1001 1110</p>
+<p>(4) 在这个例子中，加完进位之后不产生新的进位。如果有的话，重复第 3 步。</p>
+<p>(5) 接下来，我们将该值中的每一位取反，以获得校验和。<br>0100 0111 1001 1110<br>变为<br>1011 1000 0110 0001<br>用十六进制来表示即为 <strong>b861</strong>，如前面加粗部分所示。</p>
+<h4 id="接收方"><a href="#接收方" class="headerlink" title="接收方"></a>接收方</h4><p>在验证校验和时，使用与上述相同的过程，只是原始校验和字段不跳过。</p>
+<p>(1) 4500 + 0073 + 0000 + 4000 + 4011 + b861 + c0a8 + 0001 + c0a8 + 00c7 &#x3D; 2fffd</p>
+<p>(2) 加上进位。<br>fffd + 2 &#x3D; ffff</p>
+<p>(3) 翻转每一位得到 0000，这表明没有检测到差错（注意，<strong>IP 首部校验和无法检测 16 位值的正确顺序</strong>）。</p>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p><strong>检验和方法适用于需要分组开销小的场景</strong>。TCP 和 UDP 中的检验和只用了 16 比特，与常用于链路层的 CRC 相比，它们提供相对弱的差错保护。</p>
+<p><strong>为什么传输层使用检验和而链路层使用 CRC 呢</strong>？因为传输层作为用户操作系统的一部分，通常是用软件来实现的，更适合采用简单而快速（如检验和）的差错检测方案。而链路层的差错检测是用硬件来实现的，它能够快速执行更复杂的 CRC 运算。</p>
+<h2 id="循环冗余检测（Cyclic-Redundancy-Check）"><a href="#循环冗余检测（Cyclic-Redundancy-Check）" class="headerlink" title="循环冗余检测（Cyclic Redundancy Check）"></a>循环冗余检测（Cyclic Redundancy Check）</h2><h3 id="多项式编码"><a href="#多项式编码" class="headerlink" title="多项式编码"></a>多项式编码</h3><p>循环冗余检测（Cyclic Redundancy Check, CRC）也称为多项式编码（polynomial code），<strong>该编码将待发送的比特串看作是系数为 0 和 1 的一个多项式，对比特串的操作被解释为多项式运算</strong>。CRC 编码的思想如下：</p>
+<ul>
+<li>数据 D 有 d 比特，发送方要将它发送给接收方。</li>
+<li>发送方和接收方首先协商一个 r+1 比特串，称为生成多项式。我们将其表示为 G，同时规定 G 的最高有效位是 1。</li>
+<li>对于数据 D，发送方要选择 r 个附加比特 R，并将 R 附加到 D 上。使得到的 d+r 比特数据（一个二进制数）用 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%A8%A12%E8%BF%90%E7%AE%97/18556715">模 2 运算</a> 恰好能被 G 整除（即余数为 0）。</li>
+</ul>
+<p><code>图 5-6 crc</code><br><img crc src="/img/hufei/2018/05/crc.png" width="100%" height="50%"></p>
+<p>接收方用 CRC 进行差错检测的过程很简单：<strong>直接用 G 去除接收到的 d+r 比特。如果余数为非零，则出现了差错；否则认为数据正确</strong>。</p>
+<p>所有 CRC 计算采用模 2 运算来做（在加法中不进位，在减法中不借位）。这意味着加法和减法是相同的，这两种操作等价于按位异或（XOR）。 </p>
+<h3 id="举个例子-1"><a href="#举个例子-1" class="headerlink" title="举个例子"></a><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/348823629;">举个例子</a></h3><p><code>图 5-7 一个例子</code><br><img sample-crc-calculation src="/img/hufei/2018/05/sample-crc-calculation.png" width="100%" height="50%"></p>
+<p>最终求出来的 R 将会被补充到待发送数据 D 的后面。发送方实际要发送的是 D+R，即 101110011。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p><strong>这些比特差错检测和纠正技术，正是我们能在网络中正确传递消息的基石。</strong></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/26176870/">《计算机网络:自定向下方法》</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/IPv4_header_checksum">IPv4 header checksum</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.51cto.com/winda/1063951">最通俗的 CRC 校验原理剖析</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-cn/%E5%BE%AA%E7%92%B0%E5%86%97%E9%A4%98%E6%A0%A1%E9%A9%97">循环冗余校验</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B/" rel="tag"># 差错检测</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/04/%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B8%8E%E7%94%9F%E6%B4%BB/" rel="prev" title="统计学与生活">
+                  <i class="fa fa-angle-left"></i> 统计学与生活
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/03/IPv4%20%E5%92%8C%20IPv6/" rel="next" title="IPv4 和 IPv6">
+                  IPv4 和 IPv6 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

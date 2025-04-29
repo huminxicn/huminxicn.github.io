@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="我们知道，数据结构和算法本身解决的是『快』和『省』的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这就是我们今天要介绍的内容：时间、空间复杂度分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复杂度分析">
+<meta property="og:url" content="https://huminxi.netlify.com/2020/05/28/%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="我们知道，数据结构和算法本身解决的是『快』和『省』的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这就是我们今天要介绍的内容：时间、空间复杂度分析。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2020/05/compare-complexity.png">
+<meta property="article:published_time" content="2020-05-28T07:02:21.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:30.809Z">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2020/05/compare-complexity.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2020/05/28/%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2020/05/28/%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90/","path":"2020/05/28/复杂度分析/","title":"复杂度分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>复杂度分析 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">为什么需要复杂度分析？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7-O-%E5%A4%8D%E6%9D%82%E5%BA%A6%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">大 O 复杂度表示法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.1.</span> <span class="nav-text">示例 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">2.2.</span> <span class="nav-text">示例 2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">2.3.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">时间复杂度分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E6%B3%95%E5%88%99"><span class="nav-number">3.1.</span> <span class="nav-text">最大法则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B9%98%E6%B3%95%E6%B3%95%E5%88%99"><span class="nav-number">3.2.</span> <span class="nav-text">乘法法则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">3.3.</span> <span class="nav-text">常见复杂度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#O-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">\(O(1)\)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#O-log-n"><span class="nav-number">3.3.2.</span> <span class="nav-text">\(O(\log n)\)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#O-n-log-n"><span class="nav-number">3.3.3.</span> <span class="nav-text">\(O(n\log n)\)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">空间复杂度分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93-1"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2020/05/28/%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="复杂度分析 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          复杂度分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-05-28 15:02:21" itemprop="dateCreated datePublished" datetime="2020-05-28T15:02:21+08:00">2020-05-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:30" itemprop="dateModified" datetime="2025-04-29T16:33:30+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>我们知道，数据结构和算法本身解决的是『快』和『省』的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这就是我们今天要介绍的内容：时间、空间复杂度分析。</p>
+<span id="more"></span>
+
+<h2 id="为什么需要复杂度分析？"><a href="#为什么需要复杂度分析？" class="headerlink" title="为什么需要复杂度分析？"></a>为什么需要复杂度分析？</h2><p>你可能会有些疑惑，我<strong>直接把代码跑一遍</strong>不就能得到算法执行的时间和占用的内存大小。为什么还要做时间、空间复杂度分析呢？这种分析能比我实际跑一遍得到的数据更准确吗？</p>
+<p>首先，我可以肯定地说，你这种评估方法是没有任何问题的。很多数据结构和算法书籍还给它起了一个名字，叫<strong>事后统计法</strong>。但是，事后统计法有着非常大的局限性。</p>
+<ul>
+<li>测试结果非常依赖测试环境<ul>
+<li>测试环境中硬件的差异会对测试结果造成很大的影响。比如，同样一段代码，分别用 Intel Core i9 处理器和 Intel Core i3 处理器来运行，那 i9 处理器肯定要比 i3 处理器更快处理完。还有，比如原本在这台机器上 a 代码执行的速度比 b 代码要快，等我们换到另一台机器上时，可能会有相反的结果。</li>
+</ul>
+</li>
+<li>测试结果受数据规模的影响<ul>
+<li>对于排序算法来说，如果测试数据规模太小，测试结果可能无法真实地反应算法的性能。比如，对于小规模的数据排序，插入排序可能比快速排序更快！</li>
+</ul>
+</li>
+</ul>
+<p>所以，我们需要一个不用执行代码，就可以粗略地估计算法的执行效率的方法。也就是时间、空间复杂度分析方法。</p>
+<h2 id="大-O-复杂度表示法"><a href="#大-O-复杂度表示法" class="headerlink" title="大 O 复杂度表示法"></a>大 O 复杂度表示法</h2><p>算法的执行效率，粗略地讲，就是算法代码的执行时间。但如何才能在不运行代码的情况下，用『肉眼』得到一段代码的执行时间呢？</p>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例 1"></a>示例 1</h3><p>这里有段示例代码，求 1~n 的和。现在，我们来估算一下这段代码的执行时间。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int cal_1(int n) &#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    int i = 1;</span><br><span class="line">    for (; i &lt;= n; ++i) &#123;</span><br><span class="line">        sum = sum + i;</span><br><span class="line">    &#125;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从 CPU 的角度来看，这段代码的每一行都执行着类似的操作：<strong>读数据-运算-写数据</strong>。尽管每行代码 CPU 执行的次数、时间都不一样，但是，我们这里只是粗略估计，可以假设每行代码执行的时间都一样，为一个 \(unitTime\)。在这个假设的基础上，这段代码的总执行时间是多少呢？</p>
+<p>第 2、3 行代码分别需要 1 个 \(unitTime\) 的执行时间，第 4、5 行都运行了 n 遍，所以需要 \( 2n \ast unitTime \)  的执行时间，所以这段代码总的执行时间就是 \((2n+2)\ast unitTime\)。</p>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例 2"></a>示例 2</h3><p>按照这个分析思路，我们再来看这段代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int cal_2(int n) &#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    int i = 1;</span><br><span class="line">    int j = 1;</span><br><span class="line">    for (; i &lt;= n; ++i) &#123;</span><br><span class="line">        j = 1;</span><br><span class="line">        for (; j &lt;= n; ++j) &#123;</span><br><span class="line">            sum = sum + i * j;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第 2、3、4 行代码，每行都需要 1 个 \(unitTime\) 的执行时间，第 5、6 行代码循环执行了 n 遍，需要 \(2n \ast unitTime\) 的执行时间，第 7、8 行代码循环执行了 \(n^2\) 遍，所以需要 \(2n^2 \ast unitTime\) 的执行时间。所以，整段代码的执行时间 \(T(n) &#x3D; (2n^2+2n+3)\ast unitTime\)。</p>
+<p>由此，我们可以得出一个结论，代码的执行时间 \(T(n)\) 与代码的执行次数成正比。用公式来表示的话，如下所示</p>
+<p>$$ T(n)&#x3D;O(f(n)) $$</p>
+<p>公式中的 \(T(n)\) 我们已经讲过了，它表示代码执行的时间；其中 \(n\) 表示数据的规模；\(f(n)\) 表示代码执行的次数。公式中的 \(O\)，表示代码的执行时间 \(T(n)\) 与 \(f(n)\) 成正比。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>所以，第一个例子中的 \(T(n) &#x3D; O(2n+2)\)，第二个例子中的 \(T(n) &#x3D; O(2n^2+2n+3)\)。这就是<strong>大 \(O\) 时间复杂度表示法</strong>。大 \(O\) 时间复杂度实际上并不代表代码真正的执行时间，而是表示<strong>代码执行时间随数据规模增长的变化趋势</strong>，所以也叫作<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6">渐进时间复杂度（asymptotic time complexity）</a>，简称时间复杂度。</p>
+<p>当 n 趋近于无穷大时，公式中的<strong>常量、低阶项和首项系数并不左右增长趋势</strong>，所以都可以忽略。我们只需要记录一个最高阶的量级就可以了。如果用大 \(O\) 表示法来表示刚才讲的那两段代码的时间复杂度，就可以记为：\(T(n) &#x3D; O(n)\)， \(T(n) &#x3D; O(n^2)\)。</p>
+<h2 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h2><p>前面介绍了大 \(O\) 时间复杂度的由来和表示方法。下面介绍两个比较实用的分析时间复杂度的方法。</p>
+<h3 id="最大法则"><a href="#最大法则" class="headerlink" title="最大法则"></a>最大法则</h3><p><strong>总复杂度等于量级最大的那段代码的复杂度</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">int cal_3(int n) &#123;</span><br><span class="line">    int sum_1 = 0;</span><br><span class="line">    int p = 1;</span><br><span class="line">    for (; p &lt; 100; ++p) &#123;</span><br><span class="line">        sum_1 = sum_1 + p;</span><br><span class="line">    &#125;</span><br><span class="line">    int sum_2 = 0;</span><br><span class="line">    int q = 1;</span><br><span class="line">    for (; q &lt; n; ++q) &#123;</span><br><span class="line">        sum_2 = sum_2 + q;</span><br><span class="line">    &#125;</span><br><span class="line">    int sum_3 = 0;</span><br><span class="line">    int i = 1;</span><br><span class="line">    int j = 1;</span><br><span class="line">    for (; i &lt;= n; ++i) &#123;</span><br><span class="line">        j = 1;</span><br><span class="line">        for (; j &lt;= n; ++j) &#123;</span><br><span class="line">            sum_3 = sum_3 + i * j;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return sum_1 + sum_2 + sum_3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个代码分为三部分，分别是求 sum_1、sum_2、sum_3。我们可以分别分析每一部分的时间复杂度，然后把它们放到一块儿，再取一个量级最大的作为整段代码的复杂度。</p>
+<p>第一段的时间复杂度是多少呢？这段代码循环执行了 100 次，所以是一个常量的执行时间，跟 \(n\) 的规模无关。</p>
+<blockquote>
+<p>这里要强调一下，即便这段代码循环 10000 次、100000 次，只要是一个已知的数，跟 n 无关，照样也是常量级的执行时间。当 n 趋向于无限大的时候，就可以忽略。尽管对代码的执行时间会有很大影响，但是回到时间复杂度的概念来说，它表示的是一个算法执行效率与数据规模增长的变化趋势，所以不管常量的执行时间多大，我们都可以忽略掉。因为它并不影响增长趋势。</p>
+</blockquote>
+<p>那第二段代码和第三段代码的时间复杂度是多少呢？答案是 \(O(n)\) 和 \(O(n^2)\)。</p>
+<p>综合这三段代码的时间复杂度，我们取其中最大的量级。所以，整段代码的时间复杂度就为 \(O(n^2)\)。</p>
+<h3 id="乘法法则"><a href="#乘法法则" class="headerlink" title="乘法法则"></a>乘法法则</h3><p><strong>嵌套代码的复杂度等于嵌套内外代码复杂度的乘积</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int cal(int n) &#123;</span><br><span class="line">    int ret = 0;</span><br><span class="line">    int i = 1;</span><br><span class="line">    for (; i &lt; n; ++i) &#123;</span><br><span class="line">        ret = ret + f(i);</span><br><span class="line">    &#125;</span><br><span class="line">    return ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int f(int n) &#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    int i = 1;</span><br><span class="line">    for (; i &lt; n; ++i) &#123;</span><br><span class="line">        sum = sum + i;</span><br><span class="line">    &#125;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们单独看 cal() 函数。假设 f() 只是一个普通的操作，那第 4～6 行的时间复杂度就是，\(T_1(n) &#x3D; O(n)\)。但 f() 函数本身不是一个简单的操作，它的时间复杂度是 \(T_2(n) &#x3D; O(n)\)，所以，整个 cal() 函数的时间复杂度就是，\(T(n) &#x3D; T_1(n) \times T_2(n) &#x3D; O(n \times n) &#x3D; O(n^2)\)。</p>
+<h3 id="常见复杂度"><a href="#常见复杂度" class="headerlink" title="常见复杂度"></a>常见复杂度</h3><h4 id="O-1"><a href="#O-1" class="headerlink" title="\(O(1)\)"></a>\(O(1)\)</h4><p>首先你必须明确一个概念，\(O(1)\) 只是常量级时间复杂度的一种表示方法，并不是指只执行了一行代码。比如这段代码，即便有 3 行，它的时间复杂度也是 \(O(1）\)，而不是 \(O(3)\)。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int i = 8; </span><br><span class="line">int j = 6; </span><br><span class="line">int sum = i + j;</span><br></pre></td></tr></table></figure>
+<p>只要代码的执行时间不随 \(n\) 的增大而增长，这样代码的时间复杂度我们都记作 \(O(1)\)。或者说，一般情况下，只要算法中不存在循环语句、递归语句，即使有成千上万行的代码，其时间复杂度也是 \(Ο(1)\)。</p>
+<h4 id="O-log-n"><a href="#O-log-n" class="headerlink" title="\(O(\log n)\)"></a>\(O(\log n)\)</h4><p>对数阶时间复杂度十分常见，同时也是最难分析的一种时间复杂度。我们通过一个例子来说明一下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">i = 1;</span><br><span class="line">while (i &lt;= n) &#123;</span><br><span class="line">    i = i * 2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据我们前面讲的复杂度分析方法，第三行代码是循环执行次数最多的。所以，我们只要能计算出这行代码被执行了多少次，就能知道整段代码的时间复杂度。从代码中可以看出，变量 i 的值从 1 开始取，每循环一次就乘以 2，当大于 n 时，循环结束。即</p>
+<p>$$ 2^x&#x3D;n $$</p>
+<p>所以，只要解出来 x，就知道这行代码的执行次数了。而 \(x&#x3D;\log_2 n\)，所以，这段代码的时间复杂度就是 \(O(\log_2 n)\) 。</p>
+<p>现在，我们把代码稍微改下，下面这段代码的时间复杂度是多少？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">i = 1;</span><br><span class="line">while (i &lt;= n) &#123;</span><br><span class="line">    i = i * 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据刚刚讲的思路，很容易就能看出来，这段代码的时间复杂度为 \(O(\log_3 n)\)。</p>
+<p><strong>实际上，不管是以 2 为底、以 3 为底，还是以 10 为底，我们可以把所有对数阶的时间复杂度都记为 \(O(\log n)\)</strong>。为什么呢？</p>
+<p>我们知道，对数之间是可以相互转换的，\(\log_3 n\) 就等于 \(\log_3 2 \times \log_2 n\)，所以 \(O(\log_3 n) &#x3D; O(C \times \log_2 n)\)，其中 \(C&#x3D;\log_3 2\)，是一个常量。基于我们前面的分析：<strong>在采用大 \(O\) 表示复杂度的时候，可以忽略系数，即 \(O(C\times f(n)) &#x3D; O(f(n))\)</strong>。所以，\(O(\log_2 n)\) 就等于 \(O(\log_3 n)\)。因此，在对数阶时间复杂度的表示方法里，我们忽略对数的底，统一表示为 \(O(\log n)\)。</p>
+<h4 id="O-n-log-n"><a href="#O-n-log-n" class="headerlink" title="\(O(n\log n)\)"></a>\(O(n\log n)\)</h4><p>如果你理解了 \(O(\log n)\)，那 \(O(n \log n)\) 就很容易理解了。还记得我们讲的乘法法则吗？如果一段代码的时间复杂度是 \(O(\log n)\)，我们循环执行 \(n\) 遍，时间复杂度就是 \(O(n \log n)\) 了。\(O(n \log n)\) 也是一种常见的算法时间复杂度。比如，归并排序、快速排序的时间复杂度都是 \(O(n \log n)\)。</p>
+<h2 id="空间复杂度分析"><a href="#空间复杂度分析" class="headerlink" title="空间复杂度分析"></a>空间复杂度分析</h2><p>前面，咱们花了很大的篇幅讲大 \(O\) 表示法和时间复杂度分析，理解了前面讲的内容，空间复杂度分析介绍起来就非常简单了。</p>
+<p>前面讲过，时间复杂度的全称是渐进时间复杂度，表示算法的执行时间与数据规模之间的增长关系。类比一下，空间复杂度全称就是渐进空间复杂度（asymptotic space complexity），表示算法的存储空间与数据规模之间的增长关系。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void print(int n) &#123;</span><br><span class="line">    int i = 0;</span><br><span class="line">    int[] a = new int[n];</span><br><span class="line">    for (; i &lt; n; ++i) &#123;</span><br><span class="line">        a[i] = i * i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for (i = n - 1; i &gt;= 0; --i) &#123;</span><br><span class="line">        System.out.println(a[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟时间复杂度分析一样，我们可以看到，第 2 行代码中，我们申请了一个空间存储变量 i，但是它是常量阶的，跟数据规模 \(n\) 没有关系，所以可以忽略。第 3 行申请了一个大小为 \(n\) 的 int 类型数组，除此之外，剩下的代码都没有占用更多的空间，所以整段代码的空间复杂度就是 \(O(n)\)。</p>
+<p>我们常见的空间复杂度就是 \(O(1)\)、\(O(n)\)、\(O(n^2)\)，像 \(O(\log n)\)、\(O(n \log n)\) 这样的对数阶复杂度平时都用不到。而且，空间复杂度分析比时间复杂度分析要简单很多。所以，对于空间复杂度，掌握上面的这些内容已经足够了。</p>
+<h2 id="小结-1"><a href="#小结-1" class="headerlink" title="小结"></a>小结</h2><p>**复杂度也叫渐进复杂度，包括时间复杂度和空间复杂度，用来分析算法执行效率与数据规模之间的增长关系，越高阶复杂度的算法，执行效率越低。**常见的复杂度并不多，从低阶到高阶依次为：\(O(1)\)、\(O(\log n)\)、\(O(n)\)、\(O(n \log n)\)、\(O(n^2)\)。几乎所有的数据结构和算法的复杂度都跑不出这几个。</p>
+<p>其实，只要提到数据结构与算法，就一定离不开时间、空间复杂度分析。而且，我个人认为，<strong>复杂度分析是整个算法学习的精髓，只要掌握了它，数据结构和算法的内容基本上就掌握了一半。</strong></p>
+<p><code>几种常见的时间复杂度</code><br><img compare-complexity src="/img/hufei/2020/05/compare-complexity.png" width="100%" height="100%"></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://time.geekbang.org/column/article/40036">复杂度分析（上）：如何分析、统计算法的执行效率和资源消耗？</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-tw/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6">时间复杂度</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/01/15/Java%20%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" rel="prev" title="Java 内存模型与线程">
+                  <i class="fa fa-angle-left"></i> Java 内存模型与线程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/01/%E4%B8%80%E6%9D%A1%20SQL%20%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5%E6%98%AF%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E7%9A%84/" rel="next" title="一条 SQL 查询语句是如何执行的">
+                  一条 SQL 查询语句是如何执行的 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

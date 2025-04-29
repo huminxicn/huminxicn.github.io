@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="最初对个人博客有印象，就是阮一峰的个人博客。当时是在搜索 互联网协议入门 这篇文章的时候，发现原来还可以这么玩。随后在和黑牛的一次谈话中，他问我:2017 年就快要过去了，今年的总结写了吗？这才反应过来，2017 年已经到末尾了。于是就有了想写点东西，留作以后回忆的索引，搭建个人博客也就顺理成章了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mac 上如何搭建个人博客">
+<meta property="og:url" content="https://huminxi.netlify.com/2017/12/31/mac%20%E4%B8%8A%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="最初对个人博客有印象，就是阮一峰的个人博客。当时是在搜索 互联网协议入门 这篇文章的时候，发现原来还可以这么玩。随后在和黑牛的一次谈话中，他问我:2017 年就快要过去了，今年的总结写了吗？这才反应过来，2017 年已经到末尾了。于是就有了想写点东西，留作以后回忆的索引，搭建个人博客也就顺理成章了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/google-search-bolg.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/hexo-doc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/github-register.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/new-repository.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/huminxicn-github-io.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/ssh.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/ssh-generate.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/github-setting.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/github-setting-ssh.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/github-setting-ssh-new.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/ssh-success.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/git-config.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2017/12/config-deploy.png">
+<meta property="article:published_time" content="2017-12-31T05:33:47.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.095Z">
+<meta property="article:tag" content="博客">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2017/12/google-search-bolg.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2017/12/31/mac%20%E4%B8%8A%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2017/12/31/mac%20%E4%B8%8A%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/","path":"2017/12/31/mac 上如何搭建个人博客/","title":"mac 上如何搭建个人博客"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>mac 上如何搭建个人博客 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96"><span class="nav-number">1.1.</span> <span class="nav-text">或</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo"><span class="nav-number">2.</span> <span class="nav-text">Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Hexo"><span class="nav-number">2.1.</span> <span class="nav-text">什么是 Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Hexo"><span class="nav-number">2.2.</span> <span class="nav-text">安装 Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C"><span class="nav-number">2.3.</span> <span class="nav-text">校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6"><span class="nav-number">2.4.</span> <span class="nav-text">进阶</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Github-Pages"><span class="nav-number">3.</span> <span class="nav-text">Github Pages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C-Github-%E8%B4%A6%E5%8F%B7"><span class="nav-number">3.1.</span> <span class="nav-text">注册 Github 账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Github-Pages-%E4%BB%93%E5%BA%93"><span class="nav-number">3.2.</span> <span class="nav-text">创建 Github Pages 仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6-1"><span class="nav-number">3.3.</span> <span class="nav-text">进阶</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E8%81%94-Hexo-%E4%B8%8E-Github-Pages"><span class="nav-number">4.</span> <span class="nav-text">关联 Hexo 与 Github Pages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-SSH"><span class="nav-number">4.1.</span> <span class="nav-text">配置 SSH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%96%B0%E7%9A%84-SSH-Key"><span class="nav-number">4.2.</span> <span class="nav-text">生成新的 SSH Key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Github"><span class="nav-number">4.3.</span> <span class="nav-text">配置 Github</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86-Hexo-%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2%E5%88%B0-Github-Pages"><span class="nav-number">4.4.</span> <span class="nav-text">将 Hexo 博客部署到 Github Pages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C-1"><span class="nav-number">4.5.</span> <span class="nav-text">校验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2017/12/31/mac%20%E4%B8%8A%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="mac 上如何搭建个人博客 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mac 上如何搭建个人博客
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-12-31 13:33:47" itemprop="dateCreated datePublished" datetime="2017-12-31T13:33:47+08:00">2017-12-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">编程实践</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>最初对个人博客有印象，就是阮一峰的个人博客。当时是在搜索 <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2012/05/internet_protocol_suite_part_i.html">互联网协议入门</a> 这篇文章的时候，发现原来还可以这么玩。随后在和黑牛的一次谈话中，他问我:2017 年就快要过去了，今年的总结写了吗？这才反应过来，2017 年已经到末尾了。于是就有了想写点东西，留作以后回忆的索引，搭建个人博客也就顺理成章了。</p>
+<span id="more"></span>
+
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>一种方式是通过 Hexo + Github Pages 来搭建个人博客</p>
+<h3 id="或"><a href="#或" class="headerlink" title="或"></a>或</h3><img google-search-bolg src="/img/hufei/2017/12/google-search-bolg.png" width="100%" height="50%">
+
+
+
+<h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><h3 id="什么是-Hexo"><a href="#什么是-Hexo" class="headerlink" title="什么是 Hexo"></a>什么是 Hexo</h3><blockquote>
+<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 <a target="_blank" rel="noopener" href="https://daringfireball.net/projects/markdown/">Markdown</a> 解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+</blockquote>
+<h3 id="安装-Hexo"><a href="#安装-Hexo" class="headerlink" title="安装 Hexo"></a>安装 Hexo</h3><p>Hexo的安装在其 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">官方文档</a> 中有很详细的说明。</p>
+<img hexo-doc src="/img/hufei/2017/12/hexo-doc.png" width="100%" height="50%">
+
+<h3 id="校验"><a href="#校验" class="headerlink" title="校验"></a>校验</h3><p><code>cd &lt;hexo 的安装目录&gt;</code><br><code>hexo g</code><br><code>hexo s</code></p>
+<p>现在我们打开 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 已经可以看到一篇内置的blog了。</p>
+<h3 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h3><p>自己切换 hexo 主题，本人使用的是 <a target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">Next</a> 主题。</p>
+<h2 id="Github-Pages"><a href="#Github-Pages" class="headerlink" title="Github Pages"></a>Github Pages</h2><h3 id="注册-Github-账号"><a href="#注册-Github-账号" class="headerlink" title="注册 Github 账号"></a>注册 Github 账号</h3><p>进入 <a target="_blank" rel="noopener" href="https://github.com/">Github</a> 网站，按照提示进行注册并登陆。</p>
+<img github-register src="/img/hufei/2017/12/github-register.png" width="100%" height="50%">
+
+<h3 id="创建-Github-Pages-仓库"><a href="#创建-Github-Pages-仓库" class="headerlink" title="创建 Github Pages 仓库"></a>创建 Github Pages 仓库</h3><p>登录完成之后，在你的主页点击图标 New repository 创建一个新的版本库，因为我们是使用 Github Pages 去搭建我们的静态博客，所以 repository 的名称格式 你的用户名 + .github.io。例如：我的用户名是：huminxicn，那么 repository 的名字应该是： huminxicn.github.io 。因为之后你将要访问的你的博客地址就是： <a target="_blank" rel="noopener" href="https://huminxicn.github.io/">https://huminxicn.github.io</a> 。</p>
+<img new-repository src="/img/hufei/2017/12/new-repository.png" width="100%" height="50%">
+
+<img huminxicn-github-io src="/img/hufei/2017/12/huminxicn-github-io.png" width="100%" height="50%">
+
+<p>至此，Github 账号创建完成，Github Pages 所需要的 repository 也创建好了。</p>
+<h3 id="进阶-1"><a href="#进阶-1" class="headerlink" title="进阶"></a>进阶</h3><p>自己购买域名，然后再让 Github Pages 解析到此域名就行。<a target="_blank" rel="noopener" href="https://help.github.com/articles/using-a-custom-domain-with-github-pages/">Learn more</a> </p>
+<h2 id="关联-Hexo-与-Github-Pages"><a href="#关联-Hexo-与-Github-Pages" class="headerlink" title="关联 Hexo 与 Github Pages"></a>关联 Hexo 与 Github Pages</h2><h3 id="配置-SSH"><a href="#配置-SSH" class="headerlink" title="配置 SSH"></a>配置 SSH</h3><p>检查是否已经存在 ssh key</p>
+<p><code>cd ~/.ssh</code></p>
+<p>如果提示：No such file or directory 说明你是第一次使用 git。否则，可以看到如下的目录结构</p>
+<img ssh src="/img/hufei/2017/12/ssh.png" width="100%" height="50%">
+
+<h3 id="生成新的-SSH-Key"><a href="#生成新的-SSH-Key" class="headerlink" title="生成新的 SSH Key"></a>生成新的 SSH Key</h3><p><code>ssh-keygen -t rsa -C &quot;&lt;你常用的邮箱地址&gt;&quot;</code></p>
+<img ssh-generate src="/img/hufei/2017/12/ssh-generate.png" width="100%" height="50%">
+
+<p>输入命令回车之后会提示你输入一些东西，不用管，一直回车到底就好了。然后你的 ~&#x2F;.ssh 目录下就会生成两个文件 id_rsa 和 id_rsa.pub 。</p>
+<h3 id="配置-Github"><a href="#配置-Github" class="headerlink" title="配置 Github"></a>配置 Github</h3><p>打开你的 Github -&gt; Settings -&gt; SSH and GPG Keys 。然后点击 New SSH Key 创建一个新的SSH Key。</p>
+<img github-setting src="/img/hufei/2017/12/github-setting.png" width="100%" height="50%">
+<img github-setting-ssh src="/img/hufei/2017/12/github-setting-ssh.png" width="100%" height="50%">
+
+<p>Title 可以用你的计算机名，可以用以区分。将 id_rsa.pub 文件中的所有内容复制到 Key 里面。</p>
+<img github-setting-ssh-new src="/img/hufei/2017/12/github-setting-ssh-new.png" width="100%" height="50%">
+
+<p>然后使用下面的命令测试是否可以连接上 Github 。<br><code>ssh -T git@github.com</code></p>
+<img ssh-success src="/img/hufei/2017/12/ssh-success.png" width="100%" height="50%">
+
+<h3 id="将-Hexo-博客部署到-Github-Pages"><a href="#将-Hexo-博客部署到-Github-Pages" class="headerlink" title="将 Hexo 博客部署到 Github Pages"></a>将 Hexo 博客部署到 Github Pages</h3><p>先使用下面的命令对 Git 进行初始配置，用来跟踪提交信息</p>
+<p><code>git config --global user.name &quot;&lt;你的名字&gt;&quot;</code><br><code>git config --global user.email &quot;&lt;你常用的邮箱地址&gt;&quot;</code></p>
+<img git-config src="/img/hufei/2017/12/git-config.png" width="100%" height="50%">
+
+<p>然后编辑 hexo 根目录下的 _config.yml 文件，设置其中的 deploy 参数，详细请查看 Hexo 官方文档中 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/deployment.html">部署</a> 部分。</p>
+<img config-deploy src="/img/hufei/2017/12/config-deploy.png" width="100%" height="50%">
+
+<p>git 地址建议使用 SSH 地址。在上面的参数设置好了之后，使用下面的命令安装 hexo-deployer-git 插件，只有安装了插件之后才可以部署到 Github Pages。</p>
+<p><code>npm install hexo-deployer-git --save</code></p>
+<h3 id="校验-1"><a href="#校验-1" class="headerlink" title="校验"></a>校验</h3><p>安装完插件之后使用下面的命令进行部署：</p>
+<p><code>hexo g #生成静态文件</code><br><code>hexo d #部署到github</code></p>
+<p>或<br><code>hexo d -g #部署前生成静态文件</code></p>
+<p>好了，快去访问你的 <a target="_blank" rel="noopener" href="http://huminxi.com/">个人博客</a> 吧！</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://hexo.io/docs/">hexo</a></li>
+<li><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/themes.html">hexo-cn</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F">域名系统(英文:Domain Name System, 缩写:DNS)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f4dce0e76886">使用Hexo搭建个人博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/05289a4bc8b2">如何搭建一个独立博客——简明Github Pages与Hexo教程</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag"># 博客</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/10/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%89%8D%E5%90%8E%E7%AB%AF%E5%88%86%E7%A6%BB%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88/" rel="prev" title="一种基于前后端分离的单点登录实现方案">
+                  <i class="fa fa-angle-left"></i> 一种基于前后端分离的单点登录实现方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/01/13/tomcat-servlet-jsp-%E5%BC%80%E5%8F%91%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2%E5%AE%9E%E4%BE%8B/" rel="next" title="tomcat + servlet + jsp 开发登录页面实例">
+                  tomcat + servlet + jsp 开发登录页面实例 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

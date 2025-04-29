@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="大家在使用软件时基本上都遇到过乱码的问题，这是因为字符的编码和解码方式不一致导致的。由于计算机只认二进制数据，因此程序在存储、处理、传输字符时，需要将字符转化成二进制数据。通俗来讲，编码就是将字符转化为二进制数据，解码就是将二进制数据转化为字符。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RestTemplate 踩坑日记">
+<meta property="og:url" content="https://huminxi.netlify.com/2022/08/03/RestTemplate%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="大家在使用软件时基本上都遇到过乱码的问题，这是因为字符的编码和解码方式不一致导致的。由于计算机只认二进制数据，因此程序在存储、处理、传输字符时，需要将字符转化成二进制数据。通俗来讲，编码就是将字符转化为二进制数据，解码就是将二进制数据转化为字符。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/garbled.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/utf-8.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/autowired.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/resttemplate-config.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/request.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/message-converter.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/delege.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/stringHttpMessageConverter.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/get-content-type.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/content-type-utf8.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/content-type-8859.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/resttemplate-utf8.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2022/08/resttemplate-utf8-2.png">
+<meta property="article:published_time" content="2022-08-03T02:07:09.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.144Z">
+<meta property="article:tag" content="RestTemplate">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2022/08/garbled.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2022/08/03/RestTemplate%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2022/08/03/RestTemplate%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/","path":"2022/08/03/RestTemplate 踩坑日记/","title":"RestTemplate 踩坑日记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RestTemplate 踩坑日记 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">字符集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81"><span class="nav-number">1.2.</span> <span class="nav-text">编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unicode-%E5%92%8C-UTF-8-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.</span> <span class="nav-text">Unicode 和 UTF-8 的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E4%BB%A3%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">业务代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RestTemplate-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">2.2.</span> <span class="nav-text">RestTemplate 源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">2.3.</span> <span class="nav-text">原因分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">修复方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80"><span class="nav-number">3.1.</span> <span class="nav-text">方案一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C"><span class="nav-number">3.2.</span> <span class="nav-text">方案二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2022/08/03/RestTemplate%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RestTemplate 踩坑日记 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RestTemplate 踩坑日记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-08-03 10:07:09" itemprop="dateCreated datePublished" datetime="2022-08-03T10:07:09+08:00">2022-08-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">踩坑日记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>大家在使用软件时基本上都遇到过乱码的问题，这是因为字符的编码和解码方式不一致导致的。由于计算机只认二进制数据，因此程序在存储、处理、传输字符时，需要将字符转化成二进制数据。通俗来讲，<strong>编码就是将字符转化为二进制数据，解码就是将二进制数据转化为字符。</strong></p>
+<span id="more"></span>
+
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>渠道反馈，<strong>我们上送的支付信息里存在乱码，影响渠道风控结果，会导致支付失败</strong>。</p>
+<p><code>乱码信息</code><br><img garbled src="/img/hufei/2022/08/garbled.png" width="100%" height="50%"></p>
+<p><code>原始信息</code><br><code>Pendientes largos con diseño de diamante de imitación con cuenta hoja</code></p>
+<h3 id="字符集"><a href="#字符集" class="headerlink" title="字符集"></a>字符集</h3><p><strong>字符集是指多个字符的集合</strong>。不同的字符集包含的字符不一样、字符数量不一样、对字符的编码也不一样。</p>
+<blockquote>
+<p>GB2312 是中国国家标准的简体中文字符集，GB2312 收录简化汉字（6763 个）及一般符号、序号、数字、拉丁字母、日文假名、希腊字母、俄文字母、汉语拼音符号、汉语注音字母，共 7445 个图形字符。而 ASCII 字符集只包含了 128 字符，这个字符集收录的主要是英文字母、阿拉伯数字和一些简单的控制字符。</p>
+</blockquote>
+<h3 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h3><ul>
+<li>「编码」在汉语里可以作动词使用。<ul>
+<li>作动词使用时，编码就是把一个字符转换成一个字节序列，以便在网络中传输或者存储到本地。</li>
+</ul>
+</li>
+<li>「编码」还可以做名词使用。<ul>
+<li>作名词使用时，就是指一种具体的编码格式。比如 ASCII 编码，GBK 编码，UTF-8 编码。</li>
+</ul>
+</li>
+</ul>
+<h3 id="Unicode-和-UTF-8-的区别"><a href="#Unicode-和-UTF-8-的区别" class="headerlink" title="Unicode 和 UTF-8 的区别"></a>Unicode 和 UTF-8 的区别</h3><p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Unicode">Unicode</a> 是一个囊括了世界上所有字符的字符集，<strong>其中每一个字符都对应唯一的编码值（code point）</strong>。 Unicode 字符要存储要传输怎么办，它不管，具体怎么编码，你们可以自己去实现，可以用 UTF-8、UTF-16 等。</p>
+<p>Mac 可以用 <code>xxd</code> 命令查看字符编码：</p>
+<img utf-8 src="/img/hufei/2022/08/utf-8.png" width="100%" height="50%">
+
+<ul>
+<li>字符 <code>A</code> 的 <a target="_blank" rel="noopener" href="https://unicode.yunser.com/unicode">Unicode 编码值</a> 是 <code>U+0041</code>，UTF-8 编码是 <code>41</code>，<code>0a</code>是换行符。</li>
+<li>字符 <code>好</code> 的 Unicode 编码值是 <code>U+597D</code>，UTF-8 编码是 <code>e5a5bd</code>。</li>
+</ul>
+<h2 id="原因定位"><a href="#原因定位" class="headerlink" title="原因定位"></a>原因定位</h2><p><strong>数据传输发生乱码通常与字符编码有关</strong>。这里用的应该不是 <a target="_blank" rel="noopener" href="https://zh.m.wikipedia.org/zh-hans/UTF-8">UTF-8</a> 编码，所以产生了乱码。</p>
+<h3 id="业务代码"><a href="#业务代码" class="headerlink" title="业务代码"></a>业务代码</h3><p><code>注入 restTemplate</code><br><img autowired src="/img/hufei/2022/08/autowired.png" width="100%" height="50%"><br><code>restTemplate 配置</code><br><img resttemplate-config src="/img/hufei/2022/08/resttemplate-config.png" width="100%" height="50%"><br><code>请求渠道</code><br><img request src="/img/hufei/2022/08/request.png" width="100%" height="50%"></p>
+<h3 id="RestTemplate-源码分析"><a href="#RestTemplate-源码分析" class="headerlink" title="RestTemplate 源码分析"></a>RestTemplate 源码分析</h3><p>从 RestTemplate.postForEntity 方法一路跟进来，发现涉及字符编码的是 HttpMessageConverter。</p>
+<p><code>ResponseEntityResponseExtractor</code><br><img message-converter src="/img/hufei/2022/08/message-converter.png" width="100%" height="50%"></p>
+<p>HttpMessageConverter 存在多个实现类，我们这里用到的是 StringHttpMessageConverter，它的 <strong>默认字符集是 ISO_8859_1</strong>。</p>
+<img delege src="/img/hufei/2022/08/delege.png" width="100%" height="50%">
+
+<img stringHttpMessageConverter src="/img/hufei/2022/08/stringHttpMessageConverter.png" width="100%" height="50%">
+
+<p>StringHttpMessageConverter 中用到的 <strong>关键方法是 getContentTypeCharset</strong>。</p>
+<img get-content-type src="/img/hufei/2022/08/get-content-type.png" width="100%" height="50%">
+
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><ul>
+<li>首先业务代码在 RestTemplate 配置中没有指定 StringHttpMessageConverter 的字符集，所以它用的是默认字符集 ISO_8859_1。</li>
+<li>又因为上送的 contentType 是 <code>text/xml</code>，不是 <code>application/json</code>，StringHttpMessageConverter 无法使用 UTF-8 进行编码，只能使用默认的编码（ISO_8859_1）。</li>
+<li>最终导致请求渠道时使用的编码方式是 ISO_8859_1，而不是 UTF-8，产生乱码。</li>
+</ul>
+<h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><p>知道原因之后修复起来就很快，这里提供两个修复方案：</p>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>上送 contentType 时指定字符集为 UTF-8，即 <code>text/xml;charset=UTF-8</code>。</p>
+<ul>
+<li>优点是改动范围小，影响面小。</li>
+<li>缺点是可能其他人还会再踩同样的坑。</li>
+</ul>
+<img content-type-utf8 src="/img/hufei/2022/08/content-type-utf8.png" width="100%" height="50%">
+
+<p><code>优先返回 contentType 中指定的字符集</code><br><img content-type-8859 src="/img/hufei/2022/08/content-type-8859.png" width="100%" height="50%"></p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>修改 RestTemplate 中 StringHttpMessageConverter 的默认字符集为 UTF-8。</p>
+<ul>
+<li>优点是从根本上解决乱码问题，避免其他人踩同样的坑。</li>
+<li>缺点是影响面广，需要进行充分的测试。</li>
+</ul>
+<img resttemplate-utf8 src="/img/hufei/2022/08/resttemplate-utf8.png" width="100%" height="50%">
+
+<p><code>StringHttpMessageConverter 中默认的字符集变成了 UTF-8</code><br><img resttemplate-utf8-2 src="/img/hufei/2022/08/resttemplate-utf8-2.png" width="100%" height="50%"></p>
+<p>最终选择了方案二，充分回归后上线，彻底修复了乱码问题。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>StringHttpMessageConverter 的 <strong>默认字符集是 ISO_8859_1（西欧语言），而不是 UTF-8</strong>（这可能和 <a target="_blank" rel="noopener" href="https://spring.io/team/poutsma">作者</a> 是荷兰人有关吧），个人认为其实是比较坑的，希望 Spring 后续版本能改进一下。</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://xiaotua.com/63-yingyong/jisuanji/biancheng/c/46-1-1-14-ascii-gb2312-gbk-unicode-utf-8.html">深入理解字符编码ASCII,GB2312,GBK,Unicode,UTF-8</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017075323632896">字符串和编码</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RestTemplate/" rel="tag"># RestTemplate</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/07/06/Java%208%20vs%20Java%2017%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/" rel="prev" title="Java 8 vs Java 17 垃圾收集器">
+                  <i class="fa fa-angle-left"></i> Java 8 vs Java 17 垃圾收集器
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

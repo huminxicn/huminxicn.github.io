@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="POP(Procedure Oriented Programming) 面向过程编程；OOP(Object Oriented Programming) 面向对象编程；AOP(Aspect Oriented Programming) 面向切面编程。这三组单词代表了三种不同的编程思想，今天我们就一起来研究一下它们具体的含义吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="POP OOP and AOP">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/01/08/POP%20OOP%20and%20AOP/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="POP(Procedure Oriented Programming) 面向过程编程；OOP(Object Oriented Programming) 面向对象编程；AOP(Aspect Oriented Programming) 面向切面编程。这三组单词代表了三种不同的编程思想，今天我们就一起来研究一下它们具体的含义吧。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/pop-oop.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/aggregation-extension.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/01/aop.png">
+<meta property="article:published_time" content="2019-01-08T02:05:10.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.131Z">
+<meta property="article:tag" content="POP">
+<meta property="article:tag" content="AOP">
+<meta property="article:tag" content="OOP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/01/pop-oop.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/01/08/POP%20OOP%20and%20AOP/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/01/08/POP%20OOP%20and%20AOP/","path":"2019/01/08/POP OOP and AOP/","title":"POP OOP and AOP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>POP OOP and AOP | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#POP-and-OOP"><span class="nav-number">1.</span> <span class="nav-text">POP and OOP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OOP-and-AOP"><span class="nav-number">2.</span> <span class="nav-text">OOP and AOP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/01/08/POP%20OOP%20and%20AOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="POP OOP and AOP | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          POP OOP and AOP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-08 10:05:10" itemprop="dateCreated datePublished" datetime="2019-01-08T10:05:10+08:00">2019-01-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">编程实践</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>POP(Procedure Oriented Programming) 面向过程编程；OOP(Object Oriented Programming) 面向对象编程；AOP(Aspect Oriented Programming) 面向切面编程。这三组单词代表了三种不同的编程思想，今天我们就一起来研究一下它们具体的含义吧。</p>
+<span id="more"></span>
+
+<h2 id="POP-and-OOP"><a href="#POP-and-OOP" class="headerlink" title="POP and OOP"></a>POP and OOP</h2><p>记得刚开始学习 C 语言的时候，老师给我们布置了一个作业，写一个运行在 DOS 窗口的简易学生信息系统。当时也没想太多，就一门心思想着怎么才能实现功能。代码如下所示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include&lt;stdlib.h&gt;</span><br><span class="line"> </span><br><span class="line">#define MAX 20</span><br><span class="line"></span><br><span class="line">typedef struct student</span><br><span class="line">&#123;</span><br><span class="line">	long int sno;                  //学号</span><br><span class="line">	int sage;                      //年龄</span><br><span class="line">	char sname[MAX];               //姓名</span><br><span class="line">	char sclass[MAX];              //班级</span><br><span class="line">	struct student *next;          //结构体指针</span><br><span class="line">&#125;student;</span><br><span class="line"> </span><br><span class="line">student *head;                     //链表的头指针（全局变量）</span><br><span class="line"> </span><br><span class="line">//提前声明接下来将会用到的函数。</span><br><span class="line">void menu();                       </span><br><span class="line">void toAdd();                      </span><br><span class="line">void toModify();                   </span><br><span class="line">void toDelete();                   </span><br><span class="line">void toSearch();                   </span><br><span class="line">void toOutput();                   </span><br><span class="line">void toReadData();                 </span><br><span class="line">void toSaveData();                 </span><br><span class="line"> </span><br><span class="line">void main()</span><br><span class="line">&#123;</span><br><span class="line">	int n = -1; //作为接受用户输入的操作指令的变量。</span><br><span class="line">	head = (student *)malloc(sizeof(struct student)); //程序中链表的形式为带有头结点的形式。</span><br><span class="line">	head-&gt;next = NULL;</span><br><span class="line">	toReadData(); //当程序开始运行后，toReadData() 函数中把所有的学生信息数据以单向链表的形式读入到内存当中。</span><br><span class="line">	menu();</span><br><span class="line">	while(n) //具体实现。</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;输入(0-5)进行操作:\n&quot;);</span><br><span class="line">		scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">		while(n&lt;0 || n&gt;5)</span><br><span class="line">		&#123;</span><br><span class="line">			printf(&quot;错误，输入(0-5)进行操作:\n&quot;);</span><br><span class="line">			scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">		&#125;</span><br><span class="line">		switch(n)</span><br><span class="line">		&#123;</span><br><span class="line">			case 1:</span><br><span class="line">				toAdd();</span><br><span class="line">				break;</span><br><span class="line">			case 2:</span><br><span class="line">				toDelete();</span><br><span class="line">				break;</span><br><span class="line">			case 3:</span><br><span class="line">				toSearch();</span><br><span class="line">				break;</span><br><span class="line">			case 4:</span><br><span class="line">				toModify();</span><br><span class="line">				break;</span><br><span class="line">			case 5:</span><br><span class="line">				toOutput();</span><br><span class="line">				break;</span><br><span class="line">			case 0:</span><br><span class="line">				printf(&quot;谢谢使用！\n&quot;);</span><br><span class="line">				exit(0);</span><br><span class="line">				break;</span><br><span class="line">			default:</span><br><span class="line">				printf(&quot;错误！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">void menu() //菜单函数，用来提示用户进行操作。</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;----~~~~----~~~~----~~~~----~~~~----~~~~----~~~~----~~~~----~~~~----~~~~----~~~~&quot;);</span><br><span class="line">	printf(&quot;	        ~~~~----~~~~----~~~~----~~~~----~~~~----~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----      欢迎来到学生信息管理系统      ----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~                                    ~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----~~~~----~~~~----~~~~----~~~~----~~~~----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~----~~~~----~~~~----~~~~----~~~~----~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----	操作 示例:			----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~		1.  注册		~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----		2.  删除		----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~		3.  寻找		~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----		4.  修改		----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~		5.  概览		~~~~\n&quot;);</span><br><span class="line">	printf(&quot;		----		0.  退出		----\n&quot;);</span><br><span class="line">	printf(&quot;		~~~~----~~~~----~~~~----~~~~----~~~~----~~~~\n&quot;);</span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">void toAdd() //新增学生。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toModify() //修改学生的信息。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toDelete() //删除学生。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toSearch() //查询学生信息。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toOutput() //输出全部学生的信息。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toReadData() //读取文件。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">void toSaveData() //写入文件。</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>上面的这个程序充分体现了 POP 的思想，即以功能为中心来思考和组织程序。注重的是数据加工和处理的过程，<strong>说白了就是注重功能的实现，效果达到了就行。</strong> 而 OOP 则注重封装，强调整体性的概念，以对象为中心，将对象的内部组织和外部环境区分开来。有一个比较贴切的例子如下图所示。</p>
+<img pop-oop src="/img/hufei/2019/01/pop-oop.png" width="100%" height="50%">
+
+<p>假如我们把程序设计比喻为房子的布局。在一间房子的布局中，需要不同功能的家具和洁具(method)，例如马桶、浴缸、洗浴台、燃气灶、水槽、餐桌、床、电视等。POP 的程序设计更注重的是功能的实现(method 是否存在)，效果符合预期就好。因此 POP 的程序设计会更倾向于左边的房间布局，各种家具齐备(method 都在)，房子也就可以正常居住了。</p>
+<p>这对于 OOP 的程序设计来说则是无法忍受的，<strong>这样布局下的家具和洁具不仅摆放随意，而且相互之间暴露的几率大大增加。</strong> 为了更优雅的设计，OOP 程序设计采用了右侧的布局。其中设置了许多小房间，每个小房间都有各自的名称和相应功能(在 Java 语言中这样的小房间被称为 Class)。例如，卫生间是大小解和洗澡梳妆用的，卧室是休息用的，厨房则是做饭用的，每个小房间都各司其职且无需时刻向外界暴露内部的结构，整个房子结构清晰，外界只需要知道有某个房间并使用该房间提供的各项功能即可(method 调用)。</p>
+<p>OOP 这样布局的好处是显而易见的。</p>
+<ul>
+<li>有利于后期的拓展。<ul>
+<li>毕竟哪些功能需要添加到哪个小房间，依照分类标准很快就能找到。</li>
+</ul>
+</li>
+<li>可以组织更复杂的程序。<ul>
+<li>当代码量上来之后，不可能都写在同一个 .c 文件中，需要根据职责拆分成多个 .c 文件，这也符合 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%8D%95%E4%B8%80%E5%8A%9F%E8%83%BD%E5%8E%9F%E5%88%99">单一功能原则</a>。</li>
+</ul>
+</li>
+</ul>
+<h2 id="OOP-and-AOP"><a href="#OOP-and-AOP" class="headerlink" title="OOP and AOP"></a>OOP and AOP</h2><p>但随着软件规模的增大，应用的逐渐升级，慢慢地，OOP 也开始暴露出一些问题。 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class A &#123;</span><br><span class="line">    public void methodA() &#123;</span><br><span class="line">        //其它业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">    public void recordLog() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class B &#123;</span><br><span class="line">    public void methodB() &#123;</span><br><span class="line">        //其它业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">    public void recordLog() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class C &#123;</span><br><span class="line">    public void methodC() &#123;</span><br><span class="line">        //其它业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">    public void recordLog() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设存在 A、B、C 三个类，需要在它们的方法被访问时进行日志记录，于是它们的代码中均实现了 recordLog 方法。或许对现在的工程师来说几乎不可能写出如此糟糕的代码，但 OOP 中这样的写法是允许的，而且在 OOP 的初期这样的代码确实存在着。</p>
+<p>直到某一天，工程师实在忍受不了『一次修改，到处挖坟』（到处修改 recordLog 方法），才下定决心要解决该问题。为了解决程序间冗余代码的问题，工程师开始使用下面的编码方式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">//A 类</span><br><span class="line">public class A &#123;</span><br><span class="line">    public void executeA() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        Report.recordLog(args ...);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//B 类</span><br><span class="line">public class B &#123;</span><br><span class="line">    public void executeB() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        Report.recordLog(args ...);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//C 类</span><br><span class="line">public class C &#123;</span><br><span class="line">    public void executeC() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        Report.recordLog(args ...);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//recordLog</span><br><span class="line">public class Report &#123;</span><br><span class="line">    public static void recordLog(args ...) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>采取这样的编码方式，我们欣喜地发现『挖坟问题』被有效地解决了，当 recordLog 方法需要调整时，只需调整 Report 类就行，这就大大降低了软件后期维护的复杂度。而且除了上述的解决方案，还存在一种利用继承来解决的方式(不推荐，应优先使用聚合而不是继承)。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//父类</span><br><span class="line">public class Parent &#123;</span><br><span class="line">    public void recordLog() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//A 继承 Parent </span><br><span class="line">public class A extends Parent &#123;</span><br><span class="line">    public void executeA() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//B 继承 Parent </span><br><span class="line">public class B extends Parent &#123;</span><br><span class="line">    public void executeB() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//C 继承 Parent </span><br><span class="line">public class C extends Parent &#123;</span><br><span class="line">    public void executeC() &#123;</span><br><span class="line">        //其他业务操作省略...</span><br><span class="line">        recordLog();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事实上，有了上述两种解决方案后，大部分业务场景下的代码冗余问题被有效地解决了，其原理如下图所示。</p>
+<p><code>解决 OOP 代码冗余问题的两种方案</code><br><img aggregation-extension src="/img/hufei/2019/01/aggregation-extension.png" width="100%" height="50%"></p>
+<p>随着软件系统越来越复杂，工程师发现，OOP 又面临新的问题。<strong>核心业务中总掺杂着一些它并不关心的通用业务。</strong> 如日志记录，权限验证，事务控制，性能检测，错误信息检测等等。</p>
+<p>我们来看一个简单例子。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class UserServiceImpl implements UserService &#123;</span><br><span class="line">    private Authorization auth; //权限管理对象</span><br><span class="line">    private Log log; //日志操作对象</span><br><span class="line">    private UserDao userDao; //核心业务对象</span><br><span class="line">    private Transaction transaction; //事务控制对象</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void saveUser() &#123;</span><br><span class="line">        auth.valid(); //权限验证</span><br><span class="line">        log.record(); //日志操作</span><br><span class="line">        userDao.saveUser(); //核心业务操作</span><br><span class="line">        transaction.commit(); //事务控制</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void deleteUser() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void findUser() &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>真正核心业务代码其实就只有一行，但它已经淹没在了众多通用代码之中。</strong> 新的问题又来了。</p>
+<ul>
+<li>模块混杂。<ul>
+<li>核心业务模块可能需要兼顾通用业务模块，这些通用业务可能会混乱核心业务的代码。而且当通用业务模块有重大修改时也会影响到核心业务模块，这显然是不合理的。</li>
+</ul>
+</li>
+<li>代码冗余<ul>
+<li>通用业务模块的代码在许多核心业务模块随处可见，又出现了冗余代码问题。</li>
+</ul>
+</li>
+</ul>
+<p>在新问题面前，前面提及的两种解决方案都已经束手无策了，那么该如何解决呢？事实上我们知道诸如日志、权限、事务、性能监测等业务几乎涉及到了所有的核心业务。如果把这些通用业务的代码直接写入核心业务的代码中就会造成上述的问题，<strong>所以工程师希望的是这些通用业务模块可以实现 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%86%B1%E6%8F%92%E6%8B%94">热插拔</a> 特性</strong> 。</p>
+<p>假设现在我们把日志、权限、事务、性能监测等通用业务看作单独的模块(concerns)，每个模块都可以在需要它们的时刻被及时运用且无需提前整合到核心模块中，这种形式相当于下图所示。</p>
+<p><code>AOP</code><br><img aop src="/img/hufei/2019/01/aop.png" width="100%" height="50%"></p>
+<p>从图可以看出，每个关注点与核心业务模块分离，作为单独的功能，进而横切了几个核心业务模块。这样的做的好处是显而易见的——核心模块只需关注自己相关的业务，当需要通用业务(日志，权限，性能监测、事务控制)时，这些通用业务会通过一种特殊的技术自动应用到核心模块中，而这种技术的名称就叫作 AOP。</p>
+<p>AOP 的实现技术有多种，其中与 Java 无缝对接的是一种称为 <a target="_blank" rel="noopener" href="https://www.eclipse.org/aspectj/doc/next/progguide/starting.html">AspectJ</a> 的技术。那么这种 AspectJ 是如何在 Java 中的应用呢？它与 Spring AOP 又有什么关联呢？咱们下次再聊。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>无论是 POP OOP 还是 AOP，都只是程序设计的一种指导思想而已，本身并没有什么高低之分。也没有 OOP AOP 就一定比 POP 好用的说法，这需要具体程序具体分析。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/javazejian/article/details/56267036#aspectj%E7%9A%84%E7%BB%87%E5%85%A5%E6%96%B9%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86%E6%A6%82%E8%A6%81">关于 Spring AOP (AspectJ) 你该知晓的一切</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/lchad/article/details/42131513">简易学生信息管理系统</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.eclipse.org/aspectj/doc/next/progguide/starting.html">Getting Started with AspectJ</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/POP/" rel="tag"># POP</a>
+              <a href="/tags/AOP/" rel="tag"># AOP</a>
+              <a href="/tags/OOP/" rel="tag"># OOP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/01/03/macOS%20%E7%BC%96%E8%AF%91%20OpenJDK%2010/" rel="prev" title="macOS 编译 OpenJDK 10">
+                  <i class="fa fa-angle-left"></i> macOS 编译 OpenJDK 10
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/02/13/Observer/" rel="next" title="Observer">
+                  Observer <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

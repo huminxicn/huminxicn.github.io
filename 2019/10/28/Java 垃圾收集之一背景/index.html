@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Java 与 C++ 之间有一堵由内存动态分配和垃圾收集技术所围成的墙，墙外面的人想进去，墙里面的人想出来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 垃圾收集一 背景">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/10/28/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%80%E8%83%8C%E6%99%AF/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="Java 与 C++ 之间有一堵由内存动态分配和垃圾收集技术所围成的墙，墙外面的人想进去，墙里面的人想出来。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/reference-counting-1.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/reference-counting-2.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/reference-counting-result.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/gc-roots.png">
+<meta property="article:published_time" content="2019-10-28T05:35:52.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.060Z">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="垃圾收集">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/10/reference-counting-1.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/10/28/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%80%E8%83%8C%E6%99%AF/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/10/28/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%80%E8%83%8C%E6%99%AF/","path":"2019/10/28/Java 垃圾收集之一背景/","title":"Java 垃圾收集一 背景"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 垃圾收集一 背景 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%B7%B2%E7%BB%8F%E6%AD%BB%E4%BA%86%E5%90%97"><span class="nav-number">2.</span> <span class="nav-text">对象已经死了吗</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">引用计数算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">可达性分析算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%8D%E8%B0%88%E5%BC%95%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">再谈引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E6%94%B6%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="nav-number">2.4.</span> <span class="nav-text">回收方法区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/10/28/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%80%E8%83%8C%E6%99%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 垃圾收集一 背景 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 垃圾收集一 背景
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-28 13:35:52" itemprop="dateCreated datePublished" datetime="2019-10-28T13:35:52+08:00">2019-10-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Java 与 C++ 之间有一堵由内存动态分配和垃圾收集技术所围成的墙，墙外面的人想进去，墙里面的人想出来。</p>
+<span id="more"></span>
+
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p>说起垃圾收集（Garbage Collection），大部分人都把这项技术当做 Java 语言的伴生物。事实上，GC 的历史比 Java 久远，1960 年诞生于 MIT 的 Lisp 是第一门真正使用内存动态分配和垃圾收集技术的语言。当 Lisp 还在胚胎时期时，人们就在思考 GC 需要完成的 3 件事情：</p>
+</blockquote>
+<ul>
+<li>哪些内存需要回收。</li>
+<li>什么时候回收。</li>
+<li>如何回收。</li>
+</ul>
+<p>经过半个多世纪的发展，目前内存的动态分配与内存回收技术已经相当成熟，一切看起来都进入了『自动化』时代，为什么我们还要去了解 GC 和内存分配呢？答案很简单：</p>
+<p><strong>当需要排查各种内存溢出、内存泄漏问题时；当垃圾收集成为系统达到更高并发量的瓶颈时；我们就需要对这些『自动化』的技术实施必要的监控和调节</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://www.huminxi.com/2019/10/25/java%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/#more">《Java 运行时数据区域》</a> 介绍了 Java 运行时的各个内存区域。其中程序计数器、Java 虚拟机栈、本地方法栈 3 个区域随线程而生，随线程而灭，<strong>这几个区域的内存分配和回收都具有确定性</strong>。而堆和方法区则不一样，一个接口中的多个实现类需要的内存可能不一样；一个方法中的多个分支需要的内存也可能不一样，JVM 只有在程序运行期间才能知道要创建哪些对象。<strong>因此，这部分内存分配和回收都是动态的，同时也是垃圾收集器关注的部分。</strong></p>
+<h2 id="对象已经死了吗"><a href="#对象已经死了吗" class="headerlink" title="对象已经死了吗"></a>对象已经死了吗</h2><p>在堆里面存放着 Java 世界中几乎所有的对象实例，垃圾收集器在对堆进行回收前，第一件事情就是要确认哪些对象还『存活』着，哪些已经『死去』（不可能再被任何途径使用的对象）。</p>
+<h3 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h3><p><strong>一个简单的实现就是给对象添加一个引用计数器</strong>，每当有一个地方引用它时，计数器值就加 1；当引用失效时，计数器值就减 1；任何时刻计数器为 0 的就是不可能再被使用的对象。</p>
+<p>引用计数算法（Reference Counting）的实现简单，判定效率也很高。但是主流的 Java 虚拟机里面没有选用引用计数算法来管理内存，<strong>因为它很难解决对象之间循环引用的问题。</strong></p>
+<p>例如：对象 objA 和 objB 都有字段 instance，赋值 objA.instance &#x3D; objB 及 objB.instance &#x3D; objA，除此之外，这两个对象无任何引用。实际上这两个对象不可能再被访问，但因为他们互相引用着对方，所以它们的引用计数都不为 0，导致引用计数算法无法通过 GC 收集器回收它们。</p>
+<p><code>代码 1</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * jvm 运行参数: -verbose:gc -XX:+PrintGCDetails</span><br><span class="line"> */</span><br><span class="line">public class ReferenceCountingGC &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    </span><br><span class="line">        GCObject objA = new GCObject(); // Step1</span><br><span class="line">        GCObject objB = new GCObject(); // Step2</span><br><span class="line"></span><br><span class="line">        objA.instance = objB; // Step3</span><br><span class="line">        objB.instance = objA; // Step4</span><br><span class="line"></span><br><span class="line">        objA = null; // Step5</span><br><span class="line">        objB = null; // Step6</span><br><span class="line"></span><br><span class="line">        //假设在这行发生 GC，objA 和 objB 能否被回收？</span><br><span class="line">        System.gc(); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static class GCObject &#123;</span><br><span class="line">        public GCObject instance = null;</span><br><span class="line">        private static final int _1MB = 1024 * 1024;</span><br><span class="line">        /**</span><br><span class="line">         * 这个属性的唯一意义就是占点内存，以便能在 GC 日志中看清楚是否回收过。</span><br><span class="line">         */</span><br><span class="line">        private byte[] bigSize = new byte[2 * _1MB];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如果采用的是引用计数算法，会产生什么结果呢？我们一起来分析一下。</p>
+<img reference-counting-1 src="/img/hufei/2019/10/reference-counting-1.png" width="100%" height="100%">
+
+<p>来看 main 方法的前 6 个步骤：</p>
+<ul>
+<li>Step1：GCObject 实例 1 的引用计数加 1，实例 1 的引用计数&#x3D;1。</li>
+<li>Step2：GCObject 实例 2 的引用计数加 1，实例 2 的引用计数&#x3D;1。</li>
+<li>Step3：GCObject 实例 2 的引用计数再加 1，实例 2 的引用计数&#x3D;2。</li>
+<li>Step4：GCObject 实例 1 的引用计数再加 1，实例 1 的引用计数&#x3D;2。</li>
+</ul>
+<p>执行到 Step4 时，GCObject 实例 1 和 实例 2 的引用计数都等于 2。继续执行 Step5 和 Step6 之后：</p>
+<img reference-counting-2 src="/img/hufei/2019/10/reference-counting-2.png" width="100%" height="100%">
+
+<ul>
+<li>Step5：栈帧中 objA 不再指向堆，GCObject 实例 1 的引用计数减 1，实例 1 引用计数&#x3D;1。</li>
+<li>Step6：栈帧中 objB 不再指向堆，GCObject 实例 2 的引用计数减 1，实例 2 引用计数&#x3D;1。</li>
+</ul>
+<p>至此，发现 GCObject 实例 1 和实例 2 的引用计数都不为 0。如果采用引用计数算法，这两个实例所占的内存将得不到释放，这便发生了内存泄露。</p>
+<p><code>代码 1 的执行结果</code><br><img reference-counting-result src="/img/hufei/2019/10/reference-counting-result.png" width="100%" height="100%"></p>
+<p>从日志中可以看到 6717K-&gt;560K，这意味着 Java 虚拟机并没有因为这两个对象互相引用就不回收它们，侧面说明了 Java 虚拟机不是通过引用计数算法来判断对象是否存活的。</p>
+<h3 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h3><p>在一些语言（Java、C#，Lisp）的主流实现中，都是通过可达性分析（Reachability Analysis）来判定对象是否存活的。这个算法的基本思路就是通过一系列称为『GC Roots』的对象作为起始点，从这些节点开始向下搜索，搜索经过的路径称为引用链（Reference Chain）。<strong>当一个对象到 『GC Roots』没有任何引用链相连时（用图论的话来说，就是从『GC Roots』到这个对象不可达），则证明此对象是不可用的。</strong></p>
+<p>如下图所示，对象 object 5、object 6、object 7 虽然相互关联，但是它们到 GC Roots 是不可达的，因此它们被判定为可回收的对象。</p>
+<img gc-roots src="/img/hufei/2019/10/gc-roots.png" width="100%" height="100%">
+
+<p>在 Java 中，固定的『GC Roots』对象包括以下几种：</p>
+<ul>
+<li><strong>在虚拟机栈（栈帧中的本地变量表）中引用的对象</strong>。<ul>
+<li>譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。</li>
+</ul>
+</li>
+<li><strong>在方法区中类静态属性引用的对象</strong>。<ul>
+<li>譬如 Java 类的引用类型静态变量。</li>
+</ul>
+</li>
+<li><strong>在方法区中常量引用的对象</strong>。<ul>
+<li>譬如字符串常量池里的引用。</li>
+</ul>
+</li>
+<li><strong>在本地方法栈中 JNI（即 Native 方法）引用的对象</strong>。</li>
+<li><strong>Java 虚拟机内部的引用</strong>。<ul>
+<li>如基本数据类型对应的 Class 对象；一些常驻的异常对象，譬如 NullPointException、OutOfMemoryError 等；还有系统类加载器。</li>
+</ul>
+</li>
+<li><strong>所有被同步锁（synchronized 关键字）持有的对象</strong>。</li>
+</ul>
+<p>除了这些固定的 GC Roots 集合外，根据用户所选用的垃圾收集器以及当前回收的内存区域不同，还可以有其它对象『临时性』地加入，共同构成完整的 GC Roots 集合。</p>
+<h3 id="再谈引用"><a href="#再谈引用" class="headerlink" title="再谈引用"></a>再谈引用</h3><blockquote>
+<p>在 JDK 1.2 之前，Java 里面的引用是很传统的定义：如果 reference 类型的数据中存储的数值代表是另外一块内存的起始地址，就称该 reference 数据是代表某块内存、某个对象的引用。这种定义并没有什么不对，只是现在看来有些狭隘了。一个对象在这种定义下只有『被引用』或者『未被引用』两种状态，对于描述一些食之无味，弃之可惜的对象就显得无能为力。譬如我们希望能描述一类对象：<strong>当内存空间还足够时，能保存在内存之中；如果内存空间在进行垃圾收集后仍然非常紧张，那就可以抛弃这些对象（很多系统的缓存功能都符合这样的应用场景）。</strong></p>
+</blockquote>
+<p>在 JDK 1.2 之后，Java 对引用的概念进行了扩充，将引用分为以下 4 种，引用强度依次减弱：</p>
+<ul>
+<li>强引用（Strongly Reference）是最传统的引用的定义。<ul>
+<li>是指在程序代码中普遍存在的引用赋值，即类似 <code>Object obj = new Object()</code> 这种引用关系。</li>
+<li><strong>在任何情况下，只要强引用关系还存在，垃圾收集器就不会回收掉被引用的对象</strong>。</li>
+</ul>
+</li>
+<li>软引用（Soft Reference）是用来描述一些还有用、非必须的对象。<ul>
+<li>只被软引用关联着的对象，<strong>在系统将要发生 OOM 异常前，会把这些对象列进回收范围中进行第二次回收</strong>，如果这次回收还没有足够的内存，才会抛出 OOM 异常。</li>
+<li>JDK 1.2 之后提供了 SoftReference 类来实现软引用。</li>
+</ul>
+</li>
+<li>弱引用（Weak Reference）也是用来描述那些非必须的对象，但是它的强度比软引用更弱一些。<ul>
+<li>当垃圾收集器开始工作，<strong>无论当前内存是否足够，都会回收掉只被弱引用关联的对象</strong>。</li>
+<li>JDK 1.2 之后提供了 WeakReference 类来实现弱引用。</li>
+</ul>
+</li>
+<li>虚引用（Phantom Reference）也称为『幽灵引用』或者『幻影引用』，它是最弱的一种引用关系。<ul>
+<li>一个对象是否有虚引用，不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。</li>
+<li><strong>为一个对象设置虚引用的唯一目的就是为了能在这个对象被收集器回收时收到一个系统通知</strong>。</li>
+<li>JDK 1.2 之后提供了 PhantomReference 类来实现虚引用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="回收方法区"><a href="#回收方法区" class="headerlink" title="回收方法区"></a>回收方法区</h3><blockquote>
+<p>有人认为方法区（如 HotSpot 虚拟机中的元空间或者永久代）是没有垃圾收集行为的，《Java 虚拟机规范》中提到过不要求虚拟机在方法区中实现垃圾收集，事实上也确实有未能完整实现方法区类型卸载的收集器存在（如 JDK 11 时期的 ZGC 收集器就不支持类卸载）。方法区垃圾收集的性价比通常是比较低的：在 Java 堆中，尤其是新生代中，对常规应用进行一次垃圾收集通常可以回收 70% 至 99% 的内存空间，<strong>相比之下，方法区回收存在苛刻的判定条件，其区域垃圾收集的回收成果也远远低于此。</strong></p>
+</blockquote>
+<p><strong>方法区的垃圾收集主要回收两部分内容：废弃的常量和不再使用的类。</strong> </p>
+<blockquote>
+<p>举个常量池中字面量回收的例子：假如一个字符串 “java” 曾经进入常量池中，但是当前系统有没有任何一个字符串对象的值是 “java”。如果在这时发生内存回收，而且垃圾收集器判断有必要的话，这个 “java” 常量就将会被系统清理出常量池。常量池中其它类、方法、字段的符号引用也是如此。</p>
+</blockquote>
+<p>判断一个常量是否废弃还是相对简单，而要判断一个类型是否属于『不再被使用的类』的条件就比较苛刻了。需要同时满足三个条件：</p>
+<ul>
+<li>该类的所有实例都已经被回收。<ul>
+<li>也就是 Java 堆中不存在该类及其任何派生子类的实例。</li>
+</ul>
+</li>
+<li>加载该类的类加载器已经被回收。<ul>
+<li>这个条件除非是经过精心设计的可替换类加载器的场景，如 OSGi、JSP 的重加载等，否则通常是很难达成的。</li>
+</ul>
+</li>
+<li>该类对应的 java.lang.Class 对象没有在任何地方被引用。<ul>
+<li>无法在任何地方通过反射访问该类的方法。</li>
+</ul>
+</li>
+</ul>
+<p>Java 虚拟机允许对满足上述三个条件的无用类进行回收，<strong>这里仅仅是『允许』，而不是和对象一样，没有引用了就必然会回收。</strong></p>
+<blockquote>
+<p>HotSpot 虚拟机提供了 <code>-Xnoclassgc</code> 参数控制是否要回收类。</p>
+</blockquote>
+<p><strong>在大量使用反射、动态代理、CGLib 等字节码框架；动态生成 JSP 以及 OSGi 这类频繁自定义类加载器的场景中，通常都需要 Java 虚拟机具备类型卸载的能力</strong>，以保证不会对方法区造成过大的内存压力。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21539353">垃圾回收机制中，引用计数法是如何维护所有对象引用的？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.w3resource.com/java-tutorial/garbage-collection-in-java.php">Garbage Collection in Java</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86/" rel="tag"># 垃圾收集</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/10/25/Java%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/" rel="prev" title="Java 运行时数据区域">
+                  <i class="fa fa-angle-left"></i> Java 运行时数据区域
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/" rel="next" title="Java 垃圾收集二 算法">
+                  Java 垃圾收集二 算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

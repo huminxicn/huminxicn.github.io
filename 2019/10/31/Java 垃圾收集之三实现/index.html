@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="前文介绍了常见的对象存活判定算法和垃圾收集算法，Java 虚拟机实现这些算法时，必须对算法的执行效率有严格的考虑，才能保证虚拟机高效运行。下面我们来看看 HotSpot 虚拟机的具体实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 垃圾收集三 实现">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/10/31/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%89%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="前文介绍了常见的对象存活判定算法和垃圾收集算法，Java 虚拟机实现这些算法时，必须对算法的执行效率有严格的考虑，才能保证虚拟机高效运行。下面我们来看看 HotSpot 虚拟机的具体实现。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/hello-assembly-idea.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/hello-assembly-code.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/hello-assembly-test.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/serial-gc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/parnew-gc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/cms-gc.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/10/g1-gc.png">
+<meta property="article:published_time" content="2019-10-31T05:44:10.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.053Z">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="垃圾收集">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2019/10/hello-assembly-idea.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/10/31/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%89%E5%AE%9E%E7%8E%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/10/31/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%89%E5%AE%9E%E7%8E%B0/","path":"2019/10/31/Java 垃圾收集之三实现/","title":"Java 垃圾收集三 实现"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 垃圾收集三 实现 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HotSpot-%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">1.</span> <span class="nav-text">HotSpot 的实现细节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%E6%A0%B9%E8%8A%82%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">枚举根节点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GC-%E5%81%9C%E9%A1%BF"><span class="nav-number">1.1.1.</span> <span class="nav-text">GC 停顿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%86%E7%A1%AE%E5%BC%8F-GC"><span class="nav-number">1.1.2.</span> <span class="nav-text">准确式 GC</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">安全点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E5%8C%BA"><span class="nav-number">1.3.</span> <span class="nav-text">安全区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Serial-%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.1.</span> <span class="nav-text">Serial 收集器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ParNew-%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">ParNew 收集器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMS-%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.3.</span> <span class="nav-text">CMS 收集器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#G1-%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">2.4.</span> <span class="nav-text">G1 收集器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">2.5.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/10/31/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%B8%89%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 垃圾收集三 实现 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 垃圾收集三 实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-31 13:44:10" itemprop="dateCreated datePublished" datetime="2019-10-31T13:44:10+08:00">2019-10-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>前文介绍了常见的对象存活判定算法和垃圾收集算法，Java 虚拟机实现这些算法时，必须对算法的执行效率有严格的考虑，才能保证虚拟机高效运行。下面我们来看看 HotSpot 虚拟机的具体实现。</p>
+<span id="more"></span>
+
+<h2 id="HotSpot-的实现细节"><a href="#HotSpot-的实现细节" class="headerlink" title="HotSpot 的实现细节"></a>HotSpot 的实现细节</h2><h3 id="枚举根节点"><a href="#枚举根节点" class="headerlink" title="枚举根节点"></a>枚举根节点</h3><p>我们知道执行可达性分析的第一步是先确定 GC Roots。可作为 GC Roots 的节点主要在全局性的引用（例如类静态属性或常量）与执行上下文（例如栈帧的本地变量表）中。现在很多应用仅方法区就有数百兆，如果要逐个检查这些引用，必然会消耗很多时间。</p>
+<h4 id="GC-停顿"><a href="#GC-停顿" class="headerlink" title="GC 停顿"></a>GC 停顿</h4><p>另外，可达性分析对执行时间的敏感性还体现在 GC 停顿上，因为这项分析工作必须在一个能确保『一致性』的快照中进行。这个『一致性』的意思是指在可达性分析期间整个执行系统看起来就像被冻结在某个时间点上，不能出现分析过程中对象的引用关系还在不断的变化，该点不满足的话分析结果的准确性就无法得到保证。这也是 GC 时必须停顿所有 Java 执行线程的一个重要原因（Sun 将这件事情称为『Stop The World』），即使是在几乎不会发生停顿的 CMS 收集器中，枚举根节点时也是必须要停顿的。</p>
+<h4 id="准确式-GC"><a href="#准确式-GC" class="headerlink" title="准确式 GC"></a>准确式 GC</h4><p>准确式 GC 就是让虚拟机可以准确的知道内存中某个位置的数据类型是什么。比如某个内存位置到底是一个整型的变量，还是对某个对象的 reference。这样在进行 GC Roots 枚举时，只需要枚举 reference 即可。在能够准确地确定 reference 位置之后，虚拟机就能极大地缩短 GC Roots 枚举时间。</p>
+<p>HotSpot 是使用一组称为 OopMap 的数据结构来达到这个目的的。在类加载完成的时候，HotSpot 就把对象内什么偏移量上是什么类型的数据计算出来；在 JIT 编译过程中，也会在特定的位置记录下栈和寄存器中哪些位置是引用。</p>
+<p><code>示例代码</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package jvm.gc;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * jvm 参数: -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly</span><br><span class="line"> * jre 建议使用 1.8 及以上版本。</span><br><span class="line"> *</span><br><span class="line"> */</span><br><span class="line">public class HelloWorld &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;Hello World&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>idea 配置</code><br><img hello-assembly-idea src="/img/hufei/2019/10/hello-assembly-idea.png" width="100%" height="100%"></p>
+<p><code>String.hashCode() 方法编译后的本地代码</code></p>
+<img hello-assembly-code src="/img/hufei/2019/10/hello-assembly-code.png" width="100%" height="100%">
+
+
+<h3 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h3><p>在 OopMap 的协助下，HotSpot 可以快速且准确地完成 GC Roots 枚举，但一个很现实的问题随之而来：有可能导致引用关系变化的指令非常多，如果为每一条指令都生成对应的 OopMap，那将会需要大量的额外空间，这样 GC 的空间成本将会变得很高。</p>
+<p>实际上，HotSpot 也的确没有为每条指令都生成 OopMap，只会在『特定的位置』记录了这些信息，这些位置称为安全点（Safepoint），即程序执行时并非在所有地方都能停顿下来开始 GC，只有在到达安全点时才能暂停。这些『特定的位置』包括：</p>
+<ul>
+<li>循环的末尾</li>
+<li>调用方法的 call 指令后</li>
+<li>可能抛异常的位置</li>
+</ul>
+<blockquote>
+<p>对于 Sefepoint，另一个需要考虑的问题是如何在 GC 发生时让所有线程（除了调用 JNI 的线程）都跑到最近的安全点上再停顿下来。这里有两种方案可供选择：抢先式中断（Preemptive Suspension）和主动式中断（Voluntary Suspension），其中抢先式中断不需要线程的执行代码主动去配合，在 GC 发生时，首先把所有线程全部中断，如果发现有线程中断的地方不在安全点上，就恢复线程，让它跑到安全点上。而主动式中断的思想是当 GC 需要中断线程的时候，不直接对线程操作，仅仅简单地设置一个标志，各个线程执行时主动去轮询这个标志，发现中断标志为 true 时就自己中断挂起。轮询标志的地方和安全点是重合的，另外再加上创建对象需要分配内存的地方。</p>
+</blockquote>
+<blockquote>
+<p>下面的 test 指令是 HotSpot 生成的轮询指令，当需要暂停线程时，虚拟机把 0x6991750 的内存页设置为不可读，线程执行到 test 指令时就会产生一个自陷异常信号，在预先注册的异常处理器中暂停线程实现等待，这样一条汇编指令便完成安全点轮询和触发线程中断。</p>
+</blockquote>
+<p><code>test 指令</code><br><img hello-assembly-test src="/img/hufei/2019/10/hello-assembly-test.png" width="100%" height="100%"></p>
+<h3 id="安全区"><a href="#安全区" class="headerlink" title="安全区"></a>安全区</h3><blockquote>
+<p>使用 Safepoint 似乎已经完美地解决了如何进入 GC 的问题，但实际情况却并不一定。Safepoint 机制保证了程序执行时，在不太长的时间内就会遇到可进入 GC 的 Safepoint。但是，程序不执行的时候呢？所谓的程序不执行就是没有分配 CPU 时间，典型的例子就是线程处于 Sleep 状态或者 Blocked 状态，这时候线程无法响应 JVM 的中断请求，跑到安全的地方去中断挂起，JVM 也显然不太可能等待线程重新被分配 CPU 时间。对于这种情况，就需要安全区域（Safe Region）来解决。</p>
+</blockquote>
+<p>安全区域是指在一段代码片段之中，引用关系不会发生变化。在这个区域中的任意地方开始 GC 都是安全的。我们也可以把 Safe Region 看做是被扩展了的 Safepoint。</p>
+<blockquote>
+<p>在线程执行到 Safe Region 中的代码时，首先标识自己已经进入了 Safe Region。那样，当在这段时间里 JVM 要发起 GC 时，就不用管标识自己为 Safe Region 状态的线程了。当线程要离开 Safe Region 时，它要检查系统是否已经完成了根节点枚举（或者是整个 GC 过程），如果完成了，那线程就继续执行，否则它就必须等待直到收到可以安全离开 Safe Region 的信号为止。</p>
+</blockquote>
+<h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2><p>如果说收集算法是内存回收的方法论，那么垃圾收集器就是内存回收的实践者。</p>
+<h3 id="Serial-收集器"><a href="#Serial-收集器" class="headerlink" title="Serial 收集器"></a>Serial 收集器</h3><p>Serial 收集器是最基本、发展历史最悠久的收集器，曾经（在 JDK 1.3.1 之前）是虚拟机新生代收集的唯一选择。大家看名字就会知道，这个收集器是一个单线程的收集器，但它的『单线程』的意义并不仅仅说明它只会使用一个 CPU 或一条收集线程去完成垃圾收集工作，更重要的是在它进行垃圾收集时，必须暂停其他所有的工作线程，直到它收集结束。</p>
+<blockquote>
+<p>『Stop The World』这个名字也许听起来很酷，但这项工作实际上是由虚拟机在后台自动发起和自动完成的，在用户不可见的情况下把用户正常工作的线程全部停掉，这对很多应用来说都是难以接受的。</p>
+</blockquote>
+<p><code>Serial 收集器运行示意图</code><br><img serial-gc src="/img/hufei/2019/10/serial-gc.png" width="100%" height="100%"></p>
+<blockquote>
+<p>写到这里，笔者似乎已经把 Serial 收集器描述成一个『食之无味弃之可惜』的鸡肋了，但实际上到现在为止，它依然是虚拟机运行在 Client 模式下的默认新生代收集器。它也有着优于其他收集器的地方：简单而高效（与其他收集器的单线程比），对于限定单个 CPU 的环境来说，Serial 收集器由于没有线程交互的开销，专心做垃圾收集自然可以获得最高的单线程收集效率。在用户的桌面应用场景中，分配给虚拟机管理的内存一般来说不会很大，收集几十兆甚至一两百兆的新生代（仅仅是新生代使用的内存，桌面应用基本上不会再大了），停顿时间完全可以控制在几十毫秒最多一百多毫秒以内，只要不是频繁发生，这点停顿是可以接受的。所以，Serial 收集器对于运行在 Client 模式下的虚拟机来说是一个很好的选择。</p>
+</blockquote>
+<h3 id="ParNew-收集器"><a href="#ParNew-收集器" class="headerlink" title="ParNew 收集器"></a>ParNew 收集器</h3><p>ParNew 收集器其实就是 Serial 收集器的多线程版本。除了使用多条线程进行垃圾收集之外，其余行为都与 Serial 收集器完全一样，在实现上，这两种收集器也共用了相当多的代码。</p>
+<p><code>ParNew 收集器运行示意图</code><br><img parnew-gc src="/img/hufei/2019/10/parnew-gc.png" width="100%" height="100%"></p>
+<blockquote>
+<p>ParNew 收集器在单 CPU 的环境中绝对不会有比 Serial 收集器更好的效果，甚至由于存在线程交互的开销，该收集器在通过超线程技术实现的两个 CPU 的环境中都不能百分之百地保证可以超越 Serial 收集器。当然，随着可以使用的 CPU 的数量的增加，它对于 GC 时系统资源的有效利用还是很有好处的。它默认开启的收集线程数与 CPU 的数量相同，在 CPU 非常多（譬如 32 个，现在 CPU 动辄就 4 核加超线程，服务器超过 32 个逻辑 CPU 的情况越来越多了）的环境下，可以使用 -XX:ParallelGCThreads 参数来限制垃圾收集的线程数。</p>
+</blockquote>
+<h3 id="CMS-收集器"><a href="#CMS-收集器" class="headerlink" title="CMS 收集器"></a>CMS 收集器</h3><blockquote>
+<p>CMS（Concurrent Mark Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器。目前很大一部分的 Java 应用集中在互联网站或者 B&#x2F;S 系统的服务端上，这类应用尤其重视服务的响应速度，希望系统停顿时间最短，以给用户带来较好的体验。CMS 收集器就非常符合这类应用的需求。</p>
+</blockquote>
+<p>从名字上就可以看出，CMS 收集器是基于『标记—清除』算法实现的，它的运作过程相对来说更复杂一些，整个过程分为 4 个步骤，包括：</p>
+<ul>
+<li>初始标记（Initial Mark）</li>
+<li>并发标记（Concurrent Mark）</li>
+<li>重新标记（Remark）</li>
+<li>并发清除（Concurrent Sweep）</li>
+</ul>
+<blockquote>
+<p>其中，初始标记、重新标记这两个步骤仍然需要『Stop The World』。初始标记仅仅只是标记一下 GC Roots 能直接关联到的对象，速度很快；并发标记阶段就是进行 GC Roots Tracing 的过程；而重新标记阶段则是为了修正并发标记期间因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长，但远比并发标记的时间短。</p>
+</blockquote>
+<p>由于整个过程中耗时最长的并发标记和并发清除过程收集器线程都可以与用户线程一起工作，所以，从总体上来说，CMS 收集器的内存回收过程是与用户线程一起并发执行的。</p>
+<p><code>CMS 收集器运行示意图</code><br><img cms-gc src="/img/hufei/2019/10/cms-gc.png" width="100%" height="100%"></p>
+<blockquote>
+<p>CMS 收集器无法处理浮动垃圾（Floating Garbage），可能出现『Concurrent ModeFailure』失败而导致另一次 Full GC 的产生。由于 CMS 并发清理阶段用户线程还在运行着，伴随程序运行自然就还会有新的垃圾不断产生，这一部分垃圾出现在标记过程之后，CMS 无法在当次收集中处理掉它们，只好留待下一次 GC 时再清理掉。这一部分垃圾就称为『浮动垃圾』。也是由于在垃圾收集阶段用户线程还需要运行，那也就还需要预留有足够的内存空间给用户线程使用，因此 CMS 收集器不能像其他收集器那样等到老年代几乎完全被填满了再进行收集，需要预留一部分空间提供并发收集时的程序运作使用。</p>
+</blockquote>
+<blockquote>
+<p>还有一个缺点，因为 CMS 是一款基于『标记—清除』算法实现的收集器，这意味着收集结束时会有大量空间碎片产生。空间碎片过多时，将会给大对象分配带来很大麻烦，往往会出现老年代还有很大空间剩余，但是无法找到足够大的连续空间来分配当前对象，不得不提前触发一次 Full GC。</p>
+</blockquote>
+<h3 id="G1-收集器"><a href="#G1-收集器" class="headerlink" title="G1 收集器"></a>G1 收集器</h3><p>G1 是一款面向服务端应用的垃圾收集器。HotSpot 开发团队赋予它的使命是（在比较长期的）未来可以替换掉 JDK 1.5 中发布的 CMS 收集器。与其他 GC 收集器相比，G1 具备如下特点：</p>
+<ul>
+<li>并行与并发<ul>
+<li>G1 能充分利用多 CPU、多核环境下的硬件优势，使用多个 CPU 来缩短 Stop The World 停顿的时间，部分其他收集器原本需要停顿 Java 线程执行的 GC 动作，G1 收集器仍然可以通过并发的方式让 Java 程序继续执行。</li>
+</ul>
+</li>
+<li>分代收集<ul>
+<li>与其他收集器一样，分代概念在 G1 中依然得以保留。虽然 G1 可以不需要其他收集器配合就能独立管理整个 GC 堆，但它能够采用不同的方式去处理新创建的对象和已经存活了一段时间、熬过多次 GC 的旧对象以获取更好的收集效果。</li>
+</ul>
+</li>
+<li>空间整合<ul>
+<li>与 CMS 的『标记-清理』算法不同，G1 从整体来看是基于『标记—整理』算法实现的收集器，从局部（两个 Region 之间）上来看是基于『复制』算法实现的。这两种算法都意味着 G1 运作期间不会产生内存空间碎片，收集后能提供规整的可用内存。这种特性有利于程序长时间运行，分配大对象时不会因为无法找到连续内存空间而提前触发下一次 Full GC。</li>
+</ul>
+</li>
+<li>可预测的停顿<ul>
+<li>这是 G1 相对于 CMS 的另一大优势，降低停顿时间是 G1 和 CMS 共同的关注点，但 G1 除了追求低停顿外，还能建立可预测的停顿时间模型，能让使用者明确指定在一个长度为 M 毫秒的时间片段内，消耗在垃圾收集上的时间不得超过 N 毫秒，这几乎已经是实时 Java（RTSJ）的垃圾收集器的特征了。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>在 G1 之前的其他收集器进行收集的范围都是整个新生代或者老年代，而 G1 不再是这样。使用 G1 收集器时，Java 堆的内存布局就与其他收集器有很大差别，它将整个 Java 堆划分为多个大小相等的独立区域（Region），虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔离的了，它们都是一部分 Region（不需要连续）的集合。</p>
+</blockquote>
+<blockquote>
+<p>G1 收集器之所以能建立可预测的停顿时间模型，是因为它可以有计划地避免在整个 Java 堆中进行全区域的垃圾收集。G1 跟踪各个 Region 里面的垃圾堆积的价值大小（回收所获得的空间大小以及回收所需时间的经验值），在后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region（这也就是 Garbage-First 名称的来由）。这种使用 Region 划分内存空间以及有优先级的区域回收方式，保证了 G1 收集器在有限的时间内可以获取尽可能高的收集效率。</p>
+</blockquote>
+<blockquote>
+<p>G1 把内存『化整为零』的思路，理解起来似乎很容易，但其中的实现细节却远远没有想象中那样简单，否则也不会从 2004 年 Sun 实验室发表第一篇 G1 的论文开始直到 2014 年才开发出 G1 的商用版。笔者以一个细节为例：把 Java 堆分为多个 Region 后，垃圾收集是否就真的能以 Region 为单位进行了？听起来顺理成章，再仔细想想就很容易发现问题所在：Region 不可能是孤立的。一个对象分配在某个 Region 中，它并非只能被本 Region 中的其他对象引用，而是可以与整个 Java 堆任意的对象发生引用关系。那在做可达性判定确定对象是否存活的时候，岂不是还得扫描整个 Java 堆才能保证准确性？这个问题其实并非在 G1 中才有，只是在 G1 中更加突出而已。在以前的分代收集中，新生代的规模一般都比老年代要小许多，新生代的收集也比老年代要频繁许多，那回收新生代中的对象时也面临相同的问题，如果回收新生代时也不得不同时扫描老年代的话，那么 Minor GC 的效率可能下降不少。</p>
+</blockquote>
+<blockquote>
+<p>在 G1 收集器中，Region 之间的对象引用以及其他收集器中的新生代与老年代之间的对象引用，虚拟机都是使用 Remembered Set 来避免全堆扫描的。G1 中每个 Region 都有一个与之对应的 Remembered Set，虚拟机发现程序在对 Reference 类型的数据进行写操作时，会产生一个 Write Barrier 暂时中断写操作，检查 Reference 引用的对象是否处于不同的 Region 之中（在分代的例子中就是检查是否老年代中的对象引用了新生代中的对象），如果是，便通过 CardTable 把相关引用信息记录到被引用对象所属的 Region 的 Remembered Set 之中。当进行内存回收时，在 GC 根节点的枚举范围中加入 Remembered Set 即可保证不对全堆扫描也不会有遗漏。</p>
+</blockquote>
+<p>如果不计算维护 Remembered Set 的操作，G1 收集器的运作大致可划分为以下几个步骤：</p>
+<ul>
+<li>初始标记（Initial Marking）<ul>
+<li>初始标记阶段仅仅只是标记一下 GC Roots 能直接关联到的对象，并且修改 TAMS（Next Top at Mark Start）的值，让下一阶段用户程序并发运行时，能在正确可用的 Region 中创建新对象，这阶段需要停顿线程，但耗时很短。</li>
+</ul>
+</li>
+<li>并发标记（Concurrent Marking）<ul>
+<li>并发标记阶段是从 GC Root 开始对堆中对象进行可达性分析，找出存活的对象，这阶段耗时较长，但可与用户程序并发执行。而最终标记阶段则是为了修正在并发标记期间因用户程序继续运作而导致标记产生变动的那一部分标记记录，虚拟机将这段时间对象变化记录在线程 Remembered Set Logs 里面。</li>
+</ul>
+</li>
+<li>最终标记（Final Marking）<ul>
+<li>最终标记阶段需要把 Remembered Set Logs 的数据合并到 Remembered Set 中，这阶段需要停顿线程，但是可并行执行。</li>
+</ul>
+</li>
+<li>筛选回收（Live Data Counting and Evacuation）<ul>
+<li>筛选回收阶段首先对各个 Region 的回收价值和成本进行排序，根据用户所期望的 GC 停顿时间来制定回收计划，从 Sun 公司透露出来的信息来看，这个阶段其实也可以做到与用户程序一起并发执行，但是因为只回收一部分 Region，时间是用户可控制的，而且停顿用户线程将大幅提高收集效率。</li>
+</ul>
+</li>
+</ul>
+<p><code>G1 收集器运行示意图</code><br><img g1-gc src="/img/hufei/2019/10/g1-gc.png" width="100%" height="100%"></p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p><strong>没有任何场景都适用的 GC 收集器</strong>，所以我们需要了解各个 GC 收集器的特性，这样才能根据具体的应用场景选出合适的 GC 收集器。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://book.douban.com/subject/24722612/">《深入理解 Java 虚拟机》</a></li>
+<li><a target="_blank" rel="noopener" href="https://mritd.me/2016/03/24/HotSpot-%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/">HotSpot 虚拟机的算法实现</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.iteye.com/blog/rednaxelafx-1044951">找出栈上的指针&#x2F;引用</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86/" rel="tag"># 垃圾收集</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/10/29/Java%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E4%B9%8B%E4%BA%8C%E7%AE%97%E6%B3%95/" rel="prev" title="Java 垃圾收集二 算法">
+                  <i class="fa fa-angle-left"></i> Java 垃圾收集二 算法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/11/21/new%20%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/" rel="next" title="new 一个对象的过程中发生了什么">
+                  new 一个对象的过程中发生了什么 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

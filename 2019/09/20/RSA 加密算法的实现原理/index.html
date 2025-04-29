@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="RSA 加密算法 是一种非对称加密算法，在公开密钥加密中被广泛使用。RSA 是 1977 年由 Ron Rivest、Adi Shamir、Leonard Adleman 一起提出的，RSA 就是他们三人姓氏的开头字母。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RSA 加密算法的实现原理">
+<meta property="og:url" content="https://huminxi.netlify.com/2019/09/20/RSA%20%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="RSA 加密算法 是一种非对称加密算法，在公开密钥加密中被广泛使用。RSA 是 1977 年由 Ron Rivest、Adi Shamir、Leonard Adleman 一起提出的，RSA 就是他们三人姓氏的开头字母。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2019/09/rsa-prove.png">
+<meta property="article:published_time" content="2019-09-20T10:51:51.000Z">
+<meta property="article:modified_time" content="2025-04-29T08:33:31.147Z">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="RSA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2019/09/20/RSA%20%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2019/09/20/RSA%20%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/","path":"2019/09/20/RSA 加密算法的实现原理/","title":"RSA 加密算法的实现原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RSA 加密算法的实现原理 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A8%E8%BE%89%E4%B8%89%E8%A7%92%E5%BD%A2%E5%92%8C%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">杨辉三角形和二项式系数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%B9%E9%A9%AC%E5%B0%8F%E5%AE%9A%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">费马小定理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AC%A7%E6%8B%89-varphi-%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">欧拉 \( \varphi \) 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%B9%E9%A9%AC-%E6%AC%A7%E6%8B%89%E5%AE%9A%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">费马-欧拉定理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RSA-%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">RSA 算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AC%E9%92%A5%E4%B8%8E%E7%A7%81%E9%92%A5%E7%9A%84%E4%BA%A7%E7%94%9F"><span class="nav-number">5.1.</span> <span class="nav-text">公钥与私钥的产生</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%AF%86%E6%B6%88%E6%81%AF"><span class="nav-number">5.2.</span> <span class="nav-text">加密消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%AF%86%E6%B6%88%E6%81%AF"><span class="nav-number">5.3.</span> <span class="nav-text">解密消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%81%E6%98%8E"><span class="nav-number">5.4.</span> <span class="nav-text">证明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95"><span class="nav-number">6.</span> <span class="nav-text">拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E9%97%AE-1"><span class="nav-number">6.1.</span> <span class="nav-text">提问 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E9%97%AE-2"><span class="nav-number">6.2.</span> <span class="nav-text">提问 2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E7%AD%94-1"><span class="nav-number">6.3.</span> <span class="nav-text">回答 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E7%AD%94-2"><span class="nav-number">6.4.</span> <span class="nav-text">回答 2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%81%E6%98%8E%E8%BF%87%E7%A8%8B%E7%9A%84-Latex-%E8%AF%AD%E5%8F%A5"><span class="nav-number">6.5.</span> <span class="nav-text">证明过程的 Latex 语句</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2019/09/20/RSA%20%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RSA 加密算法的实现原理 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RSA 加密算法的实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-09-20 18:51:51" itemprop="dateCreated datePublished" datetime="2019-09-20T18:51:51+08:00">2019-09-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-04-29 16:33:31" itemprop="dateModified" datetime="2025-04-29T16:33:31+08:00">2025-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><script type="text/javascript" 
+    src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/RSA%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95">RSA 加密算法</a> 是一种非对称加密算法，在公开密钥加密中被广泛使用。RSA 是 1977 年由 Ron Rivest、Adi Shamir、Leonard Adleman 一起提出的，RSA 就是他们三人姓氏的开头字母。</p>
+<span id="more"></span>
+
+<h2 id="杨辉三角形和二项式系数"><a href="#杨辉三角形和二项式系数" class="headerlink" title="杨辉三角形和二项式系数"></a>杨辉三角形和二项式系数</h2><p>杨辉三角形，又称帕斯卡三角形，是 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E5%AE%9A%E7%90%86">二项式系数</a> 的一种几何排列。出现在南宋数学家杨辉所著的《详解九章算法》一书中。<br><img PascalTriangleAnimated.gif src="https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif" width="30%" height="30%"></p>
+<p>二项式 \((x+1)^n \) 的各项展开式系数就是第 n 行杨辉三角形上的数字。<br>$$<br>(x+1)^0&#x3D;1 \<br>(x+1)^1&#x3D;x+1 \<br>(x+1)^2&#x3D;x^2+2x+1 \\<br>(x+1)^3&#x3D;x^3+3x^2+3x+1 \<br>(x+1)^4&#x3D;x^4+4x^3+6x^2+4x+1 \<br>… \<br>(x+1)^n&#x3D;x^n+nx^{n-1}+\frac{n(n-1)}{2}x^{n-2}+\frac{n(n-1)(n-2)}{2\times3}x^{n-3}+…+1<br>$$</p>
+<p>其中每一项的系数都是一个组合数 \( C_n^p \)，可以表示成如下形式</p>
+<p>$$ C_n^p&#x3D;{\tbinom {n}{p}}&#x3D;{\tfrac {n!}{p!(n-p)!}} $$</p>
+<p><strong>特性</strong> 当 n 为质数时，除了第一项和最后一项，中间所有项的系数均为 n 的倍数。</p>
+<p><strong>证明</strong> p 不为 n 或 0 时，由于分子有质数 n，但分母不含 n，故分子的 n 能保留，不会因约分而除去。即 \( {\tbinom {n}{p}} \) 恒为 n 的倍数。</p>
+<p>(这里隐含了一个前提条件，即 \({\tbinom {n}{p}}\) 是一个整数。)</p>
+<h2 id="费马小定理"><a href="#费马小定理" class="headerlink" title="费马小定理"></a>费马小定理</h2><p>假如 a 是一个整数，p 是一个质数，那么 \( a^p-a\) 是 p 的倍数，可以表示为</p>
+<p>$$ a^p \equiv a \pmod p $$</p>
+<p>例如，<br>$$  7^3-7&#x3D;343-7&#x3D;336&#x3D;7\times48 \<br> 6^5-6&#x3D;7776-6&#x3D;7770&#x3D;6\times1296$$</p>
+<p>皮埃尔·德·费马于 1636 年发现了这个定理。在一封 1640 年 10 月 18 日的信中他第一次使用了上面的书写方式。 </p>
+<p><strong>证明</strong> 可以利用杨辉三角形来证明。</p>
+<p>如果 a 不是 p 的倍数，这个定理也可以写成</p>
+<p>$$ a^{p-1} \equiv 1 \pmod p ,,,,,,,,,(费马小定理) $$</p>
+<h2 id="欧拉-varphi-函数"><a href="#欧拉-varphi-函数" class="headerlink" title="欧拉 \( \varphi \) 函数"></a>欧拉 \( \varphi \) 函数</h2><p>在数论中，对于正整数 n，<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/%E6%AC%A7%E6%8B%89%E5%87%BD%E6%95%B0">欧拉函数</a> \( \varphi (n) \) 是小于或等于 n 的正整数中与 n 互质的数的数量。</p>
+<p>例如，\( \varphi (8) &#x3D;4 \)，因为 1，3，5，7 均与 8 互质。由此可以推出，当 n 为素数时， \( \varphi (n) &#x3D; (n-1) \)。</p>
+<p><strong>性质</strong> 欧拉 \(\varphi\) 函数是积性函数。即是说若 m,n 互质，则 \( \varphi(mn)&#x3D;\varphi(m) \varphi(n) \)。</p>
+<h2 id="费马-欧拉定理"><a href="#费马-欧拉定理" class="headerlink" title="费马-欧拉定理"></a>费马-欧拉定理</h2><p>1736 年，欧拉证明了费马小定理。同时还对其进行了拓展，拓展之后的定理被称为 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%AC%A7%E6%8B%89%E5%AE%9A%E7%90%86_(%E6%95%B0%E8%AE%BA)">『费马-欧拉定理』</a>。</p>
+<p>若 n，a 为正整数，且 n，a 互素，则</p>
+<p>$$ a^{\varphi(n)}\equiv 1\pmod n ,,,,,,,,,(费马-欧拉定理)$$</p>
+<p>当 n 为素数，\(\varphi(n)&#x3D;n-1\)，这时就变成了费马小定理</p>
+<p>$$ a^{p-1} \equiv 1 \pmod p $$</p>
+<h2 id="RSA-算法"><a href="#RSA-算法" class="headerlink" title="RSA 算法"></a>RSA 算法</h2><h3 id="公钥与私钥的产生"><a href="#公钥与私钥的产生" class="headerlink" title="公钥与私钥的产生"></a>公钥与私钥的产生</h3><p>假设 Alice 想要通过一个不可靠的媒体接收 Bob 的一条私人消息。她可以用下面的方法来产生一对公私钥:</p>
+<ul>
+<li>选择任意两个大素数 p 和 q，p 不等于 q，计算 \( N&#x3D;pq \)。</li>
+<li>求出 \(\varphi(N)\)，令 \(r &#x3D; \varphi(N)&#x3D;\varphi(m) \varphi(n)&#x3D;(p-1)(q-1)\)。</li>
+<li>选择一个小于 r 且与 r 互质的整数 e。</li>
+<li>选择一个数 d，使得 \(ed-1&#x3D;r,的倍数\)。即 d 是 e 关于 r 的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%A8%A1%E5%8F%8D%E5%85%83%E7%B4%A0">模逆元</a>。</li>
+<li>销毁 p 和 q。</li>
+</ul>
+<p>\((N,e)\) 是公钥， \((N,d)\) 是私钥。Alice 将公钥传给 Bob，而将私钥藏起来。</p>
+<h3 id="加密消息"><a href="#加密消息" class="headerlink" title="加密消息"></a>加密消息</h3><p>假设 Bob 想给 Alice 发送一个消息 m (m&lt;N)，需要先找到一个正整数 c，使得 \(m^e-c&#x3D;N,的倍数 \) ①。这个 c 就是加密后的密文。</p>
+<h3 id="解密消息"><a href="#解密消息" class="headerlink" title="解密消息"></a>解密消息</h3><p>Alice 拿到密文 c 后，需要找到一个数 x。使得 \(c^d-x&#x3D;N,的倍数 \) ②。然后你会发现，在小于 N 的正整数中，只有 m 这一个解。</p>
+<p>怎么样，加解密过程是不是特别简单？</p>
+<h3 id="证明"><a href="#证明" class="headerlink" title="证明"></a>证明</h3><p>其实只需要证明从式子 ① 可以变换到式子 ② 即可。</p>
+<img rsa-prove src="/img/hufei/2019/09/rsa-prove.png" width="100%" height="100%">
+
+
+
+
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><h3 id="提问-1"><a href="#提问-1" class="headerlink" title="提问 1"></a>提问 1</h3><p>如果消息 m 过长，即 m &gt; N 时怎么办？</p>
+<h3 id="提问-2"><a href="#提问-2" class="headerlink" title="提问 2"></a>提问 2</h3><p>有没有可能在已知公钥 \((N,e)\) 的情况下，推导出私钥 \((N,d)\)？</p>
+<h3 id="回答-1"><a href="#回答-1" class="headerlink" title="回答 1"></a>回答 1</h3><p>可以先将消息 m 分段，然后再传输。</p>
+<h3 id="回答-2"><a href="#回答-2" class="headerlink" title="回答 2"></a>回答 2</h3><ol>
+<li>\(ed\equiv 1 \pmod {\varphi(N)} \)。只有知道 e 和 \(\varphi(N)\)，才能算出 d。</li>
+<li>\(\varphi(N)&#x3D;(p-1)(q-1)\)。只有知道 p 和 q，才能算出 \(\varphi(N)\)。</li>
+<li>\(N&#x3D;pq\)。只有将 N 因数分解，才能算出 p 和 q。</li>
+</ol>
+<p>结论：如果 N 可以被因数分解，d 就可以算出，也就意味着私钥被破解。</p>
+<p>大整数的因数分解，是一件非常困难的事情(属于 NPC 问题)。除了暴力破解，目前还没有发现别的有效方法。人类已经分解的最大整数是（232 个十进制位，768 个二进制位）。比它更大的因数分解，还没有被报道过，因此目前被破解的最长 RSA 密钥就是 768 位。</p>
+<h3 id="证明过程的-Latex-语句"><a href="#证明过程的-Latex-语句" class="headerlink" title="证明过程的 Latex 语句"></a>证明过程的 Latex 语句</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;align*&#125;  </span><br><span class="line"></span><br><span class="line">&amp; m^e-c=N的倍数 \qquad\qquad\qquad\qquad\qquad\quad (1)将\,c\,提至一边 \\</span><br><span class="line">&amp; c=m^e-N的倍数 \qquad\qquad\qquad\qquad\qquad\quad (2)两边同时进行\,d\,次方 \\</span><br><span class="line">&amp; c^d=(m^e-N的倍数)^d \qquad\qquad\qquad\qquad\quad\,\,\, (3)将\,(m^e-N的倍数)^d\,展开，并且将包含\,N的倍数\,项合并\\</span><br><span class="line">&amp; c^d=m^&#123;ed&#125;-N的倍数 \qquad\qquad\qquad\qquad\qquad\, (4)将\,ed=1+r的倍数\,带入式中 \\</span><br><span class="line">&amp; c^d=m^&#123;1+r的倍数&#125;\,\,\,-N的倍数 \qquad\qquad\qquad\qquad\, (5)将指数\,1\,提出来 \\</span><br><span class="line">&amp; c^d=m \cdot m^&#123;r的倍数&#125;\,\,\,-N的倍数 \qquad\qquad\qquad\quad\,\,\, (6)将\,r=\varphi(N)\,带入式中 \\</span><br><span class="line">&amp; c^d=m \cdot m^&#123;\varphi(N)的倍数&#125;\,\,\,-N的倍数 \qquad\qquad\qquad\,\, (7)根据\,费马-欧拉定理，将\,m^&#123;\varphi(N)&#125;=1+N的倍数\,带入式子 \\</span><br><span class="line">&amp; c^d=m \cdot (1+N的倍数)^&#123;\varphi(N)的倍数-1&#125;\,\,\,-N的倍数 \quad (8) 重复第\,(7)\,步 \\</span><br><span class="line">&amp; c^d=m \cdot (1+N的倍数)-N的倍数 \qquad\qquad\,\,\,\, (9)将\,(1+N的倍数)^&#123;\varphi(N)的倍数-1&#125;\quad展开，并且合并\,N的倍数 \\</span><br><span class="line">&amp; c^d=m+N的倍数 \qquad\qquad\qquad\qquad\qquad\,\,\, (10) 证毕。</span><br><span class="line"></span><br><span class="line">\end&#123;align*&#125; </span><br></pre></td></tr></table></figure>
+
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av33920079">素数（五）费马是如何检验素数的？杨辉三角形和素数有什么关系？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av35557954/?spm_id_from=333.788.videocard.0">素数（六）基于欧拉函数的RSA算法加密原理是什么？RSA算法详解</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html">RSA算法原理（二）</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/RSA%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95">RSA加密算法</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av53094516?from=search&seid=3287942284086449926">二项式定理</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/RSA/" rel="tag"># RSA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/05/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" rel="prev" title="虚拟内存">
+                  <i class="fa fa-angle-left"></i> 虚拟内存
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/10/25/Java%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/" rel="next" title="Java 运行时数据区域">
+                  Java 运行时数据区域 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
