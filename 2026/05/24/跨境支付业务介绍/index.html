@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/hufei/fei.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/hufei/fei.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"huminxi.netlify.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="近年国内电商告别粗放流量竞争，迈入价值深耕、全渠道融合与 AI 赋能的发展阶段；跨境电商则朝着品牌化、内容化方向升级，同时加速开拓新兴市场，行业合规管控也日趋精细，SHEIN、TEMU 等出海品牌便是典型代表。伴随本土电商纷纷布局海外市场，跨境支付顺势成为支付领域热门赛道。本文将梳理跨境支付基础常识，帮助读者建立基础认知。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跨境支付业务介绍">
+<meta property="og:url" content="https://huminxi.netlify.com/2026/05/24/%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E4%B8%9A%E5%8A%A1%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="黄枫谷">
+<meta property="og:description" content="近年国内电商告别粗放流量竞争，迈入价值深耕、全渠道融合与 AI 赋能的发展阶段；跨境电商则朝着品牌化、内容化方向升级，同时加速开拓新兴市场，行业合规管控也日趋精细，SHEIN、TEMU 等出海品牌便是典型代表。伴随本土电商纷纷布局海外市场，跨境支付顺势成为支付领域热门赛道。本文将梳理跨境支付基础常识，帮助读者建立基础认知。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/shein.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/temu.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/two.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/three.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/four.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/card-four.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/3ds.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/adyen.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/cardbrand.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/unionpay.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/cardpay-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/e-wallet.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/wallet-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/bnpl.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/bnpl-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/bank.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/bank-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/oxxo.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/cash-process.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/oxxo-qr.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/oxxo-ticket.png">
+<meta property="og:image" content="https://huminxi.netlify.com/img/hufei/2026/05/cod-process.png">
+<meta property="article:published_time" content="2026-05-24T02:06:04.000Z">
+<meta property="article:modified_time" content="2026-05-25T13:39:40.527Z">
+<meta property="article:tag" content="跨境">
+<meta property="article:tag" content="支付">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://huminxi.netlify.com/img/hufei/2026/05/shein.png">
+
+
+<link rel="canonical" href="https://huminxi.netlify.com/2026/05/24/%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E4%B8%9A%E5%8A%A1%E4%BB%8B%E7%BB%8D/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://huminxi.netlify.com/2026/05/24/%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E4%B8%9A%E5%8A%A1%E4%BB%8B%E7%BB%8D/","path":"2026/05/24/跨境支付业务介绍/","title":"跨境支付业务介绍"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>跨境支付业务介绍 | 黄枫谷</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">黄枫谷</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">勿在浮沙筑高台。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">跨境支付背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E5%A2%83%E7%94%B5%E5%95%86%E7%9A%84%E6%94%AF%E4%BB%98%E9%93%BE"><span class="nav-number">1.1.</span> <span class="nav-text">跨境电商的支付链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8B%AC%E7%AB%8B%E7%AB%99%E6%A8%A1%E5%BC%8F-SHEIN"><span class="nav-number">1.1.1.</span> <span class="nav-text">独立站模式-SHEIN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B3%E5%8F%B0%E7%94%B5%E5%95%86%E6%A8%A1%E5%BC%8F-TEMU"><span class="nav-number">1.1.2.</span> <span class="nav-text">平台电商模式-TEMU</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E6%98%93%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">交易模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E4%BB%A5%E7%89%A9%E6%98%93%E7%89%A9%E5%88%B0%E4%BA%8C%E6%96%B9%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">从以物易物到二方模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E4%BA%8C%E6%96%B9%E6%A8%A1%E5%BC%8F%E5%88%B0%E4%B8%89%E6%96%B9%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">从二方模式到三方模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E4%B8%89%E6%96%B9%E6%A8%A1%E5%BC%8F%E5%88%B0%E5%9B%9B%E6%96%B9%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.3.</span> <span class="nav-text">从三方模式到四方模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%93%B6%E8%A1%8C%E5%8D%A1%E4%BA%A4%E6%98%93%E7%9A%84%E5%9B%9B%E6%96%B9%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.4.</span> <span class="nav-text">银行卡交易的四方模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3DS"><span class="nav-number">1.3.</span> <span class="nav-text">3DS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-3DS"><span class="nav-number">1.3.1.</span> <span class="nav-text">什么是 3DS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3DS-1-0-vs-3DS-2-0-%E7%9A%84%E5%85%B3%E9%94%AE%E5%8D%87%E7%BA%A7"><span class="nav-number">1.3.2.</span> <span class="nav-text">3DS 1.0 vs 3DS 2.0 的关键升级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3DS-%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.3.</span> <span class="nav-text">3DS 流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3DS-%E6%94%B9%E9%80%A0"><span class="nav-number">1.3.4.</span> <span class="nav-text">3DS 改造</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3DS-%E5%AF%B9%E5%9B%BD%E5%86%85%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.3.5.</span> <span class="nav-text">3DS 对国内的影响</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E4%BB%B7%E5%80%BC%E9%93%BE"><span class="nav-number">1.4.</span> <span class="nav-text">支付价值链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PSP-%E5%92%8C%E6%94%B6%E5%8D%95%E8%A1%8C%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.4.1.</span> <span class="nav-text">PSP 和收单行的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E8%B4%B9%E7%94%A8"><span class="nav-number">1.4.2.</span> <span class="nav-text">支付费用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">跨境支付方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%A1%E6%94%AF%E4%BB%98"><span class="nav-number">2.1.</span> <span class="nav-text">卡支付</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AD%E5%A4%A7%E5%8D%A1%E7%BB%84%E7%BB%87"><span class="nav-number">2.1.1.</span> <span class="nav-text">六大卡组织</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%93%B6%E8%A1%8C%E5%8D%A1%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.2.</span> <span class="nav-text">银行卡信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B"><span class="nav-number">2.1.3.</span> <span class="nav-text">支付流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.1.4.</span> <span class="nav-text">适用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B5%E5%AD%90%E9%92%B1%E5%8C%85"><span class="nav-number">2.2.</span> <span class="nav-text">电子钱包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%94%B5%E5%AD%90%E9%92%B1%E5%8C%85"><span class="nav-number">2.2.1.</span> <span class="nav-text">常见电子钱包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">支付流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%88%E4%B9%B0%E5%90%8E%E4%BB%98%EF%BC%88BNPL%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">先买后付（BNPL）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%9C%B0%E5%8C%BA-BNPL"><span class="nav-number">2.3.1.</span> <span class="nav-text">常见地区 BNPL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B-2"><span class="nav-number">2.3.2.</span> <span class="nav-text">支付流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%B6%E8%A1%8C%E8%BD%AC%E8%B4%A6"><span class="nav-number">2.4.</span> <span class="nav-text">银行转账</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%93%B6%E8%A1%8C%E8%BD%AC%E8%B4%A6"><span class="nav-number">2.4.1.</span> <span class="nav-text">常见银行转账</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B-3"><span class="nav-number">2.4.2.</span> <span class="nav-text">支付流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%B0%E9%87%91%E6%94%AF%E4%BB%98"><span class="nav-number">2.5.</span> <span class="nav-text">现金支付</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B-4"><span class="nav-number">2.5.1.</span> <span class="nav-text">支付流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A7%E5%88%B0%E4%BB%98%E6%AC%BE%EF%BC%88COD%EF%BC%89"><span class="nav-number">2.6.</span> <span class="nav-text">货到付款（COD）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B5%81%E7%A8%8B-5"><span class="nav-number">2.6.1.</span> <span class="nav-text">支付流程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E6%B8%A0%E9%81%93%EF%BC%88PSP%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">跨境支付渠道（PSP）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%AF%E4%BB%98%E6%B8%A0%E9%81%93%E5%92%8C%E6%94%AF%E4%BB%98%E6%96%B9%E5%BC%8F%E5%85%B3%E7%B3%BB"><span class="nav-number">3.1.</span> <span class="nav-text">支付渠道和支付方式关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%94%AF%E4%BB%98%E6%B8%A0%E9%81%93"><span class="nav-number">3.2.</span> <span class="nav-text">常见支付渠道</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt=""
+      src="/img/hufei/huangfenggu.png">
+  <p class="site-author-name" itemprop="name"></p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/huminxicn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;huminxicn" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:huminxi0214@qq.com" title="E-Mail → mailto:huminxi0214@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="http://www.ruanyifeng.com/home.html" title="http:&#x2F;&#x2F;www.ruanyifeng.com&#x2F;home.html" rel="noopener" target="_blank">阮一峰</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://huminxi.netlify.com/2026/05/24/%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98%E4%B8%9A%E5%8A%A1%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/hufei/huangfenggu.png">
+      <meta itemprop="name" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="跨境支付业务介绍 | 黄枫谷">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          跨境支付业务介绍
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-05-24 10:06:04" itemprop="dateCreated datePublished" datetime="2026-05-24T10:06:04+08:00">2026-05-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-05-25 21:39:40" itemprop="dateModified" datetime="2026-05-25T21:39:40+08:00">2026-05-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B7%A8%E5%A2%83%E6%94%AF%E4%BB%98/" itemprop="url" rel="index"><span itemprop="name">跨境支付</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>近年国内电商告别粗放流量竞争，迈入价值深耕、全渠道融合与 AI 赋能的发展阶段；跨境电商则朝着品牌化、内容化方向升级，同时加速开拓新兴市场，行业合规管控也日趋精细，SHEIN、TEMU 等出海品牌便是典型代表。伴随本土电商纷纷布局海外市场，跨境支付顺势成为支付领域热门赛道。本文将梳理跨境支付基础常识，帮助读者建立基础认知。</p>
+<span id="more"></span>
+
+<h2 id="跨境支付背景"><a href="#跨境支付背景" class="headerlink" title="跨境支付背景"></a>跨境支付背景</h2><h3 id="跨境电商的支付链"><a href="#跨境电商的支付链" class="headerlink" title="跨境电商的支付链"></a>跨境电商的支付链</h3><h4 id="独立站模式-SHEIN"><a href="#独立站模式-SHEIN" class="headerlink" title="独立站模式-SHEIN"></a>独立站模式-SHEIN</h4><img shein src="/img/hufei/2026/05/shein.png" width="50%" height="50%">
+
+<ul>
+<li>收单（pay-in）<ul>
+<li>坊间有人称之为 pay-in，因为收单是真正把钱从消费者那里收入囊中的角色。</li>
+<li>代表商户处理来自于消费者银行卡 &#x2F; 电子账户付款的金融机构。</li>
+</ul>
+</li>
+<li>商户海外账户<ul>
+<li>跨境商户一般会拥有不同国家账号。</li>
+</ul>
+</li>
+</ul>
+<h4 id="平台电商模式-TEMU"><a href="#平台电商模式-TEMU" class="headerlink" title="平台电商模式-TEMU"></a>平台电商模式-TEMU</h4><img temu src="/img/hufei/2026/05/temu.png" width="50%" height="50%">
+
+<ul>
+<li>收单（pay-in）<ul>
+<li>在平台电商模式下，商户即为平台本身。</li>
+</ul>
+</li>
+<li>收款 （pay-out）<ul>
+<li>坊间有人称之为 pay-out 或者资金下发。</li>
+<li>这个词指代平台与平台卖家之间资金的转移和流动。</li>
+<li>在平台电商模式下，平台收到钱之后，需要把款项分发给子商户（即平台卖家）。</li>
+</ul>
+</li>
+<li>结售汇<ul>
+<li>帮助跨境卖家把收到的外币转换成人民币结算到国内的业务。</li>
+</ul>
+</li>
+</ul>
+<h3 id="交易模式"><a href="#交易模式" class="headerlink" title="交易模式"></a>交易模式</h3><h4 id="从以物易物到二方模式"><a href="#从以物易物到二方模式" class="headerlink" title="从以物易物到二方模式"></a>从以物易物到二方模式</h4><img two src="/img/hufei/2026/05/two.png" width="50%" height="50%">
+适用场景：线下熟人交易、社区团购、品牌储值卡、小额高频现金交易。
+
+
+<h4 id="从二方模式到三方模式"><a href="#从二方模式到三方模式" class="headerlink" title="从二方模式到三方模式"></a>从二方模式到三方模式</h4><img three src="/img/hufei/2026/05/three.png" width="50%" height="50%">
+
+<ul>
+<li>信用凭证不再依赖商户。</li>
+<li>商品交易与支付流程分离。</li>
+<li>发卡机构承担支付与清算。</li>
+<li>发卡机构存在封闭性、区域性。</li>
+</ul>
+<p>适用场景：早期电商平台（淘宝 &#x2F; 支付宝）、American Express、平台内钱包支付、部分独立站自有支付。</p>
+<h4 id="从三方模式到四方模式"><a href="#从三方模式到四方模式" class="headerlink" title="从三方模式到四方模式"></a>从三方模式到四方模式</h4><img four src="/img/hufei/2026/05/four.png" width="50%" height="50%">
+- 突破了区域的限制。
+- 支付与清算分离。
+- 卡组织负责支付网络建设、业务规则制订、转接清算。
+
+<p>适用场景：跨境电商信用卡支付、国际品牌商户收单、大部分主流线下 &#x2F; 线上银行卡交易。</p>
+<h4 id="银行卡交易的四方模式"><a href="#银行卡交易的四方模式" class="headerlink" title="银行卡交易的四方模式"></a>银行卡交易的四方模式</h4><img card-four src="/img/hufei/2026/05/card-four.png" width="100%" height="50%">
+
+<ul>
+<li>收单行 (acquirer)<ul>
+<li>是一家代表商户企业处理信用卡和借记卡付款的银行，它通过银行卡组织（如 Visa&#x2F;Master）向消费者银行卡所对应的发卡行发送支付请求。</li>
+<li>收单行必须获得当地金融监管机构和银行卡组织发放的牌照方可交易。</li>
+<li>银行卡组织在本地数据库中维护了收单行列表。<a target="_blank" rel="noopener" href="https://www.mastercard.com/us/en/business/payments/mastercard-move/partner-program/partner-directory.html#tabs-a0e7b2d277-item-208702a589-tab">例如 master 合作的美国收单行。</a></li>
+</ul>
+</li>
+<li>卡组织 (Visa&#x2F;Master)<ul>
+<li>卡组织全称银行卡转接清算机构，负责制定和推行银行卡跨行交易的业务规范和技术标准，建设及运营银行卡支付网络，完成信息交换和资金清算。</li>
+<li>卡组织本身并不发卡。</li>
+</ul>
+</li>
+<li>发卡行 (issuer)<ul>
+<li>消费者所持银行卡的银行。</li>
+<li>接收来自收单行的支付请求，并授权完成交易。</li>
+</ul>
+</li>
+<li>商户 (merchant)<ul>
+<li>将来自持卡人的卡信息提供给收单行处理。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3DS"><a href="#3DS" class="headerlink" title="3DS"></a>3DS</h3><h4 id="什么是-3DS"><a href="#什么是-3DS" class="headerlink" title="什么是 3DS"></a>什么是 3DS</h4><p>Three Domain Secure（3DS） 是国际卡组织（Visa&#x2F;Mastercard&#x2F; 银联）推出的线上信用卡 &#x2F; 借记卡安全验证协议，目的是在传统 “卡号 + 有效期 + CVV” 之外，增加一层持卡人身份验证，大幅降低盗刷、拒付风险。</p>
+<p>它被称为 “3D”，是因为协议定义了三个参与方的安全域（Domain）：</p>
+<ul>
+<li>Issuer Domain（发卡行域）：负责验证持卡人身份</li>
+<li>Acquirer&#x2F; Merchant Domain（收单 &#x2F; 商户域）：发起交易与验证请求</li>
+<li>Interoperability Domain（互操作域）：卡组织提供的转接与规则体系</li>
+</ul>
+<h4 id="3DS-1-0-vs-3DS-2-0-的关键升级"><a href="#3DS-1-0-vs-3DS-2-0-的关键升级" class="headerlink" title="3DS 1.0 vs 3DS 2.0 的关键升级"></a>3DS 1.0 vs 3DS 2.0 的关键升级</h4><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>阶段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1999</td>
+<td>Visa 启动 3DS 协议开发</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>3DS 1.0 正式商用（Visa Verified by Visa &#x2F; Mastercard SecureCode）</td>
+</tr>
+<tr>
+<td>2016</td>
+<td>PSD2 草案发布，推动 3DS 2.0 研发</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>EMVCo 发布 3DS 2.0 正式规范</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>PSD2 SCA 生效，3DS 2.0 成为合规标配</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>3DS 1.0 全面停服，行业进入 3DS 2.0+ 时代</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>3DS 1.0</th>
+<th>3DS 2.0（当前主流）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>验证方式</td>
+<td>强制跳转银行页面，用户体验差</td>
+<td>支持免验模式，挑战模式可内嵌在商户页面</td>
+</tr>
+<tr>
+<td>风控能力</td>
+<td>仅基础信息校验</td>
+<td>支持设备指纹、行为分析等多维度风险评估</td>
+</tr>
+<tr>
+<td>覆盖场景</td>
+<td>仅浏览器网页</td>
+<td>支持 APP、小程序、数字钱包等全渠道</td>
+</tr>
+<tr>
+<td>合规性</td>
+<td>不满足 PSD2 等新规</td>
+<td>完全符合欧盟强客户认证（SCA）要求</td>
+</tr>
+</tbody></table>
+<h4 id="3DS-流程"><a href="#3DS-流程" class="headerlink" title="3DS 流程"></a>3DS 流程</h4><ul>
+<li>挑战模式（Challenge Flow）<ul>
+<li>发卡行判断风险较高时，会要求持卡人额外验证（短信、密码、生物识别），验证通过后才能完成交易。用户体验稍差，但安全性最高。</li>
+</ul>
+</li>
+</ul>
+<img src="/img/hufei/2026/05/3ds.png" width="100%" height="50%">
+
+<ul>
+<li>免验模式（Frictionless Flow）<ul>
+<li>发卡行通过风险模型判断交易低风险时，无需额外验证，直接完成授权。用户体验好，是 3DS 2.0 主推的模式，占比已超过 70%。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3DS-改造"><a href="#3DS-改造" class="headerlink" title="3DS 改造"></a>3DS 改造</h4><p>由于 3DS 的协议涉及传统的四方模式，在改造和实施上需要卡组织、银行、商户都加入其中，只有这样持卡人才能够享受到该验证服务的保护。</p>
+<blockquote>
+<p>不仅持卡人会从 3DS 中获益，商户也可以因应用 3DS 进行验证而享受到风险责任转移（liability shift）的福利。这是指通过 3DS 验证成功的交易，风险责任从商户转移至发卡行，即商户不用承担支付退款的责任。这对于商户来说是实打实的益处。</p>
+</blockquote>
+<p>可以通过卡组返回的 ECI 值来判断风险责任转移是否成功。<a target="_blank" rel="noopener" href="https://developer.computop.com/display/EN/ECI+Codes">例如 visa 的 05&#x2F;06，master 的 01&#x2F;02&#x2F;07。</a></p>
+<h4 id="3DS-对国内的影响"><a href="#3DS-对国内的影响" class="headerlink" title="3DS 对国内的影响"></a>3DS 对国内的影响</h4><p>3DS 对于国内市场而言，有点多余。这是因为国内的线上支付四方模式还没有来得及占据主流，就已经被二维码快捷支付给占领了。</p>
+<blockquote>
+<p>国内移动支付市场发展迅速，第三方支付过于强大，导致国内的移动支付直接跳过了信用卡时代，走向了基于二维码的快捷支付时代。支付机构作为收单方，它将安全风控的主动权掌握在自己手上，银行只提供快捷支付的签约和交易通道从而实现免密支付，支付时不再需要银行授权进行持卡人验证。因为不用再去发卡行验证身份信息了，3DS 便也失去了意义。</p>
+</blockquote>
+<h3 id="支付价值链"><a href="#支付价值链" class="headerlink" title="支付价值链"></a>支付价值链</h3><ul>
+<li>支付服务商（Payment Service Provider，PSP）<ul>
+<li>商户的支付对接合作伙伴。</li>
+</ul>
+</li>
+<li>支付网关（Payment Gateway）<ul>
+<li>支付网关是银行金融网络系统和 Internet 网络之间的接口。支付网关可由银行提供给其客户，也可由专门的金融服务提供商（例如 PSP）作为单独的服务提供。</li>
+<li>拥有支付网关是一家 PSP 能够进行交易处理的基础。</li>
+</ul>
+</li>
+<li>风控服务<ul>
+<li>除支付网关服务外，PSP 还提供风控服务，通过大数据以及完善的风控模型，将风险较高的交易拒绝掉，有效避免欺诈盗刷的交易支付成功，减少拒付。</li>
+<li>商家可以选择是否使用渠道风控，一般渠道风控都是需要收费的。</li>
+</ul>
+</li>
+<li>交易处理机构（Processor）<ul>
+<li>负责技术性功能，为银行卡组采集并处理消费者的支付卡信息。</li>
+</ul>
+</li>
+<li>收单行（Acquirer）<ul>
+<li>负责金融服务，提供金融机构和银行卡组发放的牌照来处理交易。</li>
+</ul>
+</li>
+</ul>
+<h4 id="PSP-和收单行的关系"><a href="#PSP-和收单行的关系" class="headerlink" title="PSP 和收单行的关系"></a>PSP 和收单行的关系</h4><p>表面上，商户通常与支付服务商（PSP）这个窗口合作，但实际操作的支付公司是：</p>
+<ul>
+<li>资金流层面：商户的资金流与收单行连接，钱从收单行打出。</li>
+<li>信息流层面：商户的支付信息由收单处理机构处理。</li>
+</ul>
+<p>传统支付平台 Vs adyen 渠道<br><img src="/img/hufei/2026/05/adyen.png" width="100%" height="50%"></p>
+<h4 id="支付费用"><a href="#支付费用" class="headerlink" title="支付费用"></a>支付费用</h4><p>一些收单行不会公开向哪一方支付了多少费用，而是对所有交易均收取固定费用，这称为 Blended 模式（混合定价模式），该模式可以轻松了解收取的费用金额，但对于费用支付给谁透明度欠佳。还有一些收单行会列出发票上的哪些费用是与其他方共享，这称为 Interchange++ 模式。</p>
+<p>在 Interchange++ 模式下，收单行的成本明细为：</p>
+<ul>
+<li>Interchange 费：发卡银行收取（占大头，70% ~ 90%）。</li>
+<li>Scheme 费：银行卡组织收取（5% ~ 15%）。</li>
+<li>Acquirer markup：收单行收取（5% ~ 15%）。</li>
+</ul>
+<p>当然，还会有一些增值服务的费用：例如 3DS 身份验证、风控管理、令牌化和网关服务等。</p>
+<h2 id="跨境支付方式"><a href="#跨境支付方式" class="headerlink" title="跨境支付方式"></a>跨境支付方式</h2><p>跨境支付里，传统卡支付（Visa&#x2F;Mastercard&#x2F;Amex） 之外的所有支付方式，统称 APM（Alternative Payment Method）。常见 APM 类型包括电子钱包、 先买后付（BNPL)、银行转账、 现金支付、货到付款（COD）。</p>
+<h3 id="卡支付"><a href="#卡支付" class="headerlink" title="卡支付"></a>卡支付</h3><p>Visa&#x2F;Mastercard 在全球拥有数十亿持卡人，几乎是跨境电商的 “通用支付方式”，接入后能覆盖绝大多数国家和地区的用户，是出海业务的标配。</p>
+<h4 id="六大卡组织"><a href="#六大卡组织" class="headerlink" title="六大卡组织"></a>六大卡组织</h4><img src="/img/hufei/2026/05/cardbrand.png" width="100%" height="50%">
+
+<h4 id="银行卡信息"><a href="#银行卡信息" class="headerlink" title="银行卡信息"></a>银行卡信息</h4><img src="/img/hufei/2026/05/unionpay.png" width="100%" height="50%">
+
+<h4 id="支付流程"><a href="#支付流程" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/cardpay-process.png" width="100%" height="50%">
+
+<h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>卡支付优势</th>
+<th>卡支付劣势</th>
+<th>更适合的替代方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>欧美跨境电商</td>
+<td>用户习惯、覆盖广、风控成熟</td>
+<td>费率高、拒付风险大</td>
+<td>PayPal、本地钱包（如 Klarna）</td>
+</tr>
+<tr>
+<td>新兴市场（拉美 &#x2F; 东南亚）</td>
+<td>通用度高，适配未成熟的本地支付</td>
+<td>当地卡种少、跨境费率高</td>
+<td>本地钱包（如 Mercado Pago、GrabPay）</td>
+</tr>
+<tr>
+<td>线下门店 &#x2F; 旅游消费</td>
+<td>无需网络、直接刷卡</td>
+<td>盗刷风险、汇率费用</td>
+<td>移动支付（Apple Pay&#x2F;Google Pay）</td>
+</tr>
+</tbody></table>
+<h3 id="电子钱包"><a href="#电子钱包" class="headerlink" title="电子钱包"></a>电子钱包</h3><p>电子钱包是一项手机应用程序，通过在其中存放电子货币（如电子现金、电子零钱、电子信用卡等）进行购物结算。而且可以通过网上银行，为电子钱包储值，如：支付宝、微信钱包等。</p>
+<h4 id="常见电子钱包"><a href="#常见电子钱包" class="headerlink" title="常见电子钱包"></a>常见电子钱包</h4><img src="/img/hufei/2026/05/e-wallet.png" width="100%" height="50%">
+
+
+<h4 id="支付流程-1"><a href="#支付流程-1" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/wallet-process.png" width="100%" height="50%">
+
+<h3 id="先买后付（BNPL）"><a href="#先买后付（BNPL）" class="headerlink" title="先买后付（BNPL）"></a>先买后付（BNPL）</h3><p>BNPL（Buy Now, Pay Later） 是一种短期消费信贷，在国外年轻人中比较流行。用户购物时先拿货、分期付，常见 4 期免息，商户即时收款、支付平台承担风控与坏账。</p>
+<h4 id="常见地区-BNPL"><a href="#常见地区-BNPL" class="headerlink" title="常见地区 BNPL"></a>常见地区 BNPL</h4><img src="/img/hufei/2026/05/bnpl.png" width="100%" height="50%">
+
+<h4 id="支付流程-2"><a href="#支付流程-2" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/bnpl-process.png" width="100%" height="50%">
+
+<h3 id="银行转账"><a href="#银行转账" class="headerlink" title="银行转账"></a>银行转账</h3><p>通常会有一个银行系统（例如：荷兰的 iDEAL 将该国家&#x2F;地区市场上的绝大多数银行账户联系在一起，商家只需要接入这一个系统，便可以接收来自多家银行账户的转账交易。</p>
+<h4 id="常见银行转账"><a href="#常见银行转账" class="headerlink" title="常见银行转账"></a>常见银行转账</h4><img src="/img/hufei/2026/05/bank.png" width="100%" height="50%">
+
+
+<h4 id="支付流程-3"><a href="#支付流程-3" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/bank-process.png" width="100%" height="50%">
+
+<h3 id="现金支付"><a href="#现金支付" class="headerlink" title="现金支付"></a>现金支付</h3><p>主要流行在拉美地区和东南亚，常见的现金支付方式有墨西哥的 OXXO、巴西的 Boleto、日本的 7-11 等。消费者在进行网上消费时，先打印出条形码，然后去到任意一家支持的商店完成现金支付。</p>
+<img src="/img/hufei/2026/05/oxxo.png" width="100%" height="50%">
+
+<h4 id="支付流程-4"><a href="#支付流程-4" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/cash-process.png" width="100%" height="50%">
+
+<p>付款条形码<br><img src="/img/hufei/2026/05/oxxo-qr.png" width="50%" height="50%"><br>付款凭证<br><img src="/img/hufei/2026/05/oxxo-ticket.png" width="50%" height="50%"></p>
+<h3 id="货到付款（COD）"><a href="#货到付款（COD）" class="headerlink" title="货到付款（COD）"></a>货到付款（COD）</h3><p>COD （Cash on Delivery） 指的是由快递公司代收买家货款，货先送到客户手上，客户验货之后客户再把钱给送货员，也就是我们常说的“一手交钱一手交货”，之后货款再转到卖家账户里去。多流行于东南亚和中东地区。</p>
+<h4 id="支付流程-5"><a href="#支付流程-5" class="headerlink" title="支付流程"></a>支付流程</h4><img src="/img/hufei/2026/05/cod-process.png" width="100%" height="50%">
+
+<h2 id="跨境支付渠道（PSP）"><a href="#跨境支付渠道（PSP）" class="headerlink" title="跨境支付渠道（PSP）"></a>跨境支付渠道（PSP）</h2><h3 id="支付渠道和支付方式关系"><a href="#支付渠道和支付方式关系" class="headerlink" title="支付渠道和支付方式关系"></a>支付渠道和支付方式关系</h3><ul>
+<li>支付渠道集成多种支付方式供商户选用</li>
+<li>消费者选支付方式，背后由对应支付渠道处理清算</li>
+<li>同一支付方式，可接入多家不同支付渠道</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>支付方式</th>
+<th>支付渠道</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>付款类型</td>
+<td>、消费端形式	交易服务商、技术资金通道</td>
+</tr>
+<tr>
+<td>举例</td>
+<td>Visa</td>
+<td>卡、OXXO、PayPal 钱包	Adyen、dLocal、Ebanx</td>
+</tr>
+<tr>
+<td>作用</td>
+<td>决定用户怎么付钱</td>
+<td>负责收钱、清算、风控、结汇</td>
+</tr>
+</tbody></table>
+<h3 id="常见支付渠道"><a href="#常见支付渠道" class="headerlink" title="常见支付渠道"></a>常见支付渠道</h3><table>
+<thead>
+<tr>
+<th>渠道名</th>
+<th>强势产品</th>
+<th>一句话介绍</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Adyen</td>
+<td>卡、本地支付方式</td>
+<td>荷兰公司，20 年卡收单支付经验</td>
+</tr>
+<tr>
+<td>Braintree</td>
+<td>卡、钱包</td>
+<td>美国公司，2013 年被 PayPal 收购</td>
+</tr>
+<tr>
+<td>Checkout</td>
+<td>卡</td>
+<td>英国公司，10 年 + 卡收单支付经验</td>
+</tr>
+<tr>
+<td>Stripe</td>
+<td>卡、本地支付方式</td>
+<td>美国公司，15 年 + 卡收单支付经验，硅谷精英们的最爱</td>
+</tr>
+<tr>
+<td>Airwallex</td>
+<td>卡</td>
+<td>华人在澳洲成立的新加坡公司，10 年卡收单支付经验</td>
+</tr>
+<tr>
+<td>Antom</td>
+<td>钱包</td>
+<td>中国公司，背靠支付宝，钱包 APM 经验丰富</td>
+</tr>
+<tr>
+<td>WorldPay</td>
+<td>卡</td>
+<td>美国公司，老牌卡收单，支付行业的报告专家</td>
+</tr>
+<tr>
+<td>Nuvei</td>
+<td>卡</td>
+<td>加拿大公司，20 年卡收单支付经验，最近几年才做亚太市场</td>
+</tr>
+<tr>
+<td>PPRO</td>
+<td>银行转账</td>
+<td>英国公司，欧洲地区本地支付供应强力</td>
+</tr>
+<tr>
+<td>Ebanx</td>
+<td>本地支付方式</td>
+<td>巴西公司，南美市场跨境支付主要玩家之一</td>
+</tr>
+<tr>
+<td>dLocal</td>
+<td>本地支付方式</td>
+<td>乌拉圭公司，全球新兴市场支付网关（拉美 + 亚非中东）</td>
+</tr>
+</tbody></table>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/BuAqKDPMyJJ0m_AzsfbdXA">解密支付价值链不同角色作用</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5MTI4OTQ3Ng==&mid=2649583393&idx=1&sn=c1089d4eefab5d353f0e4078130de64c&chksm=beae16ca89d99fdce1975efd5ddc7043b20d50a92be238badc01fa6198b3b0b3660aa7ab154d&scene=27">国际标准EMV 3DS V2.3的发布与解读</a><br><a target="_blank" rel="noopener" href="https://developer.computop.com/display/EN/ECI+Codes">ECI 代码</a><br><a target="_blank" rel="noopener" href="https://www.doubao.com/">豆包</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%B7%A8%E5%A2%83/" rel="tag"># 跨境</a>
+              <a href="/tags/%E6%94%AF%E4%BB%98/" rel="tag"># 支付</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/08/03/RestTemplate%20%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="prev" title="RestTemplate 踩坑日记">
+                  <i class="fa fa-angle-left"></i> RestTemplate 踩坑日记
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder"></span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
